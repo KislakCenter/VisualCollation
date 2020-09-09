@@ -178,6 +178,25 @@ describe "GET /projects/:id/export/:format", :type => :request do
       end
     end
     
+    context 'for SVG export' do
+      before do
+        @format = 'svg'
+        # stub_request(:get, "localhost:2000/projects/#{@project.id}/export/#{@format}").with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200)
+        stub_request(:any, "http://localhost:2000/xproc/viscoll2svg/")
+        get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        @body = JSON.parse(response.body)
+      end
+
+      it 'should return 200' do
+        expect(response).to have_http_status(:ok)
+      end
+      
+      it 'should have expected content' do
+        # expect the corrent content
+        binding.pry
+      end
+    end
+
     context 'with missing project' do
       before do
         get "/projects/#{@project.id}missing/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
