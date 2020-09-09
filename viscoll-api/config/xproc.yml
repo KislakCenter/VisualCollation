@@ -1,3 +1,5 @@
+test:
+  url: http://localhost:2000
 development:
   url: http://xproc:2000
 production:
