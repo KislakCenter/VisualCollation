@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--SVG file generated on: 20 August 2020 at 20:18:52 using SAXON version HE 9.9.1.5-->
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" preserveAspectRatio="xMidYMid meet" viewBox="0 -20 158 110"><title>Collation diagram of quire 1 for test123 composed of 8 leaves</title><defs><style type="text/css">/* style.css */
+
+
+@font-face{
+    font-family: 'Archivo Narrow', sans-serif;
+    src: url('https://fonts.googleapis.com/css?family=Archivo+Narrow&amp;display=swap');
+}
+
+.folioNumber {
+    font-family: 'Archivo Narrow', sans-serif;
+    font-size: 0.5em;
+    alignment-baseline:middle;
+}
+
+.leaf{
+    stroke:#000000;
+    stroke-width:1pt;
+    fill:none;
+    stroke-linecap:round;
+}
+
+.current{
+stroke:red;
+}
+
+.missingLeaf{
+    stroke:none;
+    stroke-width:1pt;
+    fill:none;
+    stroke-linecap:round;
+}
+
+.replacedLeaf{
+    stroke:#000000;
+    stroke-dasharray:0.25, 3, 4, 3;
+    stroke-width:1pt;
+    fill:none;
+    stroke-linecap:round;
+}
+
+.addedLeaf{
+    stroke:#000000;
+    stroke-dasharray:0.8, 2;
+    stroke-width:0.8pt;
+    fill:none;
+    stroke-linecap:square;
+}
+
+.addedLeaf2{
+    stroke:#000000;
+    stroke-dasharray:0.8, 2;
+    stroke-width:1.8pt;
+    fill:none;
+}
+
+.glued{
+    stroke:grey;
+    stroke-width:0.5;
+    stroke-linecap:round;
+}
+</style><filter id="f1" filterUnits="userSpaceOnUse"><feGaussianBlur in="SourceGraphic" stdDeviation="0"/></filter><filter id="f2" filterUnits="userSpaceOnUse"><feGaussianBlur in="SourceGraphic" stdDeviation="1"/></filter><filter id="f3" filterUnits="userSpaceOnUse"><feGaussianBlur in="SourceGraphic" stdDeviation="2"/></filter><pattern xmlns:xlink="http://www.w3.org/1999/xlink" id="gluedPattern" patternUnits="userSpaceOnUse" width="2" height="6" xlink:type="simple" xlink:show="other" xlink:actuate="onLoad" preserveAspectRatio="xMidYMid meet"><desc>Glue pattern</desc><path d="M 0,0 L 2,12 " class="glued"/></pattern></defs><desc>Collation diagram of quire 1 for test123 composed of 8 leaves</desc><svg x="0" y="0"><g><g id="test123-1-1"><desc>Folio #1</desc><g><g><desc>Folio #1: arc</desc><g class="leaf g1-1-8_leaf"><path d="M42,9 Q19,9 19,33"/></g></g><g><desc>Folio #1: line</desc><g class="leaf g1-1-8_leaf"><path d="M92,9 L42,9"/></g></g></g><text dy="9" dx="95" class="folioNumber">1</text></g><g id="test123-1-2"><desc>Folio #2</desc><g><g><desc>Folio #2: arc</desc><g class="leaf g1-2-7_leaf"><path d="M42,15 Q25,15 25,33"/></g></g><g><desc>Folio #2: line</desc><g class="leaf g1-2-7_leaf"><path d="M92,15 L42,15"/></g></g></g></g><g id="test123-1-3"><desc>Folio #3</desc><g><g><desc>Folio #3: arc</desc><g class="leaf g1-3-6_leaf"><path d="M42,21 Q31,21 31,33"/></g></g><g><desc>Folio #3: line</desc><g class="leaf g1-3-6_leaf"><path d="M92,21 L42,21"/></g></g></g></g><g id="test123-1-4"><desc>Folio #4</desc><g><g><desc>Folio #4: arc</desc><g class="leaf g1-4-5_leaf"><path d="M42,27 Q37,27 37,33"/></g></g><g><desc>Folio #4: line</desc><g class="leaf g1-4-5_leaf"><path d="M92,27 L42,27"/></g></g></g></g><g id="test123-1-5"><desc>Folio #5</desc><g><g><desc>Folio #5: arc</desc><g class="leaf g1-4-5_leaf"><path d="M42,39 Q37,39 37,33"/></g></g><g><desc>Folio #5: line</desc><g class="leaf g1-4-5_leaf"><path d="M92,39 L42,39"/></g></g></g></g><g id="test123-1-6"><desc>Folio #6</desc><g><g><desc>Folio #6: arc</desc><g class="leaf g1-3-6_leaf"><path d="M42,45 Q31,45 31,33"/></g></g><g><desc>Folio #6: line</desc><g class="leaf g1-3-6_leaf"><path d="M92,45 L42,45"/></g></g></g></g><g id="test123-1-7"><desc>Folio #7</desc><g><g><desc>Folio #7: arc</desc><g class="leaf g1-2-7_leaf"><path d="M42,51 Q25,51 25,33"/></g></g><g><desc>Folio #7: line</desc><g class="leaf g1-2-7_leaf"><path d="M92,51 L42,51"/></g></g></g></g><g id="test123-1-8"><desc>Folio #8</desc><g><g><desc>Folio #8: arc</desc><g class="leaf g1-1-8_leaf"><path d="M42,57 Q19,57 19,33"/></g></g><g><desc>Folio #8: line</desc><g class="leaf g1-1-8_leaf"><path d="M92,57 L42,57"/></g></g></g><text dy="57" dx="95" class="folioNumber">8</text></g></g></svg></svg>
