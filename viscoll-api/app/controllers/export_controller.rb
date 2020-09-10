@@ -54,7 +54,6 @@ class ExportController < ApplicationController
         xml = Nokogiri::XML(exportData)
         schema = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel81120.rng"))
         errors = schema.validate(xml)
-        puts "Errors: #{errors.inspect}"
 
         if errors.empty?
           # TODO: Create Xproc class for handing XPROC calls and data
@@ -71,7 +70,6 @@ class ExportController < ApplicationController
             http.request(xproc_req)
           end
           response_hash = JSON.parse(xproc_response.body)
-          puts response_hash
 
           # TODO: Xproc#retreive_data; returns IO object
           job_url = response_hash["_links"]["job"]["href"]
