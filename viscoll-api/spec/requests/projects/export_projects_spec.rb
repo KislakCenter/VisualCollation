@@ -23,7 +23,7 @@ describe "GET /projects/:id/export/:format", :type => :request do
     @testgroup = FactoryGirl.create(:group, project: @project, nestLevel: 1, title: 'Group 1')
     @upleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
     @testmidgroup = FactoryGirl.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2, title: 'Group 2')
-    @midleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }  
+    @midleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
     @botleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
     @botleafs[1].update(type: 'Endleaf')
     @project.add_groupIDs([@testgroup.id.to_s, @testmidgroup.id.to_s], 0)
@@ -37,11 +37,11 @@ describe "GET /projects/:id/export/:format", :type => :request do
       url: "https://dummy.library.utoronto.ca/images/#{@testimage.id}_pixel.png"
     })
   end
-  
+
   before :each do
     @format = 'json'
   end
-  
+
   before :all do
     imagePath = "#{Rails.root}/public/uploads"
     File.new(imagePath+'/pixel', 'w')
@@ -62,11 +62,11 @@ describe "GET /projects/:id/export/:format", :type => :request do
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'should return 200' do
         expect(response).to have_http_status(:ok)
       end
-      
+
       it 'should have expected content' do
         export_result = @body['Export']
         image_result = @body['Images']
@@ -113,18 +113,18 @@ describe "GET /projects/:id/export/:format", :type => :request do
         expect(image_result['exportedImages']).to eq("https://vceditor.library.upenn.edu/images/zip/#{@project.id}")
       end
     end
-    
+
     context 'for XML export' do
       before do
         @format = 'xml'
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'should return 200' do
         expect(response).to have_http_status(:ok)
       end
-      
+
       it 'should have expected content' do
         expect(@body['type']).to eq 'xml'
         expect(@body['Images']['exportedImages']).to eq("https://vceditor.library.upenn.edu/images/zip/#{@project.id}")
@@ -177,13 +177,17 @@ describe "GET /projects/:id/export/:format", :type => :request do
         # )
       end
     end
-    
+
     context 'for SVG export' do
       before do
         @format = 'svg'
-        # stub_request(:get, "localhost:2000/projects/#{@project.id}/export/#{@format}").with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200)
-        stub_request(:any, /project\/*\/export\/svg/).to_return(status: 200)
-        #stub_request(:any, "/xproc/viscoll2svg/").to_return(status: 200)
+         # response_hash["_links"]["job"]["href"]
+        job_id = 'http://localhost:2000/xproc/xpl/JOB_ID/'
+        response_body =  %Q( {"_links": { "job": { "href": #{job_id} } } )
+        stub_request(:post, 'localhost:2000/xproc/viscoll2svg/').to_return(status: 200, body: response_body)
+         # TODO: replace zip body with the contents of ../spec/fixtures/viscoll2svg as zip IO object
+        zip_body = 'x'
+        stub_request(:get, 'localhost:2000/xproc/xpl/JOB_ID/').with(headers: { 'Accept' => 'application/zip' }).to_return(status: 200, body: zip_body)
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
@@ -191,7 +195,7 @@ describe "GET /projects/:id/export/:format", :type => :request do
       it 'should return 200' do
         expect(response).to have_http_status(:ok)
       end
-      
+
       it 'should have expected content' do
         # expect the corrent content
         binding.pry
@@ -203,44 +207,44 @@ describe "GET /projects/:id/export/:format", :type => :request do
         get "/projects/#{@project.id}missing/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'should return 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'should show error' do
         expect(@body['error']).to eq "project not found with id #{@project.id}missing"
       end
     end
-    
+
     context 'with unauthorized project' do
       before do
         @project.update(user: FactoryGirl.create(:user))
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
-      
+
       it 'should return 401' do
         expect(response).to have_http_status(:unauthorized)
       end
     end
-    
+
     context 'with invalid format' do
       before do
         @format = 'waahoo'
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'should return 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
-      
+
       it 'should show error' do
         expect(@body['error']).to eq "Export format must be one of [json, xml, svg]"
       end
     end
   end
-    
+
   context 'with corrupted authorization' do
     before do
       get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
