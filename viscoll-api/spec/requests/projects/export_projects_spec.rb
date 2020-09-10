@@ -183,10 +183,16 @@ describe "GET /projects/:id/export/:format", :type => :request do
         @format = 'svg'
          # response_hash["_links"]["job"]["href"]
         job_id = 'http://localhost:2000/xproc/xpl/JOB_ID/'
-        response_body =  %Q( {"_links": { "job": { "href": #{job_id} } } )
+        response_body =  %Q(
+          { "id": "JOB_ID",
+            "_links":
+            { "job":
+              { "href": "#{job_id}" }
+            }
+           }
+        )
         stub_request(:post, 'localhost:2000/xproc/viscoll2svg/').to_return(status: 200, body: response_body)
-         # TODO: replace zip body with the contents of ../spec/fixtures/viscoll2svg as zip IO object
-        zip_body = 'x'
+        zip_body = open(File.expand_path('../../../fixtures/viscoll2svg/JOB_ID.zip',__FILE__)).read
         stub_request(:get, 'localhost:2000/xproc/xpl/JOB_ID/').with(headers: { 'Accept' => 'application/zip' }).to_return(status: 200, body: zip_body)
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
@@ -197,8 +203,9 @@ describe "GET /projects/:id/export/:format", :type => :request do
       end
 
       it 'should have expected content' do
-        # expect the corrent content
-        binding.pry
+        # TODO: confirm exportedImages is the URL for downloading the zip file is has expected path
+        # TODO: Confirm that hitting exportedImages URL sends zip body to user (for another spec?)
+        expect(@body['type']).to eq 'svg'
       end
     end
 
