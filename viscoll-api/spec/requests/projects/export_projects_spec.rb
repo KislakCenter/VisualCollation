@@ -182,7 +182,8 @@ describe "GET /projects/:id/export/:format", :type => :request do
       before do
         @format = 'svg'
         # stub_request(:get, "localhost:2000/projects/#{@project.id}/export/#{@format}").with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200)
-        stub_request(:any, "http://localhost:2000/xproc/viscoll2svg/")
+        stub_request(:any, /project\/*\/export\/svg/).to_return(status: 200)
+        #stub_request(:any, "/xproc/viscoll2svg/").to_return(status: 200)
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
