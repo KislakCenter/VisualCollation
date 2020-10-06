@@ -171,12 +171,12 @@
                     </p>
                     <p>
                         <xsl:text>Formula 1: </xsl:text>
-                        <xsl:copy-of select="unparsed-text(concat($job-base, $idno, '-formula_01.xml'))"
+                        <xsl:copy-of select="doc(concat($job-base, $idno, '-formula_01.xml'))//vc:formula/text()"
                         />
                     </p>
                     <p>
                         <xsl:text>Formula 2: </xsl:text>
-                        <xsl:copy-of select="unparsed-text(concat($job-base, $idno, '-formula_02.xml'))"
+                        <xsl:copy-of select="doc(concat($job-base, $idno, '-formula_02.xml'))//vc:formula/text()"
                         />
                     </p>
                 </body>
