@@ -13,7 +13,7 @@
       <p:document href="rng/viscoll-2.0.rng"/>
     </p:input>
   </p:validate-with-relax-ng>
-  <p:xslt name="xslt">
+  <p:xslt name="formulas">
     <p:with-option name="output-base-uri" select="$job-dir"/>
     <p:input port="stylesheet">
       <p:document href="xsl/viscoll2formulas.xsl"/>
@@ -25,7 +25,7 @@
   <p:sink/>
   <p:for-each>
       <p:iteration-source>
-         <p:pipe step="xslt" port="secondary"/>
+         <p:pipe step="formulas" port="secondary"/>
       </p:iteration-source>
       <p:store>
          <p:with-option name="href" select="p:base-uri()"/>

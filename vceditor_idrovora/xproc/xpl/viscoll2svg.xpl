@@ -5,7 +5,6 @@
                 type="vc:viscoll2svg"
                 version="1.0">
   <p:option name="job-dir" required="true"/>
-  <p:variable name="css-base" select="'../css/'"/>
   <p:load name="read-from-input">
     <p:with-option name="href" select="concat($job-dir,'input.xml')"/>
   </p:load>
@@ -14,10 +13,10 @@
       <p:document href="rng/viscoll-2.0.rng"/>
     </p:input>
   </p:validate-with-relax-ng>
-  <p:xslt name="xslt">
+  <p:xslt name="svg">
     <p:with-option name="output-base-uri" select="$job-dir"/>
     <p:with-param name="job-base" select="$job-dir"/>
-    <p:with-param name="css-base" select="$css-base"/>
+    <p:with-param name="css-base" select="'../css/'"/>
     <p:input port="stylesheet">
       <p:document href="xsl/viscoll2svg.xsl"/>
     </p:input>
@@ -25,7 +24,7 @@
   <p:sink/>
   <p:for-each>
       <p:iteration-source>
-         <p:pipe step="xslt" port="secondary"/>
+         <p:pipe step="svg" port="secondary"/>
       </p:iteration-source>
       <p:store encoding="utf-8" indent="false" omit-xml-declaration="false">
          <p:with-option name="href" select="p:base-uri()"/>

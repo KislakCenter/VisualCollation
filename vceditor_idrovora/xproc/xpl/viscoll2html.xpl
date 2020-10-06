@@ -4,7 +4,6 @@
                 xmlns:vc="http://schoenberginstitute.org/schema/collation"
                 version="1.0">
   <p:option name="job-dir" required="true"/>
-  <p:variable name="css-base" select="'../css/'"/>
 
   <p:import href="viscoll2svg.xpl"/>
   <p:import href="viscoll2formulas.xpl"/>
