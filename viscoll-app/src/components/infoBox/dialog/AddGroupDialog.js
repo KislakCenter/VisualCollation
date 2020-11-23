@@ -30,6 +30,7 @@ export default class AddGroupDialog extends React.Component {
         oddLeaf: "",
         copies: "",
       },
+      memberOrder: 1,
     }
   };
 
@@ -215,7 +216,7 @@ export default class AddGroupDialog extends React.Component {
         } else if (this.state.location==="inside") {
           // Add group inside
           groupOrder += 1;
-          memberOrder = 1;
+          memberOrder = this.state.memberOrder;
           data.additional["parentGroupID"] = group.id;
         }
         data.group = {
