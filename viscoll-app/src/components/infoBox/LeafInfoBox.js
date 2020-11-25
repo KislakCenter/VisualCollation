@@ -19,6 +19,12 @@ import TextField from 'material-ui/TextField/TextField';
 import IconSubmit from 'material-ui/svg-icons/action/done';
 import IconClear from 'material-ui/svg-icons/content/clear';
 
+//imports for add popover menu
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
+import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
+import AddGroupDialog from '../infoBox/dialog/AddGroupDialog';
+
 /** Leaf infobox */
 export default class LeafInfoBox extends React.Component {
   constructor(props) {
@@ -27,6 +33,9 @@ export default class LeafInfoBox extends React.Component {
     this.state = {
       imageModalOpen: false,
       folioModalOpen: false,
+      addButtonPopoverOpen: false,
+      addGroupDialogOpen: false,
+      addLeafDialogOpon: false,
       isBatch: this.props.selectedLeaves.length > 1,
       ...this.emptyAttributeState(),
       ...this.batchAttributeToggleState(),
