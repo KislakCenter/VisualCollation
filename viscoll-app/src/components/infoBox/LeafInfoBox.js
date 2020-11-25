@@ -697,7 +697,7 @@ export default class LeafInfoBox extends React.Component {
       addBtn = (
         <RaisedButton
           primary
-          label={this.props.selectedGroups ? 'Add' : 'Add New Group'}
+          label={'Add'}
           onClick={this.handleAddButtonTouchTap}
           tabIndex={this.props.tabIndex}
           {...btnBase()}
@@ -876,6 +876,7 @@ export default class LeafInfoBox extends React.Component {
           </div>
         )}
         {submitBtn}
+        {addButtonPopover}
 
         {this.props.isReadOnly ? (
           ''
