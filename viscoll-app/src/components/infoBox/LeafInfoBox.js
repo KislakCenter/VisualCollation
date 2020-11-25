@@ -665,18 +665,50 @@ export default class LeafInfoBox extends React.Component {
       );
     }
     let addBtn = '';
+    let addButtonPopover = '';
     if (!this.state.isBatch) {
+      addButtonPopover = (
+        <Popover
+          open={this.state.addButtonPopoverOpen}
+          anchorEl={this.state.popoverAnchorEl}
+          anchorOrigin={{ horizontal: 'middle', vertical: 'bottom' }}
+          targetOrigin={{ horizontal: 'middle', vertical: 'top' }}
+          onRequestClose={this.handleAddButtonRequestClose}
+          animation={PopoverAnimationVertical}
+        >
+          <Menu>
+            <MenuItem
+              primaryText="Add New Group"
+              onClick={() => {
+                this.props.togglePopUp(true);
+                this.toggleAddGroupDialog(true);
+              }}
+            />
+            <MenuItem
+              primaryText="Add Leaf(s) Inside"
+              onClick={() => {
+                this.props.togglePopUp(true);
+                this.toggleAddLeafDialog(true);
+              }}
+            />
+          </Menu>
+        </Popover>
+      );
       addBtn = (
-        <AddLeafDialog
-          action={{ addLeafs: this.props.action.addLeafs }}
-          Leafs={this.props.Leafs}
-          leafIDs={this.props.leafIDs}
-          Groups={this.props.Groups}
-          groupIDs={this.props.groupIDs}
-          selectedLeaves={this.props.selectedLeaves}
-          projectID={this.props.projectID}
-          togglePopUp={this.props.togglePopUp}
+        <RaisedButton
+          primary
+          label={this.props.selectedGroups ? 'Add' : 'Add New Group'}
+          onClick={this.handleAddButtonTouchTap}
           tabIndex={this.props.tabIndex}
+          {...btnBase()}
+          style={
+               {
+                  ...btnBase().style,
+                  width: '48%',
+                  float: 'left',
+                  marginRight: '2%',
+                }
+          }
         />
       );
     }
