@@ -441,7 +441,7 @@ export default class AddGroupDialog extends React.Component {
                               </div>
                             </div> : "";
 
-    let groupPosition = this.state.location !==""?<div>
+    let groupPosition = this.state.location === "inside"?<div>
                           <div className="label">
                             <h4>Group position</h4>
                           </div>
