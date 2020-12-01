@@ -10,7 +10,8 @@ import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import RemoveCircle from 'material-ui/svg-icons/content/remove-circle-outline';
 import light from '../../../styles/light';
 import { getMemberOrder } from '../../../helpers/getMemberOrder';
-import { SelectField } from 'material-ui';
+import { MenuItem } from 'material-ui';
+import SelectField from '../../global/SelectField';
 
 
 /** Dialog to add groups in a collation.  This component is used in the visual and tabular edit modes.  It is mounted by `InfoBox` and `GroupInfoBox` components. */
@@ -440,20 +441,18 @@ export default class AddGroupDialog extends React.Component {
                                 />
                               </div>
                             </div> : "";
-
     let groupPosition = this.state.location === "inside"?<div>
                           <div className="label">
                             <h4>Group position</h4>
                           </div>
-                          <div className="input">
-                          <TextField
-                                aria-label="Number of groups"
-                                name="numberOfGroups"
-                                value={this.state.memberOrder}
-                                onChange={(e,v)=>this.onNumberChange("memberOrder", v)}
-                                style={{width:"100px"}}
-                                inputStyle={{textAlign:"center"}}
-                              /> 
+                          <div className="input"
+                            >
+                            <SelectField
+                              id='leafSelect'
+                              label='select where the quire should be positioned'
+                              data={this.props.groupIDs}
+                              width={250}
+                            />
                           </div>
                         </div> : "";
 
