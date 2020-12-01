@@ -25,7 +25,7 @@ export default class AddGroupDialog extends React.Component {
       conjoin: false,
       oddLeaf: 2,
       copies: 1,
-      location: "inside",
+      location: "",
       errorText: {
         numberOfGroups: "",
         numberOfLeaves: "",
@@ -441,7 +441,7 @@ export default class AddGroupDialog extends React.Component {
                                 />
                               </div>
                             </div> : "";
-    let groupPosition = this.state.location === "inside"?<div>
+    let groupPosition = this.state.location !== '' && this.state.location === "inside" ? <div>
                           <div className="label">
                             <h4>Group position</h4>
                           </div>
@@ -450,7 +450,7 @@ export default class AddGroupDialog extends React.Component {
                             <SelectField
                               id='leafSelect'
                               label='select where the quire should be positioned'
-                              data={this.props.groupIDs}
+                              data={this.props.Groups[this.props.selectedGroups]['memberIDs']}
                               width={250}
                             />
                           </div>
