@@ -26,7 +26,7 @@ export default class AddGroupDialog extends React.Component {
       oddLeaf: 2,
       copies: 1,
       location: "",
-      groupInsertPosition: 1,
+      selectedLeaf: "",
       errorText: {
         numberOfGroups: "",
         numberOfLeaves: "",
@@ -39,6 +39,7 @@ export default class AddGroupDialog extends React.Component {
 
   componentWillReceiveProps() {
     this.resetForm();
+    this.state.selectedLeaf = this.props.Groups[this.props.selectedGroups]['memberIDs'][0] 
   }
 
   /**
@@ -462,12 +463,14 @@ export default class AddGroupDialog extends React.Component {
                             <SelectField
                               id='leafSelect'
                               label='select where the quire should be positioned'
+                              onChange={v => this.dropDownChange(v, 'selectedLeaf')}
                               value={this.props.Groups[this.props.selectedGroups]['memberIDs'][0]}
                               data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID, index) => {
                                 return { value: itemID, text: 'Leaf ' + (index + 1) };
                               })}
                               width={250}
                             />
+                            {console.log(this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedLeaf))}
                           </div>
                         </div> : "";
 
