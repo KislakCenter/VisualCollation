@@ -272,6 +272,7 @@ export default class AddGroupDialog extends React.Component {
       oddLeaf: 2,
       copies: 1,
       location: this.props.selectedGroups.length>0?"":"inside",
+      selectedLeaf: "",
       errorText: {
         numberOfGroups: "",
         numberOfLeaves: "",
