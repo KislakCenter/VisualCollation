@@ -467,8 +467,22 @@ export default class AddGroupDialog extends React.Component {
                           <div className="label">
                             <h4>Group position</h4>
                           </div>
-                          <div className="input"
-                            >
+                          <div className="input">
+                            <RadioButtonGroup name="group_position" defaultSelected={this.state.placementLocation} onChange={(e,v)=>this.onPlacementLocationChange(v)}>
+                              <RadioButton
+                                aria-label="Add new group above selected leaf"
+                                value="above"
+                                label="above"
+                                style={styles.radioButton}
+                                autoFocus
+                              />
+                              <RadioButton
+                                aria-label="Add new group below selected leaf"
+                                value="below"
+                                label="below"
+                                style={styles.radioButton}
+                              />
+                            </RadioButtonGroup>
                             <SelectField
                               id='leafSelect'
                               label='select where the quire should be positioned'
@@ -479,21 +493,6 @@ export default class AddGroupDialog extends React.Component {
                               })}
                               width={250}
                             />
-                            <RadioButtonGroup name="group_position" defaultSelected={this.state.placementLocation} onChange={(e,v)=>this.onPlacementLocationChange(v)}>
-                              <RadioButton
-                                aria-label="Add new group above selected leaf"
-                                value="above"
-                                label="above selected leaf"
-                                style={styles.radioButton}
-                                autoFocus
-                              />
-                              <RadioButton
-                                aria-label="Add new group below selected item"
-                                value="below"
-                                label="below selected leaf"
-                                style={styles.radioButton}
-                              />
-                            </RadioButtonGroup>
                           </div>
                         </div> : "";
 
