@@ -26,6 +26,7 @@ export default class AddGroupDialog extends React.Component {
       oddLeaf: 2,
       copies: 1,
       location: "",
+      placementLocation: "",
       selectedLeaf: "",
       errorText: {
         numberOfGroups: "",
@@ -128,6 +129,9 @@ export default class AddGroupDialog extends React.Component {
    */
   onLocationChange = (value) => {
     this.setState({location: value});;
+  }
+  onPlacementLocationChange = (value) => {
+    this.setState({placementLocation: value});;
   }
   /**
    * Returns next sibling of a group
@@ -471,7 +475,21 @@ export default class AddGroupDialog extends React.Component {
                               })}
                               width={250}
                             />
-                            {console.log(this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedLeaf) + 1)}
+                            <RadioButtonGroup name="group_position" defaultSelected={this.state.placementLocation} onChange={(e,v)=>this.onPlacementLocationChange(v)}>
+                              <RadioButton
+                                aria-label="Add new group above selected leaf"
+                                value="above"
+                                label="above selected leaf"
+                                style={styles.radioButton}
+                                autoFocus
+                              />
+                              <RadioButton
+                                aria-label="Add new group below selected item"
+                                value="below"
+                                label="below selected leaf"
+                                style={styles.radioButton}
+                              />
+                            </RadioButtonGroup>
                           </div>
                         </div> : "";
 
