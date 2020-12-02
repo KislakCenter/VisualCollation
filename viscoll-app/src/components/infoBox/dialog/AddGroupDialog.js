@@ -111,6 +111,17 @@ export default class AddGroupDialog extends React.Component {
   }
 
   /**
+   * Change dropdown value
+   */ 
+  dropDownChange = (value, stateValue) => {
+    if (Object.keys(this.props.selectedGroups).length === 1) {
+      let updatedStateValue = {};
+      updatedStateValue[stateValue] = value;
+      this.setState(updatedStateValue);
+    }
+  }
+
+  /**
    * Update location radio button group
    */
   onLocationChange = (value) => {
