@@ -231,7 +231,7 @@ export default class AddGroupDialog extends React.Component {
         } else if (this.state.location==="inside") {
           // Add group inside
           groupOrder += 1;
-          memberOrder = this.state.memberOrder;
+          memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedLeaf) + 1
           data.additional["parentGroupID"] = group.id;
         }
         data.group = {
