@@ -450,7 +450,10 @@ export default class AddGroupDialog extends React.Component {
                             <SelectField
                               id='leafSelect'
                               label='select where the quire should be positioned'
-                              data={this.props.Groups[this.props.selectedGroups]['memberIDs']}
+                              value={this.props.Groups[this.props.selectedGroups]['memberIDs'][0]}
+                              data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID, index) => {
+                                return { value: itemID, text: 'Leaf ' + (index + 1) };
+                              })}
                               width={250}
                             />
                           </div>
