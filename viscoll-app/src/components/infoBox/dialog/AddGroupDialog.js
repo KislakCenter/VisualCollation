@@ -39,7 +39,7 @@ export default class AddGroupDialog extends React.Component {
 
   componentWillReceiveProps() {
     this.resetForm();
-    this.state.selectedLeaf = this.props.Groups[this.props.selectedGroups]['memberIDs'][0] 
+    this.setState({selectedLeaf: this.props.Groups[this.props.selectedGroups]['memberIDs'][0]})
   }
 
   /**
@@ -470,7 +470,7 @@ export default class AddGroupDialog extends React.Component {
                               })}
                               width={250}
                             />
-                            {console.log(this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedLeaf))}
+                            {console.log(this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedLeaf) + 1)}
                           </div>
                         </div> : "";
 
