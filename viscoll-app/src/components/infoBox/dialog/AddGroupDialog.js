@@ -503,7 +503,9 @@ export default class AddGroupDialog extends React.Component {
                                 if(itemID[0]==='L') {
                                   return { value: itemID, text: `Leaf ${this.state.allChildren.indexOf(itemID) + 1}`}
                                 } else if (itemID[0]==='G') {
-                                  return { value: itemID, text: `Group ${this.state.allChildren.indexOf(itemID) + 1}`}
+                                  let groupType = this.props.Groups[itemID].type
+                                  let quireNumber = this.props.groupIDs.indexOf(itemID) + 1
+                                  return { value: itemID, text: `${groupType} ${quireNumber}`}
                                 }
                                 
                               })}
