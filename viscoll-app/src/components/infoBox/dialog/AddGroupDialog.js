@@ -499,10 +499,14 @@ export default class AddGroupDialog extends React.Component {
                               label='select where the quire should be positioned'
                               onChange={v => this.dropDownChange(v, 'selectedChild')}
                               value={this.props.Groups[this.props.selectedGroups]['memberIDs'][0]}
-                              // data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID, index) => {
-                              //   return { value: itemID, text: 'Leaf ' + (index + 1) };
-                              // })}
-                              data={this.state.allChildren}
+                              data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID) => {
+                                if(itemID[0]==='L') {
+                                  return { value: itemID, text: `Leaf ${this.state.allChildren.indexOf(itemID) + 1}`}
+                                } else if (itemID[0]==='G') {
+                                  return { value: itemID, text: `Group ${this.state.allChildren.indexOf(itemID) + 1}`}
+                                }
+                                
+                              })}
                               width={250}
                             />
                           </div>
