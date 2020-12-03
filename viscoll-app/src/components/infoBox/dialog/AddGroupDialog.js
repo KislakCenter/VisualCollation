@@ -35,12 +35,23 @@ export default class AddGroupDialog extends React.Component {
         copies: "",
       },
       memberOrder: 1,
+      allChildren: [],
     }
   };
 
   componentWillReceiveProps() {
     this.resetForm();
     this.setState({selectedLeaf: this.props.Groups[this.props.selectedGroups]['memberIDs'][0]})
+    this.setState({allChildren: this.allChildren()})
+  }
+
+  allChildren = () => {
+    let groupIDs = this.props.groupIDs;
+    let allGroupChildren = [];
+    for (let ID of groupIDs) {
+      allGroupChildren.push(this.props.Groups[ID]['memberIDs'])
+    }
+    return allGroupChildren.flat();
   }
 
   /**
