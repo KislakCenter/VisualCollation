@@ -35,23 +35,12 @@ export default class AddGroupDialog extends React.Component {
         copies: "",
       },
       memberOrder: 1,
-      allChildren: [],
     }
   };
 
   componentWillReceiveProps() {
     this.resetForm();
     this.setState({selectedChild: this.props.Groups[this.props.selectedGroups]['memberIDs'][0]})
-    this.setState({allChildren: this.allChildren()})
-  }
-
-  allChildren = () => {
-    let groupIDs = this.props.groupIDs;
-    let allGroupChildren = [];
-    for (let ID of groupIDs) {
-      allGroupChildren.push(this.props.Groups[ID]['memberIDs'])
-    }
-    return allGroupChildren.flat();
   }
 
   /**
@@ -300,7 +289,6 @@ export default class AddGroupDialog extends React.Component {
         copies: "",
       },
       memberOrder: 1,
-      allChildren: [],
     });
   }
 
@@ -504,7 +492,7 @@ export default class AddGroupDialog extends React.Component {
                               value={this.props.Groups[this.props.selectedGroups]['memberIDs'][0]}
                               data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID) => {
                                 if(itemID[0]==='L') {
-                                  return { value: itemID, text: `Leaf ${this.state.allChildren.indexOf(itemID) + 1}`}
+                                  return { value: itemID, text: `Leaf ${this.props.leafIDs.indexOf(itemID) + 1}`}
                                 } else if (itemID[0]==='G') {
                                   let groupType = this.props.Groups[itemID].type
                                   let quireNumber = this.props.groupIDs.indexOf(itemID) + 1
