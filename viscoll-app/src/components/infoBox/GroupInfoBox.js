@@ -874,7 +874,6 @@ export default class GroupInfoBox extends React.Component {
         </div>
         <AddGroupDialog
           projectID={this.props.projectID}
-          Leafs={this.props.Leafs}
           Groups={this.props.Groups}
           groupIDs={this.props.groupIDs}
           selectedGroups={this.props.selectedGroups}
