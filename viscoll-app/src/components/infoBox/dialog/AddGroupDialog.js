@@ -291,6 +291,7 @@ export default class AddGroupDialog extends React.Component {
       oddLeaf: 2,
       copies: 1,
       location: this.props.selectedGroups.length>0?"":"inside",
+      placementLocation: "",
       selectedChild: "",
       errorText: {
         numberOfGroups: "",
@@ -298,6 +299,8 @@ export default class AddGroupDialog extends React.Component {
         oddLeaf: "",
         copies: "",
       },
+      memberOrder: 1,
+      allChildren: [],
     });
   }
 
