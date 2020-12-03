@@ -27,7 +27,7 @@ export default class AddGroupDialog extends React.Component {
       copies: 1,
       location: "",
       placementLocation: "",
-      selectedLeaf: "",
+      selectedChild: "",
       errorText: {
         numberOfGroups: "",
         numberOfLeaves: "",
@@ -41,7 +41,7 @@ export default class AddGroupDialog extends React.Component {
 
   componentWillReceiveProps() {
     this.resetForm();
-    this.setState({selectedLeaf: this.props.Groups[this.props.selectedGroups]['memberIDs'][0]})
+    this.setState({selectedChild: this.props.Groups[this.props.selectedGroups]['memberIDs'][0]})
     this.setState({allChildren: this.allChildren()})
   }
 
@@ -247,9 +247,9 @@ export default class AddGroupDialog extends React.Component {
           // Add group inside
           groupOrder += 1;
           if (this.state.placementLocation==="above") {
-            memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedLeaf) + 1
+            memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 1
           } else if (this.state.placementLocation==="below") {
-            memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedLeaf) + 2
+            memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 2
           }
           data.additional["parentGroupID"] = group.id;
         }
@@ -291,7 +291,7 @@ export default class AddGroupDialog extends React.Component {
       oddLeaf: 2,
       copies: 1,
       location: this.props.selectedGroups.length>0?"":"inside",
-      selectedLeaf: "",
+      selectedChild: "",
       errorText: {
         numberOfGroups: "",
         numberOfLeaves: "",
@@ -497,11 +497,12 @@ export default class AddGroupDialog extends React.Component {
                             <SelectField
                               id='leafSelect'
                               label='select where the quire should be positioned'
-                              onChange={v => this.dropDownChange(v, 'selectedLeaf')}
+                              onChange={v => this.dropDownChange(v, 'selectedChild')}
                               value={this.props.Groups[this.props.selectedGroups]['memberIDs'][0]}
-                              data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID, index) => {
-                                return { value: itemID, text: 'Leaf ' + (index + 1) };
-                              })}
+                              // data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID, index) => {
+                              //   return { value: itemID, text: 'Leaf ' + (index + 1) };
+                              // })}
+                              data={this.state.allChildren}
                               width={250}
                             />
                           </div>
