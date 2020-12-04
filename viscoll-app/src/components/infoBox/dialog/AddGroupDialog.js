@@ -467,9 +467,11 @@ export default class AddGroupDialog extends React.Component {
                             </div> : "";
     let groupPosition = this.state.location !== '' && this.state.location === "inside" ? <div>
                           <div className="label">
-                            <h4>Group position</h4>
+                            <h4
+                              style={{marginBottom: "1em"}}
+                            >Group position</h4>
                           </div>
-                          <div className="input">
+                          <div>
                             <RadioButtonGroup name="group_position" defaultSelected={this.state.placementLocation} onChange={(e,v)=>this.onPlacementLocationChange(v)}>
                               <RadioButton
                                 aria-label="Add new group above selected leaf"
@@ -485,6 +487,8 @@ export default class AddGroupDialog extends React.Component {
                                 style={styles.radioButton}
                               />
                             </RadioButtonGroup>
+                          </div>
+                          <div className="input">
                             <SelectField
                               id='leafSelect'
                               label='select where the quire should be positioned'
