@@ -18,7 +18,6 @@ class Group
   # Callbacks
   before_create :edit_ID
   before_destroy :unlink_terms, :unlink_project, :unlink_group, :destroy_members
-  after_create :group_notation
 
   def group_notation
     outer_groups = project.groups.where(nestLevel: 1).to_a
@@ -42,7 +41,7 @@ class Group
       subquire_order = quire_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
       notation = "#{quire_order}.#{subquire_order}"
     end
-    puts notation
+    notation
   end
 
   def edit_ID

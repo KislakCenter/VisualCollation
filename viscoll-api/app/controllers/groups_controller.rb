@@ -77,6 +77,7 @@ class GroupsController < ApplicationController
             addLeavesInside(project_id, group, noOfLeafs, conjoin, oddMemberLeftOut)
           end
         end
+        puts group.group_notation
       end
     rescue Exception => e
       render json: {error: e.message}, status: :unprocessable_entity and return
