@@ -18,7 +18,32 @@ class Group
   # Callbacks
   before_create :edit_ID
   before_destroy :unlink_terms, :unlink_project, :unlink_group, :destroy_members
+  after_create :group_notation
 
+  def group_notation
+    outer_groups = project.groups.where(nestLevel: 1).to_a
+    groupIDs = outer_groups.map(&:id)
+    puts outer_groups.inspect
+    puts groupIDs.inspect
+    if self.nestLevel == 1
+      quire_order = groupIDs.index(self.id) + 1 # index of this group (self.id) in context of outer_groups + 1
+      notation = quire_order.to_s
+    else
+      puts 'line 32'
+      # get parent group
+      parent_group = Group.find(self.parentID)
+      puts "parent: #{parent_group}" 
+      puts "memberIDs: #{parent_group.memberIDs}"
+      # get memberIDs from parent group that start with 'G'
+      quire_children = parent_group.memberIDs.select{ |g| g.start_with? 'G'}
+      puts "children: #{quire_children}" 
+      # find this group in context of above array
+      quire_order = parent_group.group_notation # index of this group's parent (self.parentID) in context of all groups
+      subquire_order = quire_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
+      notation = "#{quire_order}.#{subquire_order}"
+    end
+    puts notation
+  end
 
   def edit_ID
     self.id = "Group_"+self.id.to_s unless self.id.to_s[0] == "G"
