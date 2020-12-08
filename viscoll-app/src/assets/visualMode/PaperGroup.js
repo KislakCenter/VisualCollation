@@ -93,7 +93,7 @@ PaperGroup.prototype = {
   },
   setVisibility: function (visibleAttributes) {
     this.visibleAttributes = visibleAttributes;
-    let groupText = this.group.type + ' ' + this.groupOrder;
+    let groupText = this.group.type + ' ' + this.group.notation;
     if (this.visibleAttributes && this.visibleAttributes.title)
       groupText = groupText + ': ' + this.group.title;
     this.text.set({
