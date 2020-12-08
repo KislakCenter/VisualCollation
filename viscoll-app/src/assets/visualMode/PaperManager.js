@@ -9,6 +9,7 @@ PaperManager.prototype = {
     let g = new PaperGroup({
       manager: this,
       group: group,
+      notation: this.groupNotation(group),
       groupIDs: this.groupIDs,
       y: this.groupYs[this.groupIDs.indexOf(group.id)],
       x: (group.nestLevel - 1) * this.spacing,
@@ -39,6 +40,23 @@ PaperManager.prototype = {
     if (this.flashItems.groups.includes(group.id)) {
       this.flashGroups.push(g);
     }
+  },
+  groupNotation: function(group) {
+    let outerGroups = Object.values(this.Groups).filter(g => g.nestLevel === 1)
+    let outerGroupIDs = outerGroups.map(g => g.id)
+    let notation = ''
+    if (group.nestLevel === 1){
+      let groupOrder = outerGroupIDs.indexOf(group.id) + 1
+      notation =  `${groupOrder}`
+    } else {
+      console.log(group.parentID);
+      console.log(group);
+      let parentGroup = this.Groups[group.parentID]
+      let parentGroupChildren = parentGroup.memberIDs.filter(g => g[0] === 'G')
+      let subquireNotation = parentGroupChildren.indexOf(group.id) + 1
+      notation = `${parentGroup.notation}.${subquireNotation}`
+    }
+    return notation;
   },
   createLeaf: function (leaf) {
     let l = new PaperLeaf({
@@ -123,11 +141,19 @@ PaperManager.prototype = {
       }
     }
 
-    // Create background Rectangle for each group
-    for (let groupID of this.groupIDs) {
-      const group = this.Groups[groupID];
-      this.createGroup(group);
+  let nestLevel = 1;
+  while (true) {
+    let groupsAtLevel = Object.values(this.Groups).filter(g => g.nestLevel === nestLevel);
+    if (groupsAtLevel.length === 0) {
+      break;
     }
+    console.log(groupsAtLevel);
+    for (let key in groupsAtLevel) {
+      const g = groupsAtLevel[key];
+      this.createGroup(g);
+    }
+    nestLevel++;
+  }
 
     // Create all the leaves
     for (let leafID of this.leafIDs) {
