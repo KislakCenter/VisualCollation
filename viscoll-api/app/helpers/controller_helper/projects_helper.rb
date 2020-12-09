@@ -145,7 +145,6 @@ module ControllerHelper
             "id":         group.id.to_s,
             "type":       group.type,
             "title":      group.title,
-            "notation":   group.group_notation,
             "tacketed":   group.tacketed,
             "sewing":     group.sewing,
             "nestLevel":  group.nestLevel,
