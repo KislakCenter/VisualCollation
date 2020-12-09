@@ -147,7 +147,6 @@ PaperManager.prototype = {
     if (groupsAtLevel.length === 0) {
       break;
     }
-    console.log(groupsAtLevel);
     for (let key in groupsAtLevel) {
       const g = groupsAtLevel[key];
       this.createGroup(g);
