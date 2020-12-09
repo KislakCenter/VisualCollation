@@ -42,19 +42,17 @@ PaperManager.prototype = {
     }
   },
   groupNotation: function(group) {
-    let outerGroups = Object.values(this.Groups).filter(g => g.nestLevel === 1)
-    let outerGroupIDs = outerGroups.map(g => g.id)
-    let notation = ''
+    let outerGroups = Object.values(this.Groups).filter(g => g.nestLevel === 1);
+    let outerGroupIDs = outerGroups.map(g => g.id);
+    let notation = '';
     if (group.nestLevel === 1){
-      let groupOrder = outerGroupIDs.indexOf(group.id) + 1
-      notation =  `${groupOrder}`
+      let groupOrder = outerGroupIDs.indexOf(group.id) + 1;
+      notation =  `${groupOrder}`;
     } else {
-      console.log(group.parentID);
-      console.log(group);
-      let parentGroup = this.Groups[group.parentID]
-      let parentGroupChildren = parentGroup.memberIDs.filter(g => g[0] === 'G')
-      let subquireNotation = parentGroupChildren.indexOf(group.id) + 1
-      notation = `${parentGroup.notation}.${subquireNotation}`
+      let parentGroup = this.Groups[group.parentID];
+      let parentGroupChildren = parentGroup.memberIDs.filter(g => g[0] === 'G');
+      let subquireNotation = parentGroupChildren.indexOf(group.id) + 1;
+      notation = `${parentGroup.notation}.${subquireNotation}`;
     }
     return notation;
   },
