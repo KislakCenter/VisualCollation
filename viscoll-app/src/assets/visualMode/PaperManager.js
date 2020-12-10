@@ -52,7 +52,7 @@ PaperManager.prototype = {
       let parentGroup = this.Groups[group.parentID];
       let parentGroupChildren = parentGroup.memberIDs.filter(g => g[0] === 'G');
       let subquireNotation = parentGroupChildren.indexOf(group.id) + 1;
-      notation = `${parentGroup.notation}.${subquireNotation}`;
+      notation = `${this.groupNotation(parentGroup)}.${subquireNotation}`;
     }
     return notation;
   },
