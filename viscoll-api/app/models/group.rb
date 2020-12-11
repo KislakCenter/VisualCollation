@@ -29,7 +29,7 @@ class Group
     else
       parent_group = Group.find(self.parentID)
       parent_group_children = parent_group.memberIDs.select{ |g| g.start_with? 'G'}
-      subquire_notation = quire_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
+      subquire_notation = parent_group_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
       notation = "#{parent_group.group_notation}.#{subquire_notation}"
     end
     notation
