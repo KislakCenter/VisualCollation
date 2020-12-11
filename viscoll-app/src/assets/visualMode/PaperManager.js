@@ -43,14 +43,18 @@ PaperManager.prototype = {
   },
   // code here must mirror group_notation function in group.rb:23
   groupNotation: function(group) {
+    // get all groups as base nest level
     let outerGroups = Object.values(this.Groups).filter(g => g.nestLevel === 1);
     let outerGroupIDs = outerGroups.map(g => g.id);
     let notation = '';
     if (group.nestLevel === 1){
+      // get index of current group within the context of all outer groups
       let groupOrder = outerGroupIDs.indexOf(group.id) + 1;
       notation =  `${groupOrder}`;
     } else {
+      // get parent of current group
       let parentGroup = this.Groups[group.parentID];
+      // get children of parent group
       let parentGroupChildren = parentGroup.memberIDs.filter(g => g[0] === 'G');
       let subquireNotation = parentGroupChildren.indexOf(group.id) + 1;
       notation = `${this.groupNotation(parentGroup)}.${subquireNotation}`;
