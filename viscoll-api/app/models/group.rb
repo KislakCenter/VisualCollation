@@ -21,16 +21,15 @@ class Group
 
   def group_notation
     outer_groups = project.groups.where(nestLevel: 1).to_a
-    groupIDs = outer_groups.map(&:id)
+    outer_groupIDs = outer_groups.map(&:id)
     if self.nestLevel == 1
-      quire_order = groupIDs.index(self.id) + 1 # index of this group (self.id) in context of outer_groups + 1
-      notation = quire_order.to_s
+      group_order = outer_groupIDs.index(self.id) + 1 # index of this group (self.id) in context of outer_groups + 1
+      notation = group_order.to_s
     else
       parent_group = Group.find(self.parentID)
-      quire_children = parent_group.memberIDs.select{ |g| g.start_with? 'G'}
-      quire_order = parent_group.group_notation # index of this group's parent (self.parentID) in context of all groups
-      subquire_order = quire_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
-      notation = "#{quire_order}.#{subquire_order}"
+      parent_group_children = parent_group.memberIDs.select{ |g| g.start_with? 'G'}
+      subquire_notation = quire_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
+      notation = "#{parent_group.group_notation}.#{subquire_notation}"
     end
     notation
   end
