@@ -19,6 +19,22 @@ class Group
   before_create :edit_ID
   before_destroy :unlink_terms, :unlink_project, :unlink_group, :destroy_members
 
+  def group_notation
+    outer_groups = project.groups.where(nestLevel: 1).to_a
+    groupIDs = outer_groups.map(&:id)
+    if self.nestLevel == 1
+      quire_order = groupIDs.index(self.id) + 1 # index of this group (self.id) in context of outer_groups + 1
+      notation = quire_order.to_s
+    else
+      parent_group = Group.find(self.parentID)
+      quire_children = parent_group.memberIDs.select{ |g| g.start_with? 'G'}
+      quire_order = parent_group.group_notation # index of this group's parent (self.parentID) in context of all groups
+      subquire_order = quire_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
+      notation = "#{quire_order}.#{subquire_order}"
+    end
+    notation
+  end
+
   def edit_ID
     self.id = "Group_"+self.id.to_s unless self.id.to_s[0] == "G"
   end
