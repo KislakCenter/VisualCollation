@@ -19,6 +19,7 @@ class Group
   before_create :edit_ID
   before_destroy :unlink_terms, :unlink_project, :unlink_group, :destroy_members
 
+  # code here must mirror groupNotation function in PaperManager.js:44
   def group_notation
     outer_groups = project.groups.where(nestLevel: 1).to_a
     outer_groupIDs = outer_groups.map(&:id)

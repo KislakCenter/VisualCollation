@@ -41,6 +41,7 @@ PaperManager.prototype = {
       this.flashGroups.push(g);
     }
   },
+  // code here must mirror group_notation function in group.rb:23
   groupNotation: function(group) {
     let outerGroups = Object.values(this.Groups).filter(g => g.nestLevel === 1);
     let outerGroupIDs = outerGroups.map(g => g.id);
