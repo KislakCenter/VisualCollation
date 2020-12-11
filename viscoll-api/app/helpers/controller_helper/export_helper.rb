@@ -211,7 +211,7 @@ module ControllerHelper
                 idPostfix = parents.empty? ? groupOrder.to_s : parents.join("-")+"-"+groupOrder.to_s
                 quireAttributes = {}
                 quireAttributes["xml:id"] = idPrefix+"-q-"+idPostfix
-                quireAttributes[:n] = index + 1
+                quireAttributes[:n] = group.group_notation
                 quireAttributes[:certainty] = 1
                 if group.parentID
                   quireAttributes[:parent] = idPrefix+"-q-"+parents.join("-")
