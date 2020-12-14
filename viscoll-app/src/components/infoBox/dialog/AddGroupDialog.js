@@ -10,7 +10,6 @@ import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import RemoveCircle from 'material-ui/svg-icons/content/remove-circle-outline';
 import light from '../../../styles/light';
 import { getMemberOrder } from '../../../helpers/getMemberOrder';
-import { MenuItem } from 'material-ui';
 import SelectField from '../../global/SelectField';
 
 
