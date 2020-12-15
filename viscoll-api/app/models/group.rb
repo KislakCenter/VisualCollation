@@ -90,4 +90,17 @@ class Group
     end
   end
 
+  def all_leafIDs_in_order
+    return @child_leafs if @child_leafs.present?
+    @child_leafs = []
+    memberIDs.each do |memberID|
+      if memberID[0] === "G"
+        @child_leafs += Group.find(memberID).all_leafIDs_in_order
+      elsif memberID[0] === "L"
+        @child_leafs << memberID
+      end
+    end
+    @child_leafs
+  end
+
 end

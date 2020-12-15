@@ -265,7 +265,7 @@ module ControllerHelper
                   # TODO: come up with consistent way of caching and assigning xml IDs
                   qAttributes = {}
                   qAttributes[:target] = "#"+idPrefix+"-q-"+parents.join("-")
-                  qAttributes[:position] = project.groups.find(leaf.parentID).memberIDs.index(leafID)+1
+                  qAttributes[:position] = leaf.position_in_top_level_group
                   qAttributes[:n] = project.groups.find(leaf.parentID).group_notation
                   qAttributes[:leafno] = leafemberOrder
                   qAttributes[:certainty] = 1

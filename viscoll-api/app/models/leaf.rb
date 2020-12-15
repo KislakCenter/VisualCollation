@@ -33,6 +33,20 @@ class Leaf
     Group.find(self.parentID).remove_members([self.id.to_s])
   end
 
+  def top_level_group
+    parent = Group.find(self.parentID)
+    nest_level = parent.nestLevel
+    while nest_level > 1
+      parent = Group.find(parent.parentID)
+      nest_level = parent.nestLevel
+    end
+    parent
+  end
+
+  def position_in_top_level_group
+    self.top_level_group.all_leafIDs_in_order.index(self.id) + 1
+  end
+
   protected
   def edit_ID
     self.id = "Leaf_"+self.id.to_s unless self.id.to_s[0]=="L"
