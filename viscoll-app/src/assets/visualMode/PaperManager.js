@@ -10,7 +10,6 @@ PaperManager.prototype = {
       manager: this,
       group: group,
       Groups: this.Groups,
-      //notation: this.groupNotation(group),
       groupIDs: this.groupIDs,
       y: this.groupYs[this.groupIDs.indexOf(group.id)],
       x: (group.nestLevel - 1) * this.spacing,
