@@ -149,7 +149,6 @@ PaperManager.prototype = {
     let nestLevel = 1;
     while (true) {
       let groupsAtLevel = Object.values(this.Groups).filter(g => g.nestLevel === nestLevel);
-      console.log(groupsAtLevel)
       if (groupsAtLevel.length === 0) {
         break;
       }
