@@ -67,7 +67,7 @@ class GroupsController < ApplicationController
         parent_group.add_members(new_group_ids, memberOrder)
       end
       # Add group(s) to global list 
-      @project.add_groupIDs(new_group_ids, order.to_i - 1)
+      @project.add_groupIDs(new_group_ids, memberOrder.to_i - 1)
       # Add leaves inside each new group
       new_groups.each_with_index do |group, index|
         if noOfLeafs
@@ -78,6 +78,7 @@ class GroupsController < ApplicationController
           end
         end
       end
+      order_group_IDs(@project)
     rescue Exception => e
       render json: {error: e.message}, status: :unprocessable_entity and return
     end

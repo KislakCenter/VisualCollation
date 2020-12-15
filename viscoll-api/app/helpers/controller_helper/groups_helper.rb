@@ -1,6 +1,23 @@
 module ControllerHelper
   module GroupsHelper
     include ControllerHelper::LeafsHelper
+
+    def order_group_IDs(project)
+       group_IDs_in_order = []
+       project.leafs.each do |leaf|
+         next if group_IDs_in_order.include? leaf.parentID
+         group_IDs_in_order << leaf.parentID
+       end
+       missing_IDs = []
+       project.groupIDs.each do |groupID|
+         missing_IDs << groupID unless group_IDs_in_order.include? groupID
+       end
+       unless missing_IDs.empty?
+         raise "Ordered GroupIDs is missing these IDs: #{missing_IDs.join(', ')}"
+       end
+       project.groupIDs = group_IDs_in_order
+       project.save
+    end
     
     def addLeavesInside(project_id, group, noOfLeafs, conjoin, oddMemberLeftOut, leafIDs=false, sideIDs=false)
       begin
