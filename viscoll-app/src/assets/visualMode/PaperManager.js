@@ -10,8 +10,8 @@ PaperManager.prototype = {
       manager: this,
       group: group,
       Groups: this.Groups,
-      groupIDs: this.groupIDs,
-      y: this.groupYs[this.groupIDs.indexOf(group.id)],
+      groupIDs: this.groupIDsInOrder(),
+      y: this.groupYs[this.groupIDsInOrder().indexOf(group.id)],
       x: (group.nestLevel - 1) * this.spacing,
       width: this.width,
       groupHeight: this.getGroupHeight(group),
@@ -41,27 +41,17 @@ PaperManager.prototype = {
       this.flashGroups.push(g);
     }
   },
-  // code here must mirror group_notation function in group.rb:23
-  // groupNotation: function(group) {
-  //   // get all groups as base nest level
-  //   let outerGroups = Object.values(this.Groups).filter(g => g.nestLevel === 1);
-  //   let outerGroupIDs = outerGroups.map(g => g.id);
-  //   let notation = '';
-  //   if (group.nestLevel === 1){
-  //     // get index of current group within the context of all outer groups
-  //     let groupOrder = outerGroupIDs.indexOf(group.id) + 1;
-  //     notation =  `${groupOrder}`;
-  //   } else {
-  //     // get parent of current group
-  //     let parentGroup = this.Groups[group.parentID];
-  //     // get children of parent group
-  //     let parentGroupChildren = parentGroup.memberIDs.filter(g => g[0] === 'G');
-  //     let subquireNotation = parentGroupChildren.indexOf(group.id) + 1;
-  //     notation = `${this.groupNotation(parentGroup)}.${subquireNotation}`;
-  //   }
-  //   console.log(notation)
-  //   return notation;
-  // },
+  groupIDsInOrder: function () {
+    // create groups based on leaf parents
+    let groupIDsInOrder = [];
+    for (let leafID of this.leafIDs) {
+      let leaf = this.Leafs[leafID];
+      if (groupIDsInOrder.indexOf(leaf.parentID)===-1) {
+        groupIDsInOrder.push(leaf.parentID)
+      }
+    }
+    return groupIDsInOrder;
+  },
   createLeaf: function (leaf) {
     let l = new PaperLeaf({
       manager: this,
@@ -158,17 +148,7 @@ PaperManager.prototype = {
       nestLevel++;
     }
 
-    // // create groups based on leaf parents
-    // let groupIDsInOrder = [];
-    // for (let leafID of this.leafIDs) {
-    //   let leaf = this.Leafs[leafID];
-    //   groupIDsInOrder.indexOf(leaf.parentID) === -1 ? groupIDsInOrder.push(leaf.parentID) : console.log("Already in array.");
-    // }
-    //
-    // for (let groupID of groupIDsInOrder) {
-    //   const group = this.Groups[groupID];
-    //   this.createGroup(group)
-    // }
+
 
     // Create all the leaves
     for (let leafID of this.leafIDs) {
@@ -550,7 +530,7 @@ PaperManager.prototype = {
     if (group.memberIDs.length > 0) {
       let height =
         this.getYOfLastMember(group.id) -
-        this.groupYs[this.groupIDs.indexOf(group.id)];
+        this.groupYs[this.groupIDsInOrder().indexOf(group.id)];
       return height + this.spacing;
     } else {
       return this.spacing;
