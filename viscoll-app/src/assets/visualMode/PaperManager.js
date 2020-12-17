@@ -12,7 +12,7 @@ PaperManager.prototype = {
       Groups: this.Groups,
       groupIDs: this.groupIDsInOrder(),
       y: this.groupYs[this.groupIDsInOrder().indexOf(group.id)],
-      x: (group.nestLevel - 1) * this.spacing,
+      x: (this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0]).indent-1) * this.spacing,
       width: this.width,
       groupHeight: this.getGroupHeight(group),
       isActive: this.activeGroups.includes(group.id),
@@ -25,6 +25,9 @@ PaperManager.prototype = {
       viewingMode: this.viewingMode,
       spacing: this.spacing,
     });
+
+    console.log(this.paperLeaves)
+    console.log(this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0]).indent);
 
     g.draw();
     g.setMouseEventHandlers();
@@ -135,6 +138,16 @@ PaperManager.prototype = {
       }
     }
 
+    // Create all the leaves
+    for (let leafID of this.leafIDs) {
+      this.createLeaf(this.Leafs[leafID]);
+    }
+    // Draw all leaves and set mouse event handlers
+    this.paperLeaves.forEach(leaf => {
+      leaf.draw();
+      leaf.setMouseEventHandlers();
+    });
+
     let nestLevel = 1;
     while (true) {
       let groupsAtLevel = Object.values(this.Groups).filter(g => g.nestLevel === nestLevel);
@@ -149,16 +162,6 @@ PaperManager.prototype = {
     }
 
 
-
-    // Create all the leaves
-    for (let leafID of this.leafIDs) {
-      this.createLeaf(this.Leafs[leafID]);
-    }
-    // Draw all leaves and set mouse event handlers
-    this.paperLeaves.forEach(leaf => {
-      leaf.draw();
-      leaf.setMouseEventHandlers();
-    });
 
     // Show filter
     this.showFilter();
