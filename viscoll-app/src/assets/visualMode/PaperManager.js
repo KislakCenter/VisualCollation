@@ -26,9 +26,6 @@ PaperManager.prototype = {
       spacing: this.spacing,
     });
 
-    console.log(this.paperLeaves)
-    console.log(this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0]).indent);
-
     g.draw();
     g.setMouseEventHandlers();
 
