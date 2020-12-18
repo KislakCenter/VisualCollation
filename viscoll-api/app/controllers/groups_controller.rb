@@ -78,7 +78,7 @@ class GroupsController < ApplicationController
           end
         end
       end
-      order_group_IDs(@project)
+      # order_group_IDs(@project)
     rescue Exception => e
       render json: {error: e.message}, status: :unprocessable_entity and return
     end

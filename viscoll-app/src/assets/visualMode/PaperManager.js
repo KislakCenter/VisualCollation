@@ -12,7 +12,10 @@ PaperManager.prototype = {
       Groups: this.Groups,
       groupIDs: this.groupIDsInOrder(),
       y: this.groupYs[this.groupIDsInOrder().indexOf(group.id)],
-      x: (this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0]).indent-1) * this.spacing,
+      x: (this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0])) ?
+          (this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0]).indent-1) * this.spacing
+          : (group.nestLevel - 1) * this.spacing,
+      // x: (group.nestLevel - 1) * this.spacing,
       width: this.width,
       groupHeight: this.getGroupHeight(group),
       isActive: this.activeGroups.includes(group.id),
@@ -26,6 +29,7 @@ PaperManager.prototype = {
       spacing: this.spacing,
     });
 
+    console.log(g.x)
     g.draw();
     g.setMouseEventHandlers();
 
