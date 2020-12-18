@@ -72,6 +72,30 @@ export default class AddGroupDialog extends React.Component {
     newState.errorText[name]="";
     this.setState({...newState});
   }
+
+  /**
+   * Generate group notation for dropdown.
+   * Code here must mirror PaperGroup and Group model notation logic.
+   */
+  groupNotation = (group) => {
+    // get all groups as base nest level
+    let outerGroups = Object.values(this.props.Groups).filter(g => g.nestLevel === 1);
+    let outerGroupIDs = outerGroups.map(g => g.id);
+    let notation = '';
+    if (group.nestLevel === 1){
+      // get index of current group within the context of all outer groups
+      let groupOrder = outerGroupIDs.indexOf(group.id) + 1;
+      notation =  `${groupOrder}`;
+    } else {
+      // get parent of current group
+      let parentGroup = this.props.Groups[group.parentID];
+      // get children of parent group
+      let parentGroupChildren = parentGroup.memberIDs.filter(g => g[0] === 'G');
+      let subquireNotation = parentGroupChildren.indexOf(group.id) + 1;
+      notation = `${this.groupNotation(parentGroup)}.${subquireNotation}`;
+    }
+    return notation;
+  }
   
   /**
    * Validate user input. If invalid, display error message, otherwise update relevant state 
@@ -498,8 +522,10 @@ export default class AddGroupDialog extends React.Component {
                                   return { value: itemID, text: `Leaf ${this.props.leafIDs.indexOf(itemID) + 1}`}
                                 } else if (itemID[0]==='G') {
                                   let groupType = this.props.Groups[itemID].type
-                                  let quireNumber = this.props.groupIDs.indexOf(itemID) + 1
-                                  return { value: itemID, text: `${groupType} ${quireNumber}`}
+                                  // quireNumber should be the notation value, which means we have to have
+                                  // the notation logic here as well
+                                  let groupNotation = this.groupNotation(this.props.Groups[itemID])
+                                  return { value: itemID, text: `${groupType} ${groupNotation}`}
                                 }
                                 
                               })}
