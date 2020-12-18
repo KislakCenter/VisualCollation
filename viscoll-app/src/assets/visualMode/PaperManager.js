@@ -10,8 +10,8 @@ PaperManager.prototype = {
       manager: this,
       group: group,
       Groups: this.Groups,
-      groupIDs: this.groupIDsInOrder(),
-      y: this.groupYs[this.groupIDsInOrder().indexOf(group.id)],
+      groupIDs: this.groupIDs,
+      y: this.groupYs[this.groupIDs.indexOf(group.id)],
       x: (this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0])) ?
           (this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0]).indent-1) * this.spacing
           : (group.nestLevel - 1) * this.spacing,
@@ -44,17 +44,6 @@ PaperManager.prototype = {
     if (this.flashItems.groups.includes(group.id)) {
       this.flashGroups.push(g);
     }
-  },
-  groupIDsInOrder: function () {
-    // create groups based on leaf parents
-    let groupIDsInOrder = [];
-    for (let leafID of this.leafIDs) {
-      let leaf = this.Leafs[leafID];
-      if (groupIDsInOrder.indexOf(leaf.parentID)===-1) {
-        groupIDsInOrder.push(leaf.parentID)
-      }
-    }
-    return groupIDsInOrder;
   },
   createLeaf: function (leaf) {
     let l = new PaperLeaf({
@@ -534,7 +523,7 @@ PaperManager.prototype = {
     if (group.memberIDs.length > 0) {
       let height =
         this.getYOfLastMember(group.id) -
-        this.groupYs[this.groupIDsInOrder().indexOf(group.id)];
+        this.groupYs[this.groupIDs.indexOf(group.id)];
       return height + this.spacing;
     } else {
       return this.spacing;
