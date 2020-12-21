@@ -260,8 +260,21 @@ export default class AddGroupDialog extends React.Component {
           groupOrder += 1;
           if (this.state.placementLocation==="above") {
             memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 1
+
           } else if (this.state.placementLocation==="below") {
             memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 2
+          }
+          if (group.memberIDs.length>0) {
+            // Find the last child (possibly multi-nested)
+            let lastChild = this.findLastChildGroup(group.memberIDs);
+            if (lastChild===null) {
+              groupOrder = this.props.groupIDs.indexOf(group.id) + 2;
+            } else {
+              groupOrder = this.props.groupIDs.indexOf(lastChild.id) + 2;
+            }
+          } else {
+            // If no children
+            groupOrder = groupOrder+1;
           }
           data.additional["parentGroupID"] = group.id;
         }
