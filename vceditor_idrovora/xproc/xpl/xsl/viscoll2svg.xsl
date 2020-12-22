@@ -27,6 +27,9 @@
         </xd:desc>
     </xd:doc>
 
+    <!-- Write all page numbers in SVG file? 0 = no 1 = yes -->
+    <xsl:param name="allNumbers" select="0"/>
+
     <!--
         CSS
         ===
@@ -399,7 +402,7 @@
                     </xsl:attribute>
                     <g>
                         <!-- Writing Direction -->
-                        <xsl:variable name="direction" select="parent::textblock/direction/@val"/>
+                        <xsl:variable name="direction" select="ancestor::textblock/direction/@val"/>
                         <xsl:call-template name="writingDirRotation">
                             <xsl:with-param name="direction" select="$direction"/>
                             <xsl:with-param name="countRegularBifolia" select="$countRegularBifolia"/>
@@ -1470,7 +1473,9 @@
             <xsl:variable name="ID-conjoined">
                 <xsl:call-template name="ID-conjoined">
                     <xsl:with-param name="currentPosition" select="$currentPosition_SQ"/>
-                    <xsl:with-param name="conjoinPosition" select="$conjoinPosition"/>
+                    <xsl:with-param name="conjoinPosition"
+                        select="if ($conjoinPosition = '') then xs:integer(0) else $conjoinPosition "
+                        as="xs:integer"/>
                 </xsl:call-template>
             </xsl:variable>
             <!-- Set group and drawing direction -->
@@ -2119,7 +2124,41 @@
         <xsl:param name="folioNumber"/>
         <xsl:param name="direction" tunnel="yes"/>
         <xsl:choose>
-            <xsl:when test="@xml:id eq $first">
+            <xsl:when test="$allNumbers = 0">
+                <xsl:choose>
+                    <xsl:when test="@xml:id eq $first">
+                        <text xmlns="http://www.w3.org/2000/svg" dy="{$Cy + $parametricY}"
+                            dx="{(($Cx + ($delta * $countRegularBifolia - 2)) + $lineLength) + ($delta div 2)}"
+                            class="folioNumber">
+                            <xsl:call-template name="writingDirRotation">
+                                <xsl:with-param name="direction" select="$direction"/>
+                                <xsl:with-param name="Cx" select="$Cx"/>
+                                <xsl:with-param name="leafLength" select="$leafLength"/>
+                                <xsl:with-param name="countRegularBifolia"
+                                    select="$countRegularBifolia"/>
+                                <xsl:with-param name="text" select="1"/>
+                            </xsl:call-template>
+                            <xsl:value-of select="$folioNumber"/>
+                        </text>
+                        </xsl:when>
+                    <xsl:when test="@xml:id eq $last">
+                        <text xmlns="http://www.w3.org/2000/svg" dy="{$Cy + $parametricY}"
+                            dx="{(($Cx + ($delta * $countRegularBifolia - 2)) + $lineLength) + ($delta div 2)}"
+                            class="folioNumber">
+                            <xsl:call-template name="writingDirRotation">
+                                <xsl:with-param name="direction" select="$direction"/>
+                                <xsl:with-param name="Cx" select="$Cx"/>
+                                <xsl:with-param name="leafLength" select="$leafLength"/>
+                                <xsl:with-param name="countRegularBifolia"
+                                    select="$countRegularBifolia"/>
+                                <xsl:with-param name="text" select="1"/>
+                            </xsl:call-template>
+                            <xsl:value-of select="$folioNumber"/>
+                        </text>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
                 <text xmlns="http://www.w3.org/2000/svg" dy="{$Cy + $parametricY}"
                     dx="{(($Cx + ($delta * $countRegularBifolia - 2)) + $lineLength) + ($delta div 2)}"
                     class="folioNumber">
@@ -2132,21 +2171,7 @@
                     </xsl:call-template>
                     <xsl:value-of select="$folioNumber"/>
                 </text>
-            </xsl:when>
-            <xsl:when test="@xml:id eq $last">
-                <text xmlns="http://www.w3.org/2000/svg" dy="{$Cy + $parametricY}"
-                    dx="{(($Cx + ($delta * $countRegularBifolia - 2)) + $lineLength) + ($delta div 2)}"
-                    class="folioNumber">
-                    <xsl:call-template name="writingDirRotation">
-                        <xsl:with-param name="direction" select="$direction"/>
-                        <xsl:with-param name="Cx" select="$Cx"/>
-                        <xsl:with-param name="leafLength" select="$leafLength"/>
-                        <xsl:with-param name="countRegularBifolia" select="$countRegularBifolia"/>
-                        <xsl:with-param name="text" select="1"/>
-                    </xsl:call-template>
-                    <xsl:value-of select="$folioNumber"/>
-                </text>
-            </xsl:when>
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -2306,7 +2331,7 @@
                                 <xsl:value-of select="$delta"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:value-of select="2 * $delta - (2*($delta div 3))"/>
+                                <xsl:value-of select="2 * $delta - (2 * ($delta div 3))"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:variable>
@@ -2364,8 +2389,7 @@
     <xsl:template name="defs">
         <defs xmlns="http://www.w3.org/2000/svg">
             <style type="text/css">
-            <!-- copy the CSS file content into the SVG -->
-            <xsl:value-of select="$css"/>
+                <xsl:value-of select="$css"/>
             </style>
             <!-- Uncertainty can have three values: 1 = very certain, 2 = fairly certain, 3 = not certain -->
             <filter id="f1" filterUnits="userSpaceOnUse">
