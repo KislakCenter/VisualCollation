@@ -21,6 +21,8 @@
             <xd:p><xd:b>Modified by:</xd:b> Alberto Campagnolo</xd:p>
             <xd:p><xd:b>Modified on:</xd:b>2020-08-14</xd:p>
             <xd:p><xd:b>Modified by:</xd:b> Alberto Campagnolo</xd:p>
+            <xd:p><xd:b>Modified on:</xd:b>2020-12-04</xd:p>
+            <xd:p><xd:b>Modified by:</xd:b> Alberto Campagnolo</xd:p>
             <xd:p>This document takes as its input the output from the Collation Modeler. It
                 generates one SVG diagram per gathering. A general parameter permits to insert the
                 CSS information directly into the SVG file. </xd:p>
@@ -253,6 +255,12 @@
                         test="
                             every $leaf in current-group()
                                 satisfies $leaf/q[1]/single[@val = 'yes']">
+                        <xsl:value-of select="count(current-group())"/>
+                    </xsl:when>
+                    <!-- Orphan subquires, i.e. subquires without (a) parent leaf/leaves from a main quire -->
+                    <xsl:when test="
+                            every $leaf in current-group()
+                                satisfies $leaf/q/contains(@n, '.')">
                         <xsl:value-of select="count(current-group())"/>
                     </xsl:when>
                     <!-- For normal and complex quires, the variable returns the position of the last leaf
@@ -1637,24 +1645,37 @@
     <xsl:template name="centralLeftLeafPos_SQ">
         <xsl:param name="subquires"/>
         <xsl:param name="counter"/>
-        <xsl:for-each select="$subquires/tp:subquire[$counter]/vc:leaf">
-            <xsl:variable name="ownIdRef_SQ">
-                <xsl:value-of select="concat('#', @xml:id)"/>
-            </xsl:variable>
-            <xsl:variable name="subquireN" select="vc:q[1]/@n"/>
-            <!-- The pattern looks for the next regular folio -->
-            <xsl:variable name="followingConjoinID_SQ">
-                <xsl:value-of
-                    select="(following-sibling::vc:leaf[not(vc:q[1]/vc:single/@val = 'yes') and vc:q[1]/@n = $subquireN])[1]/vc:q[1]/vc:conjoin/@target"
-                />
-            </xsl:variable>
-            <!--  -->
-            <xsl:choose>
-                <xsl:when test="$followingConjoinID_SQ = $ownIdRef_SQ">
-                    <xsl:value-of select="xs:integer(vc:q[1]/@position)"/>
-                </xsl:when>
+        <xsl:choose>
+            <!-- If a subquire is composed by all singletons, then there cannot be a middle leaf
+                and there are no conjoines, so the variable simply returns the number of singletons in that quire -->
+            <xsl:when test="
+                    every $vc:leaf in $subquires/tp:subquire[$counter]/vc:leaf
+                        satisfies $vc:leaf/q[1]/single[@val = 'yes']">
+                <xsl:value-of select="count($subquires/tp:subquire[$counter]/vc:leaf)"/>
+            </xsl:when>
+            <!-- For normal and complex subquires, the variable returns the position of the last leaf
+                to be drawn in the left (upper) part of the quire -->
+            <xsl:otherwise>
+                <xsl:for-each select="$subquires/tp:subquire[$counter]/vc:leaf">
+                    <xsl:variable name="ownIdRef_SQ">
+                        <xsl:value-of select="concat('#', @xml:id)"/>
+                    </xsl:variable>
+                    <xsl:variable name="subquireN" select="vc:q[1]/@n"/>
+                    <!-- The pattern looks for the next regular folio -->
+                    <xsl:variable name="followingConjoinID_SQ">
+                        <xsl:value-of
+                            select="(following-sibling::vc:leaf[not(vc:q[1]/vc:single/@val = 'yes') and vc:q[1]/@n = $subquireN])[1]/vc:q[1]/vc:conjoin/@target"
+                        />
+                    </xsl:variable>
+                    <!--  -->
+                    <xsl:choose>
+                        <xsl:when test="$followingConjoinID_SQ = $ownIdRef_SQ">
+                            <xsl:value-of select="xs:integer(vc:q[1]/@position)"/>
+                        </xsl:when>
+                    </xsl:choose>
+                </xsl:for-each>
+            </xsl:otherwise>
             </xsl:choose>
-        </xsl:for-each>
     </xsl:template>
 
     <xd:doc>
