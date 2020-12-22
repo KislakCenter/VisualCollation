@@ -221,7 +221,8 @@ module ControllerHelper
                   quireAttributes[:parent] = idPrefix+"-q-"+parents.join("-")
                 end
                 xml.quire quireAttributes do
-                  xml.text index + 1
+                  # xml.text index + 1
+                  # TODO: loop though quire's subquires
                 end
                 @groups[groupID]["xmlID"] = quireAttributes["xml:id"]
               end
