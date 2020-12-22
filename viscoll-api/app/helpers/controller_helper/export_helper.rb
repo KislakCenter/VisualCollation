@@ -231,7 +231,7 @@ module ControllerHelper
                 leafemberOrder = parents.pop
                 idPostfix = parents.join("-")+"-"+leafemberOrder.to_s
                 leafAttributes = {}
-                leafAttributes["xml:id"] = idPrefix+"-"+idPostfix
+                leafAttributes["xml:id"] = leaf.id
                 leafAttributes["stub"] = "yes" if leaf.stubType != "None"
                 xml.leaf leafAttributes do
 
