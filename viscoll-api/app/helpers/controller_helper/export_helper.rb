@@ -206,12 +206,13 @@ module ControllerHelper
               @groupIDs.each_with_index do |groupID, index|
                 puts "groupID: #{groupID}, index: #{index}"
                 group = @groups[groupID]
+                next if group.parentID.present?
                 parents = parentsOrders(groupID, project)
                 groupOrder = parents.pop
                 groupMemberOrder = group["memberOrder"]
                 idPostfix = parents.empty? ? groupOrder.to_s : parents.join("-")+"-"+groupOrder.to_s
                 quireAttributes = {}
-                quireAttributes["xml:id"] = idPrefix+"-q-"+idPostfix
+                quireAttributes["xml:id"] = group.id
                 quireAttributes[:n] = group.group_notation
                 quireAttributes[:certainty] = 1
                 if group.parentID
