@@ -265,7 +265,7 @@ module ControllerHelper
 
                   # TODO: come up with consistent way of caching and assigning xml IDs
                   qAttributes = {}
-                  qAttributes[:target] = "#"+idPrefix+"-q-"+parents.join("-")
+                  qAttributes[:target] = "#"+leaf.parentID
                   qAttributes[:position] = leaf.position_in_top_level_group
                   qAttributes[:n] = project.groups.find(leaf.parentID).group_notation
                   qAttributes[:leafno] = leafemberOrder
@@ -273,7 +273,7 @@ module ControllerHelper
                   xml.q qAttributes do
                     if leaf.conjoined_to
                       idPostfix = parents.join("-")+"-"+@leafs[leaf.conjoined_to][:memberOrder].to_s
-                      xml.conjoin :certainty => 1, :target => "#"+idPrefix+"-"+idPostfix
+                      xml.conjoin :certainty => 1, :target => "#"+leaf.conjoined_to
                     else
                       xml.single :val => "yes"
                     end
