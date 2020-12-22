@@ -190,6 +190,8 @@ module ControllerHelper
           populateLeafSideObjects(@groups[groupID][:memberIDs], project)
         end
       end
+      puts @leafs
+      puts @leafIDs.inspect
 
       return Nokogiri::XML::Builder.new { |xml|
         xml.viscoll :xmlns => "http://schoenberginstitute.org/schema/collation" do
@@ -286,14 +288,14 @@ module ControllerHelper
                   if leaf.attached_above != "None"
                     attachmentAttributes[:type] = leaf.attached_above.downcase
                     idPostfix = parents.join("-") + "-" + (@leafs[leaf.id][:memberOrder] - 1).to_s
-                    attachmentAttributes[:target] = "#"+idPrefix+"-"+idPostfix
+                    attachmentAttributes[:target] = "#"+@leafIDs[@leafIDs.index(leaf.id) - 1]
                     xml.send('attachment-method', attachmentAttributes)
                   end
 
                   if leaf.attached_below != "None"
                     attachmentAttributes[:type] = leaf.attached_below.downcase
                     idPostfix = parents.join("-") + "-" + (@leafs[leaf.id][:memberOrder] + 1).to_s
-                    attachmentAttributes[:target] = "#"+idPrefix+"-"+idPostfix
+                    attachmentAttributes[:target] = "#"+@leafIDs[@leafIDs.index(leaf.id) + 1]
                     xml.send('attachment-method', attachmentAttributes)
                   end
 
