@@ -257,20 +257,25 @@ export default class AddGroupDialog extends React.Component {
           }
         } else if (this.state.location==="inside") {
           // Add group inside
-          groupOrder += 1;
-          if (this.state.placementLocation==="above") {
-            memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 1
-
-          } else if (this.state.placementLocation==="below") {
-            memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 2
-          }
+          // groupOrder += 1;
+          // if (this.state.placementLocation==="above") {
+          //   memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 1
+          // } else if (this.state.placementLocation==="below") {
+          //   memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 2
+          // }
           if (group.memberIDs.length>0) {
             // Find the last child (possibly multi-nested)
-            let lastChild = this.findLastChildGroup(group.memberIDs);
-            if (lastChild===null) {
-              groupOrder = this.props.groupIDs.indexOf(group.id) + 2;
-            } else {
-              groupOrder = this.props.groupIDs.indexOf(lastChild.id) + 2;
+            // let lastChild = this.findLastChildGroup(group.memberIDs);
+            // if (lastChild===null) {
+            //   groupOrder = this.props.groupIDs.indexOf(group.id) + 2;
+            // } else {
+            //   groupOrder = this.props.groupIDs.indexOf(lastChild.id) + 2;
+            // }
+            let selectedChildIndex = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild)
+            if (this.state.placementLocation==='above') {
+              groupOrder = selectedChildIndex + 1
+            } else if (this.state.placementLocation==='below') {
+              groupOrder = selectedChildIndex + 2
             }
           } else {
             // If no children
@@ -282,7 +287,7 @@ export default class AddGroupDialog extends React.Component {
           title: "None", 
           type: "Quire"
         };
-        data.additional["memberOrder"] = memberOrder;
+        data.additional["memberOrder"] = groupOrder;
         data.additional["order"] = groupOrder;
       }
       data.group["project_id"] = this.props.projectID
