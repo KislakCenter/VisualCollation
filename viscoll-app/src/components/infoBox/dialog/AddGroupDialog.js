@@ -256,38 +256,26 @@ export default class AddGroupDialog extends React.Component {
             }
           }
         } else if (this.state.location==="inside") {
-          // Add group inside
-          // groupOrder += 1;
-          // if (this.state.placementLocation==="above") {
-          //   memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 1
-          // } else if (this.state.placementLocation==="below") {
-          //   memberOrder = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild) + 2
-          // }
-          if (group.memberIDs.length>0) {
-            // Find the last child (possibly multi-nested)
-            // let lastChild = this.findLastChildGroup(group.memberIDs);
-            // if (lastChild===null) {
-            //   groupOrder = this.props.groupIDs.indexOf(group.id) + 2;
-            // } else {
-            //   groupOrder = this.props.groupIDs.indexOf(lastChild.id) + 2;
-            // }
-            let selectedChildIndex = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild)
-            if (this.state.placementLocation==='above') {
-              groupOrder = selectedChildIndex + 1
-            } else if (this.state.placementLocation==='below') {
-              groupOrder = selectedChildIndex + 2
-            }
-          } else {
-            // If no children
-            groupOrder = groupOrder+1;
+          // two values need to be calculated here. these values are memberOrder and groupOrder.
+          // memberOrder represents the placement of the new group in context of it's parent group's memberIDs
+          let selectedChildIndex = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild)
+          if (this.state.placementLocation==="above") {
+            memberOrder = selectedChildIndex + 1
+          } else if (this.state.placementLocation==="below") {
+            memberOrder = selectedChildIndex + 2
           }
+          groupOrder = this.props.groupIDs.length + 1;
+          // create array of all values (G1, L1, L2, G1.1, L3, L4)
+          // find index of state.selectedChild in above array
+          // find groupIDs before & after selectedChild
+          // find index of this new value that should go in between above groups
           data.additional["parentGroupID"] = group.id;
         }
         data.group = {
           title: "None", 
           type: "Quire"
         };
-        data.additional["memberOrder"] = groupOrder;
+        data.additional["memberOrder"] = memberOrder;
         data.additional["order"] = groupOrder;
       }
       data.group["project_id"] = this.props.projectID
