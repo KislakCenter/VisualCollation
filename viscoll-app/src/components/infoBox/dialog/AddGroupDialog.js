@@ -264,39 +264,36 @@ export default class AddGroupDialog extends React.Component {
           } else if (this.state.placementLocation==="below") {
             memberOrder = selectedChildIndex + 2
           }
-          // groupOrder = this.props.groupIDs.length + 1;
-          //// create array of all values (G1, L1, L2, G1.1, L3, L4)
-          let allMembers = [];
-          // loop through groupIDs
-          this.props.groupIDs.forEach(groupID =>{
-            let group = this.props.Groups[groupID];
-            // add memberIDs of each group to a new array
-            allMembers.push(group.memberIDs)
+          //// determine groupOrder
+          // generate an array of all groups and leaves in the project in order
+          let orderedElements = []
+          this.props.groupIDs.forEach(groupID => {
+            if (!orderedElements.includes(groupID)) {
+              orderedElements.push(groupID)
+            }
+            let group = this.props.Groups[groupID]
+            group.memberIDs.forEach(memberID => {
+              if (!orderedElements.includes(memberID))
+              orderedElements.push(memberID)
+            })
           })
-          // find index of state.selectedChild in above array
-          console.log(allMembers.flat())
-          console.log(this.state.selectedChild)
-          let selectedChildIndexInAllMembers = allMembers.flat().indexOf(this.state.selectedChild);
-          console.log(selectedChildIndexInAllMembers)
-          //// find how many groupIDs occur before the selected child
-          // cut array at our selectedChild
-          let allMembersSliced = []
+          // find the user selected leaf/group in this array
+          let selectedChildIndexInOrderedElements = orderedElements.indexOf(this.state.selectedChild)
+          let orderedElementsSliced = []
           if (this.state.placementLocation==='above') {
-            allMembersSliced = allMembers.flat().slice(0, selectedChildIndexInAllMembers + 1)
+            orderedElementsSliced = orderedElements.slice(0, selectedChildIndexInOrderedElements)
           } else if (this.state.placementLocation==='below') {
-            allMembersSliced = allMembers.flat().slice(0, selectedChildIndexInAllMembers + 2)
+            orderedElementsSliced = orderedElements.slice(0, selectedChildIndexInOrderedElements + 1)
           }
-          console.log(allMembersSliced)
-          // count occurrences of G in the cut array
+          // count how many groups occur before this value in the array
           let groupCount = 0;
-          allMembersSliced.forEach(member => {
+          orderedElementsSliced.forEach(member => {
             if (member[0]==='G') {
               groupCount++;
             }
           })
-          console.log(groupCount)
-          groupOrder = groupCount + 2
-          // find index of this new value that should go in between above groups
+          // add 1 to determine the new groupOrder
+          groupOrder = groupCount + 1;
           data.additional["parentGroupID"] = group.id;
         }
         data.group = {
