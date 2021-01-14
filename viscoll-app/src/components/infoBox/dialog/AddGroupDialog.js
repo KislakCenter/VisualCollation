@@ -74,6 +74,24 @@ export default class AddGroupDialog extends React.Component {
   }
 
   /**
+   * get all children of a given group, including the children of child groups
+   */
+  getAllChildrenOfGroup = (inputGroupID) => {
+    let allChildrenOfGroup = []
+    let group = this.props.Groups[inputGroupID]
+    group.memberIDs.forEach(memberID => {
+      if (memberID[0] === 'L') {
+        if (!allChildrenOfGroup.includes(memberID)) {
+          allChildrenOfGroup.push(memberID);
+        } else {
+          allChildrenOfGroup.push(this.getAllChildrenOfGroup(memberID))
+        }
+      }
+    })
+    return allChildrenOfGroup;
+  }
+
+  /**
    * Generate group notation for dropdown.
    * Code here must mirror PaperGroup and Group model notation logic.
    */
@@ -270,12 +288,9 @@ export default class AddGroupDialog extends React.Component {
           this.props.groupIDs.forEach(groupID => {
             if (!orderedElements.includes(groupID)) {
               orderedElements.push(groupID)
+              // recursively get group children for nested subquires
+              orderedElements.push(...this.getAllChildrenOfGroup(groupID))
             }
-            let group = this.props.Groups[groupID]
-            group.memberIDs.forEach(memberID => {
-              if (!orderedElements.includes(memberID))
-              orderedElements.push(memberID)
-            })
           })
           // find the user selected leaf/group in this array
           let selectedChildIndexInOrderedElements = orderedElements.indexOf(this.state.selectedChild)
@@ -311,7 +326,8 @@ export default class AddGroupDialog extends React.Component {
     }
   }
 
-   /**
+
+  /**
    * Return `true` if there are any errors in the input fields
    */
   isDisabled = () => {
