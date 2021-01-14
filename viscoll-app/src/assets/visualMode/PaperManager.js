@@ -29,7 +29,6 @@ PaperManager.prototype = {
       spacing: this.spacing,
     });
 
-    console.log(g.x)
     g.draw();
     g.setMouseEventHandlers();
 
