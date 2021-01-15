@@ -91,6 +91,19 @@ export default class AddGroupDialog extends React.Component {
     return allChildrenOfGroup;
   }
 
+  countGroupChildren = (inputGroupID) => {
+    let group = this.props.Groups[inputGroupID]
+    let groupCount = 0;
+    group.memberIDs.forEach(memberID => {
+      if (memberID[0] === 'G') {
+        groupCount++;
+        // go into group
+        groupCount += this.countGroupChildren(memberID)
+      }
+    })
+    return groupCount;
+  }
+
   /**
    * Generate group notation for dropdown.
    * Code here must mirror PaperGroup and Group model notation logic.
@@ -308,6 +321,9 @@ export default class AddGroupDialog extends React.Component {
             }
           })
           // add 1 to determine the new groupOrder
+          if (this.state.selectedChild[0] === 'G') {
+            groupCount += this.countGroupChildren(this.state.selectedChild)
+          }
           groupOrder = groupCount + 1;
           data.additional["parentGroupID"] = group.id;
         }
