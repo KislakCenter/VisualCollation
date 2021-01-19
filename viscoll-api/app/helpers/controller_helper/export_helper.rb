@@ -190,8 +190,6 @@ module ControllerHelper
           populateLeafSideObjects(@groups[groupID][:memberIDs], project)
         end
       end
-      puts @leafs
-      puts @leafIDs.inspect
 
       return Nokogiri::XML::Builder.new { |xml|
         xml.viscoll :xmlns => "http://schoenberginstitute.org/schema/collation" do
@@ -206,7 +204,6 @@ module ControllerHelper
             idPrefix = project.shelfmark.parameterize.underscore
             xml.quires do
               @groupIDs.each_with_index do |groupID, index|
-                puts "groupID: #{groupID}, index: #{index}"
                 group = @groups[groupID]
                 next if group.parentID.present?
                 parents = parentsOrders(groupID, project)
