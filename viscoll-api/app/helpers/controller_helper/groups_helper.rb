@@ -1,7 +1,7 @@
 module ControllerHelper
   module GroupsHelper
     include ControllerHelper::LeafsHelper
-
+    
     def addLeavesInside(project_id, group, noOfLeafs, conjoin, oddMemberLeftOut, leafIDs=false, sideIDs=false)
       begin
         if (leafIDs and sideIDs)
