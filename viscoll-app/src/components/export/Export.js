@@ -13,54 +13,54 @@ import Checkbox from 'material-ui/Checkbox';
 
 /** Dialog to export collation to JSON, XML or PNG */
 const Export = props => {
-  const filename = props.projectTitle.replace(/\s/g, '_');
+    const filename = props.projectTitle.replace(/\s/g, '_');
 
-  const isValidExport =
-    props.exportCols > 0 && props.exportCols <= props.numRootGroups;
+    const isValidExport =
+        props.exportCols > 0 && props.exportCols <= props.numRootGroups;
 
-  const actions = [
-    <FlatButton
-      label={'Download image'}
-      icon={<IconDownload />}
-      style={
-        props.exportedType === 'png' ? { marginRight: 10 } : { display: 'none' }
-      }
-      onClick={() => props.downloadImage()}
-      disabled={!isValidExport}
-    />,
-    <FlatButton
-      label={'Download ' + props.exportedType}
-      icon={<IconDownload />}
-      style={
-        props.exportedImages && props.exportedType !== 'png'
-          ? { marginRight: 10 }
-          : { display: 'none' }
-      }
-      onClick={() => {
-        downloadZip();
-      }}
-    />,
-    <FlatButton
-      label={'Download ' + props.exportedType}
-      icon={<IconDownload />}
-      style={
-        props.exportedImages ||
-        props.exportedType === 'png' ||
-        props.exportedType === 'share'
-          ? { display: 'none' }
-          : { marginRight: 10 }
-      }
-      onClick={() =>
-        fileDownload(props.exportedData, `${filename}.${props.exportedType}`)
-      }
-    />,
-    <FlatButton
-      label="Close"
-      primary={true}
-      onClick={() => props.handleExportToggle(false)}
-      keyboardFocused
-    />,
-  ];
+    const actions = [
+        <FlatButton
+            label={'Download image'}
+            icon={<IconDownload/>}
+            style={
+                props.exportedType === 'png' ? { marginRight: 10 } : { display: 'none' }
+            }
+            onClick={() => props.downloadImage()}
+            disabled={!isValidExport}
+        />,
+        <FlatButton
+            label={'Download ' + props.exportedType}
+            icon={<IconDownload/>}
+            style={
+                props.exportedImages && props.exportedType !== 'png'
+                ? { marginRight: 10 }
+                : { display: 'none' }
+            }
+            onClick={() => {
+                downloadZip();
+            }}
+        />,
+        <FlatButton
+            label={'Download ' + props.exportedType}
+            icon={<IconDownload/>}
+            style={
+                props.exportedImages ||
+                props.exportedType === 'png' ||
+                props.exportedType === 'share'
+                ? { display: 'none' }
+                : { marginRight: 10 }
+            }
+            onClick={() =>
+                fileDownload(props.exportedData, `${filename}.${props.exportedType}`)
+            }
+        />,
+        <FlatButton
+            label="Close"
+            primary={true}
+            onClick={() => props.handleExportToggle(false)}
+            keyboardFocused
+        />,
+    ];
 
     const SVGImageContainer =
         Array.from(props.exportedData)
@@ -74,117 +74,117 @@ const Export = props => {
                  );
              })
 
-  const downloadZip = () => {
-    fetch(props.exportedImages)
-      .then(function (response) {
-        if (response.status === 200 || response.status === 0) {
-          return Promise.resolve(response.blob());
-        } else {
-          return Promise.reject(new Error(response.statusText));
-        }
-      })
-      .then(JSZip.loadAsync)
-      .then(function (zip) {
-        zip.generateAsync({ type: 'blob' }).then(
-          function (blob) {
-            saveAs(blob, `${props.projectID}_${props.exportedType}.zip`);
-          },
-          function (err) {
-            console.log('error saving zip file!');
-          }
-        );
-      });
-  };
+    const downloadZip = () => {
+        fetch(props.exportedImages)
+            .then(function (response) {
+                if (response.status === 200 || response.status === 0) {
+                    return Promise.resolve(response.blob());
+                } else {
+                    return Promise.reject(new Error(response.statusText));
+                }
+            })
+            .then(JSZip.loadAsync)
+            .then(function (zip) {
+                zip.generateAsync({ type: 'blob' }).then(
+                    function (blob) {
+                        saveAs(blob, `${props.projectID}_${props.exportedType}.zip`);
+                    },
+                    function (err) {
+                        console.log('error saving zip file!');
+                    }
+                );
+            });
+    };
 
-  const exportedData =
-    props.exportedType !== 'png' ? (
-      <div
-        style={{ maxHeight: 500, overflow: 'scroll', background: '#f5f5f5' }}
-      >
-        <IconButton
-          style={{ position: 'fixed', right: '40px' }}
-          tooltip="Copy to clipboard"
-          onClick={() => {
-            copy(
-              props.exportedType === 'share'
-                ? window.location.href + '/viewOnly'
-                : props.exportedData
-            );
-            props.showCopyToClipboardNotification();
-          }}
-        >
-          <IconCopy />
-        </IconButton>
+    const exportedData =
+        props.exportedType !== 'png' ? (
+            <div
+                style={{ maxHeight: 500, overflow: 'scroll', background: '#f5f5f5' }}
+            >
+                <IconButton
+                    style={{ position: 'fixed', right: '40px' }}
+                    tooltip="Copy to clipboard"
+                    onClick={() => {
+                        copy(
+                            props.exportedType === 'share'
+                            ? window.location.href + '/viewOnly'
+                            : props.exportedData
+                        );
+                        props.showCopyToClipboardNotification();
+                    }}
+                >
+                    <IconCopy/>
+                </IconButton>
 
-        {/* {props.exportedType === 'share'
+                {/* {props.exportedType === 'share'
           ? window.location.href + '/viewOnly'
           : props.exportedData} */}
-        {props.exportedType === 'svg' ? (
-            <div className="svg_container">
-                {SVGImageContainer}
+                {props.exportedType === 'svg' ? (
+                    <div className="svg_container">
+                        {SVGImageContainer}
+                    </div>
+                ) : (
+                     <pre>{props.exportedData}</pre>
+                 )}
             </div>
         ) : (
-          <pre>{props.exportedData}</pre>
-        )}
-      </div>
-    ) : (
-      <div>
-        <TextField
-          floatingLabelText="Number of quires per line"
-          id="exportCols"
-          value={props.exportCols}
-          type="number"
-          onChange={(event, newValue) =>
-            props.setExport('exportCols', newValue)
-          }
-          style={{ width: 180 }}
-          errorText={
-            isValidExport ? '' : `Must be between 1 and ${props.numRootGroups}`
-          }
-          aria-invalid={!isValidExport}
-          min={1}
-          max={props.numRootGroups}
-        />
-        <br />
-        <br />
-        <Checkbox
-          label="Show terms in exported image"
-          id="exportTerms"
-          checked={props.exportTerms}
-          onCheck={() => props.setExport('exportTerms', !props.exportTerms)}
-        />
+            <div>
+                <TextField
+                    floatingLabelText="Number of quires per line"
+                    id="exportCols"
+                    value={props.exportCols}
+                    type="number"
+                    onChange={(event, newValue) =>
+                        props.setExport('exportCols', newValue)
+                    }
+                    style={{ width: 180 }}
+                    errorText={
+                        isValidExport ? '' : `Must be between 1 and ${props.numRootGroups}`
+                    }
+                    aria-invalid={!isValidExport}
+                    min={1}
+                    max={props.numRootGroups}
+                />
+                <br/>
+                <br/>
+                <Checkbox
+                    label="Show terms in exported image"
+                    id="exportTerms"
+                    checked={props.exportTerms}
+                    onCheck={() => props.setExport('exportTerms', !props.exportTerms)}
+                />
 
-        <div style={{ width: 1, height: 1, overflow: 'hidden' }}>
-          <canvas id="exportCanvas" width="1" height="1" />
-        </div>
-      </div>
+                <div style={{ width: 1, height: 1, overflow: 'hidden' }}>
+                    <canvas id="exportCanvas" width="1" height="1"/>
+                </div>
+            </div>
+        );
+    return (
+        <Dialog
+            title={props.label}
+            actions={actions}
+            modal={false}
+            open={props.exportOpen}
+            onRequestClose={() => props.handleExportToggle(false)}
+            contentStyle={{ maxWidth: 1000 }}
+        >
+            {props.label === 'XML' ? (
+                <p>
+                    <strong>Note:</strong> custom folio numbers and page numbers will be
+                    lost when exporting to XML format. If you wish to preserve all
+                    collation data, please choose JSON export.
+                </p>
+            ) : (
+                 ''
+             )}
+            {props.label === 'Share this project' ? (
+                <p>The URL below shows the view-only mode of your project.</p>
+            ) : (
+                 ''
+             )}
+            {exportedData}
+        </Dialog>
     );
-  return (
-    <Dialog
-      title={props.label}
-      actions={actions}
-      modal={false}
-      open={props.exportOpen}
-      onRequestClose={() => props.handleExportToggle(false)}
-      contentStyle={{ maxWidth: 1000 }}
-    >
-      {props.label === 'XML' ? (
-        <p>
-          <strong>Note:</strong> custom folio numbers and page numbers will be
-          lost when exporting to XML format. If you wish to preserve all
-          collation data, please choose JSON export.
-        </p>
-      ) : (
-        ''
-      )}
-      {props.label === 'Share this project' ? (
-        <p>The URL below shows the view-only mode of your project.</p>
-      ) : (
-        ''
-      )}
-      {exportedData}
-    </Dialog>
-  );
 };
 
 export default Export;
