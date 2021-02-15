@@ -70,6 +70,10 @@ const Export = props => {
                          alt={'Quire SVG'}
                          key={index}
                          src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
+                         style={
+                             {maxHeight: '200px'}
+
+                         }
                      ></img>
                  );
              })
@@ -121,7 +125,9 @@ const Export = props => {
           : props.exportedData} */}
                 {props.exportedType === 'svg' ? (
                     <div className="svg_container">
-                        {SVGImageContainer}
+                        <pre>
+                            {SVGImageContainer}
+                        </pre>
                     </div>
                 ) : (
                      <pre>{props.exportedData}</pre>
