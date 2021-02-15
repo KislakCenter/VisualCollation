@@ -62,6 +62,18 @@ const Export = props => {
     />,
   ];
 
+    const SVGImageContainer =
+        Array.from(props.exportedData)
+             .map((value, index) => {
+                 return (
+                     <img
+                         alt={'Quire SVG'}
+                         key={index}
+                         src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
+                     ></img>
+                 );
+             })
+
   const downloadZip = () => {
     fetch(props.exportedImages)
       .then(function (response) {
@@ -108,19 +120,9 @@ const Export = props => {
           ? window.location.href + '/viewOnly'
           : props.exportedData} */}
         {props.exportedType === 'svg' ? (
-          <div>
-            {Array.from(props.exportedData)
-              .reverse()
-              .map((value, index) => {
-                return (
-                  <img
-                    alt={'Quire SVG'}
-                    key={index}
-                    src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
-                  ></img>
-                );
-              })}
-          </div>
+            <div className="svg_container">
+                {SVGImageContainer}
+            </div>
         ) : (
           <pre>{props.exportedData}</pre>
         )}
