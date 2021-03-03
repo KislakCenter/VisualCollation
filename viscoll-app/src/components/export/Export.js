@@ -125,9 +125,7 @@ const Export = props => {
           : props.exportedData} */}
                 {props.exportedType === 'svg' ? (
                     <div className="svg_container">
-                        <pre>
                             {SVGImageContainer}
-                        </pre>
                     </div>
                 ) : (
                      <pre>{props.exportedData}</pre>
