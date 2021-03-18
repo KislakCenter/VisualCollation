@@ -2,6 +2,7 @@ import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import { ClickAwayListener } from '@material-ui/core/ClickAwayListener';
 import Checkbox from 'material-ui/Checkbox';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import TextField from 'material-ui/TextField';
@@ -645,9 +646,11 @@ export default class AddGroupDialog extends React.Component {
         );
 
         return (
-            <div>
-                {dialog}
-            </div>
+            <ClickAwayListener onClickAway={this.resetForm()}>
+                <div>
+                    {dialog}
+                </div>
+            </ClickAwayListener>
         );
     }
 }
