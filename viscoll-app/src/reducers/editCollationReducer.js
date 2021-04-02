@@ -116,6 +116,7 @@ export default function editCollationReducer(state = initialState, action) {
         // adding more options to this breaks json export
         action.payload.type === 'xml' ||
         action.payload.type === 'svg' ||
+        action.payload.type === 'png' ||
         action.payload.type === 'formula'
           ? action.payload.data
           : JSON.stringify(action.payload.Export, null, 4);

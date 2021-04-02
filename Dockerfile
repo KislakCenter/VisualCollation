@@ -14,6 +14,7 @@ COPY viscoll-app .
 RUN npm run build
 
 FROM ruby:2.7
+RUN apt-get update && apt-get install -y librsvg2-bin
 
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config --global frozen 1

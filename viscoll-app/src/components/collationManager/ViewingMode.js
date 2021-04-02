@@ -46,6 +46,7 @@ export default class ViewingMode extends React.Component {
         toggleTacket: this.props.toggleTacket,
         addTacket: this.addTacket,
         viewingMode: true,
+        notationStyle: this.props.project.notationStyle,
       })
     }, ()=>{this.drawOnCanvas();});
   }

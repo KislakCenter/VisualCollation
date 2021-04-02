@@ -1,4 +1,8 @@
 FROM ruby:2.7
+
+RUN apt-get update && apt-get install -y librsvg2-bin
+
 WORKDIR /app
 COPY viscoll-api/Gemfile viscoll-api/Gemfile.lock ./
 RUN bundle install
+

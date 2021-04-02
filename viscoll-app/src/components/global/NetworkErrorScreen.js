@@ -13,7 +13,6 @@ export default class NetworkErrorScreen extends React.Component {
 
   componentWillMount() {
     let that = this;
-    console.log("API_URL is: " + API_URL);
     let healthCheckURL = API_URL + '/status';
     let apiRequest = () => {
       fetch(healthCheckURL)

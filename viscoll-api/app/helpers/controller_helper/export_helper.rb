@@ -407,7 +407,7 @@ module ControllerHelper
                   if linkedImage != ""
                     termText = termText+" "+linkedImage+" #manifest_"+recto.image[:manifestID]
                   end
-                  xml.map :side => 'recto', :target => "#"+attributes["xml:id"] do
+                  xml.map :side => 'right', :target => "#"+attributes["xml:id"] do
                     xml.term :target => termText.strip
                   end
                 else
@@ -415,7 +415,7 @@ module ControllerHelper
                   if linkedImage != ""
                     termText = termText+" "+linkedImage+" #manifest_"+recto.image[:manifestID]
                   end
-                  xml.map :side => 'recto', :target => "#"+attributes["xml:id"] do
+                  xml.map :side => 'right', :target => "#"+attributes["xml:id"] do
                     xml.term :target => termText.strip
                   end
                 end
@@ -442,7 +442,7 @@ module ControllerHelper
                   if linkedImage != ""
                     termText = termText+" "+linkedImage+" #manifest_"+verso.image[:manifestID]
                   end
-                  xml.map :side => 'verso', :target => "#"+attributes["xml:id"] do
+                  xml.map :side => 'left', :target => "#"+attributes["xml:id"] do
                     xml.term :target => termText.strip
                   end
                 else
@@ -450,7 +450,7 @@ module ControllerHelper
                   if linkedImage != ""
                     termText = termText+" "+linkedImage+" #manifest_"+verso.image[:manifestID]
                   end
-                  xml.map :side => 'verso', :target => "#"+attributes["xml:id"] do
+                  xml.map :side => 'left', :target => "#"+attributes["xml:id"] do
                     xml.term :target => termText.strip
                   end
                 end
