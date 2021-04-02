@@ -8,50 +8,42 @@ import IconDownload from 'material-ui/svg-icons/file/file-download';
 import IconButton from 'material-ui/IconButton';
 import JSZip from 'jszip';
 import saveAs from 'file-saver';
-import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
+
 
 /** Dialog to export collation to JSON, XML or PNG */
 const Export = props => {
     const filename = props.projectTitle.replace(/\s/g, '_');
-
-    const isValidExport =
-        props.exportCols > 0 && props.exportCols <= props.numRootGroups;
-
     const actions = [
-        <FlatButton
-            label={'Download image'}
-            icon={<IconDownload/>}
-            style={
-                props.exportedType === 'png' ? { marginRight: 10 } : { display: 'none' }
-            }
-            onClick={() => props.downloadImage()}
-            disabled={!isValidExport}
-        />,
         <FlatButton
             label={'Download ' + props.exportedType}
             icon={<IconDownload/>}
             style={
-                props.exportedImages && props.exportedType !== 'png'
-                ? { marginRight: 10 }
-                : { display: 'none' }
+                props.exportedImages
+                    ? {marginRight: 10}
+                    : {display: 'none'}
             }
             onClick={() => {
                 downloadZip();
             }}
         />,
         <FlatButton
+            label={"Download " + props.exportedType}
+            icon={<IconDownload />}
+            style={props.exportedType==="xml"?{marginRight:10}:{display:"none"}}
+            onClick={()=>fileDownload(props.exportedData, `${filename}.${props.exportedType}`)}
+        />,
+        <FlatButton
             label={'Download ' + props.exportedType}
             icon={<IconDownload/>}
             style={
                 props.exportedImages ||
-                props.exportedType === 'png' ||
+                props.exportedType === 'xml' ||
                 props.exportedType === 'share'
-                ? { display: 'none' }
-                : { marginRight: 10 }
+                    ? {display: 'none'}
+                    : {marginRight: 10}
             }
             onClick={() =>
-                fileDownload(props.exportedData, `${filename}.${props.exportedType}`)
+                downloadZip()
             }
         />,
         <FlatButton
@@ -133,32 +125,9 @@ const Export = props => {
             </div>
         ) : (
             <div>
-                <TextField
-                    floatingLabelText="Number of quires per line"
-                    id="exportCols"
-                    value={props.exportCols}
-                    type="number"
-                    onChange={(event, newValue) =>
-                        props.setExport('exportCols', newValue)
-                    }
-                    style={{ width: 180 }}
-                    errorText={
-                        isValidExport ? '' : `Must be between 1 and ${props.numRootGroups}`
-                    }
-                    aria-invalid={!isValidExport}
-                    min={1}
-                    max={props.numRootGroups}
-                />
-                <br/>
-                <br/>
-                <Checkbox
-                    label="Show terms in exported image"
-                    id="exportTerms"
-                    checked={props.exportTerms}
-                    onCheck={() => props.setExport('exportTerms', !props.exportTerms)}
-                />
+                Please download your PNGs below.
 
-                <div style={{ width: 1, height: 1, overflow: 'hidden' }}>
+                <div style={{width: 1, height: 1, overflow: 'hidden'}}>
                     <canvas id="exportCanvas" width="1" height="1"/>
                 </div>
             </div>
