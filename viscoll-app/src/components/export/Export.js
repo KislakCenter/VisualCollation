@@ -63,8 +63,7 @@ const Export = props => {
                          key={index}
                          src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
                          style={
-                             {maxHeight: '200px'}
-
+                             {maxWidth: '100%'}
                          }
                      ></img>
                  );
