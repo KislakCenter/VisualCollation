@@ -182,7 +182,7 @@ module ControllerHelper
 
 
       @project.sides.each do | side |
-        parentOrder =  @leafIDs.index(side.parentID) + 1
+        # parentOrder =  @leafIDs.index(side.parentID) + 1
         obj = {
             "id":               side.id.to_s,
             "parentID":         side.parentID,

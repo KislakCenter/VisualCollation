@@ -10,7 +10,8 @@ class Project
   field :manifests, type: Hash, default: lambda { { } } # (eg) { "1234556": { id: "123456, url: ""} }
   field :taxonomies, type: Array, default: ["Unknown"] # custom taxonomies
   field :preferences, type: Hash, default: lambda { { :showTips => true } }
-  field :groupIDs, type: Array, default: []
+  field :topLevelGroupIDs, type: Array, default: []
+  # field :groupIDs, type: Array, default: []
 
   # Relations
   belongs_to :user, inverse_of: :projects
@@ -26,18 +27,39 @@ class Project
   validates_presence_of :title, :message => "Project title is required."
   validates_uniqueness_of :title, :message => "Project title: '%{value}', must be unique.", scope: :user
 
-  def add_groupIDs(groupIDs, index)
-    if self.groupIDs.length == 0
-      self.groupIDs = groupIDs
-    else
-      self.groupIDs.insert(index, *groupIDs)
+  def groupIDs
+    ids = []
+    self.topLevelGroupIDs.each do |tl|
+      group = Group.find tl
+      get_groupIDs group, ids
     end
-    self.save()
+    ids.flatten
+  end
+
+  def get_groupIDs group, ids
+    ids << group.id unless ids.include? group.id
+    group.memberIDs.each do |id|
+      if id.starts_with? 'G'
+        subgroup = Group.find id
+        get_groupIDs subgroup, ids
+      end
+    end
+    ids.flatten
+  end
+
+  def add_groupIDs(groupIDs, index)
+    top_level_groups = groupIDs.select {|id| Group.find(id).nestLevel == 1}
+    if self.topLevelGroupIDs.length == 0
+      self.topLevelGroupIDs = top_level_groups
+    else
+      self.topLevelGroupIDs.insert(index, *top_level_groups)
+    end
+    self.save
   end
 
   def remove_groupID(groupID)
-    self.groupIDs.delete(groupID)
-    self.save()
+    self.topLevelGroupIDs.delete(groupID)
+    self.save
   end
 
   def unlink_images_before_delete

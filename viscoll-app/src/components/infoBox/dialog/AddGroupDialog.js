@@ -334,7 +334,6 @@ export default class AddGroupDialog extends React.Component {
                     title: "None",
                     type: "Quire"
                 };
-                data.additional["memberOrder"] = memberOrder;
                 data.additional["order"] = groupOrder;
             }
             data.group["project_id"] = this.props.projectID
