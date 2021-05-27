@@ -5,31 +5,31 @@ services:
     image: "quay.io/upennlibraries/vceditor_web:${RELEASE_TAG}"
     command: server -b 0.0.0.0
     environment:
-      - MAILER_HOST
+      - ADMIN_EMAIL
+      - APPLICATION_HOST
       - MAILER_DEFAULT_FROM
       - MAILER_DOMAIN
-      - RELEASE_TAG
-      - APPLICATION_HOST
-      - PROJECT_URL
-      - MAILER_USR
+      - MAILER_HOST
+      - MAILER_PORT
       - MAILER_PWD
-      - ADMIN_EMAIL
-      - SECRET_KEY_BASE
+      - MAILER_USR
+      - PROJECT_URL
       - RAILS_ENV
       - RAILS_SERVE_STATIC_FILES
+      - RELEASE_TAG
+      - SECRET_KEY_BASE
       - XPROC_URL
-    depends_on:
-      - mongo
-      - xproc
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.staging-app.rule=Host(`${PROJECT_URL}`)"
-        - "traefik.http.routers.staging-app.entrypoints=web"
-        - "traefik.http.services.staging-app.loadbalancer.server.port=3000"
+        - "traefik.http.routers.${INSTANCE}-app.rule=Host(`${PROJECT_URL}`)"
+        - "traefik.http.routers.${INSTANCE}-app.entrypoints=${INSTANCE}"
+        - "traefik.http.services.${INSTANCE}-app.loadbalancer.server.port=3000"
     networks:
       - internal
       - traefik
+    volumes:
+      - images:/usr/src/app/public/uploads
 
   mongo:
     image: mongo:4.0
@@ -40,18 +40,13 @@ services:
 
   xproc:
     image: "quay.io/upennlibraries/vceditor_idrovora:${RELEASE_TAG}"
-    command: ["--http", "2000",
-              "--http-context-path", "/xproc",
-              "--http-doc-root", "/docs",
-              "--http-cleanup-schedule", "0 0 * * * ?",
-              "--http-job-max-age", "PT168H",
-              "/xpl"]
+    command: --http 2000 --http-context-path /xproc --http-doc-root /docs /xpl
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.staging-xproc.rule=Host(`${PROJECT_URL}`) && PathPrefix(`/xproc`)"
-        - "traefik.http.routers.staging-xproc.entrypoints=web"
-        - "traefik.http.services.staging-xproc.loadbalancer.server.port=2000"
+        - "traefik.http.routers.${INSTANCE}-xproc.rule=Host(`${PROJECT_URL}`) && PathPrefix(`/xproc`)"
+        - "traefik.http.routers.${INSTANCE}-xproc.entrypoints=${INSTANCE}"
+        - "traefik.http.services.${INSTANCE}-xproc.loadbalancer.server.port=2000"
     networks:
       - internal
       - traefik
@@ -65,6 +60,8 @@ networks:
 
 volumes:
   db:
-    name: db
+    name: ${INSTANCE}-db
   xproc:
-    name: xproc
+    name: ${INSTANCE}-xproc
+  images:
+    name: ${INSTANCE}-images
