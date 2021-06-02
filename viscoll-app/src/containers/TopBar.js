@@ -20,6 +20,8 @@ import {
   updateProfile,
   deleteProfile,
 } from '../actions/backend/userActions';
+import { API_URL } from '../store/axiosConfig';
+import light from '../styles/light';
 
 /** The topbar menu used in `Dashboard` and `Project` components */
 class TopBar extends Component {
@@ -32,6 +34,15 @@ class TopBar extends Component {
 
   componentDidMount() {
     window.addEventListener('keydown', this.shortcutListener);
+    // set instance into state
+    let instanceURL = API_URL + '/instance'
+    let instanceRequest = () => {
+      fetch(instanceURL).then(async (response) => {
+        const data = await response.json();
+        this.setState({instance:data.current_instance})
+      })
+    }
+    instanceRequest();
   }
 
   componentWillUnmount() {
@@ -130,6 +141,7 @@ class TopBar extends Component {
           onClick={this.goHome}
           aria-label="Click to go home"
           tabIndex={this.props.tabIndex}
+          style={{background: this.state.instance ? light.palette.stagingColor : light.palette.primary1Color}}
         >
           <img src={imgLogo} alt="Viscoll logo" />
         </button>
