@@ -137,11 +137,11 @@ class TopBar extends Component {
       >
         <button
           className="logo"
-          style={{ cursor: 'pointer', border: 0 }}
+          style={{ cursor: 'pointer', border: 0, background: this.state.instance ? light.palette.stagingColor : light.palette.primary2Color }}
           onClick={this.goHome}
           aria-label="Click to go home"
           tabIndex={this.props.tabIndex}
-          style={{background: this.state.instance ? light.palette.stagingColor : light.palette.primary1Color}}
+
         >
           <img src={imgLogo} alt="Viscoll logo" />
         </button>

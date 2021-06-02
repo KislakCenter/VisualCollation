@@ -43,7 +43,6 @@ import fileDownload from 'js-file-download';
 import TermDialog from '../components/collationManager/dialog/TermDialog';
 import {radioBtnDark} from '../styles/button';
 import ManagersPanel from '../components/global/ManagersPanel';
-import { API_URL } from '../store/axiosConfig';
 
 /** Container for `TabularMode`, `VisualMode`, `InfoBox`, `TopBar`, `LoadingScreen`, and `Notification`. This container has the project sidebar embedded directly.  */
 class CollationManager extends Component {
