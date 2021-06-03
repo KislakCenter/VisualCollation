@@ -211,7 +211,7 @@ class Landing extends Component {
             {resendConfirmation}
           </div>
         </div>
-        <div className="panelBottom" style={{background: this.state.instance ? light.palette.stagingColor : light.palette.primary1Color}}></div>
+        <div className="panelBottom" style={{background: this.state.instance === 'staging' ? light.palette.stagingColor : light.palette.primary1Color}}></div>
         <NetworkErrorScreen />
       </div>
     );
