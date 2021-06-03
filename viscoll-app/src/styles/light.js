@@ -17,6 +17,7 @@ exports.default = {
   fontFamily: 'Roboto, sans-serif',
   borderRadius: 2,
   palette: {
+    stagingColor: '#B81616',
     primary1Color: '#526C91',
     primary2Color: '#3A4B55',
     primary3Color: _colors.grey400,

@@ -19,6 +19,8 @@ import {
   logout,
   resendConfirmation,
 } from '../actions/backend/userActions';
+import { API_URL } from '../store/axiosConfig';
+import light from "../styles/light.js";
 
 /** Landing page of the app.  Contain register, login and password reset forms. */
 class Landing extends Component {
@@ -94,6 +96,15 @@ class Landing extends Component {
         this.props.history.push('/dashboard');
       }
     }
+    // set instance into state
+    let instanceURL = API_URL + '/instance'
+    let instanceRequest = () => {
+      fetch(instanceURL).then(async (response) => {
+        const data = await response.json();
+        this.setState({instance:data.current_instance})
+      })
+    }
+    instanceRequest();
   }
 
   render() {
@@ -200,7 +211,7 @@ class Landing extends Component {
             {resendConfirmation}
           </div>
         </div>
-        <div className="panelBottom"></div>
+        <div className="panelBottom" style={{background: this.state.instance === 'staging' ? light.palette.stagingColor : light.palette.primary1Color}}></div>
         <NetworkErrorScreen />
       </div>
     );
