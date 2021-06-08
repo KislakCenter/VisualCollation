@@ -391,7 +391,8 @@ module ControllerHelper
             end
           end
 
-          if project.terms.present?
+          # check if any mappings exist
+          if project.mapping?
           # MAPPING
           xml.mapping do
             # Map rectos to attributes and terms and sides

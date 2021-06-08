@@ -19,6 +19,19 @@ class Group
   before_create :edit_ID
   before_destroy :unlink_terms, :unlink_project, :unlink_group, :destroy_members
 
+  def mapping?
+    # if any terms are attached to group, mappings exist
+    return true if terms.present?
+    memberIDs.any? do |memberID|
+      if memberID[0] == 'G'
+        member = Group.find(memberID)
+      elsif memberID[0] == 'L'
+        member = Leaf.find(memberID)
+      end
+      member.mapping?
+    end
+  end
+
   # code here must mirror groupNotation function in PaperManager.js:44
   def group_notation
     outer_groups = project.groups.where(nestLevel: 1).to_a
