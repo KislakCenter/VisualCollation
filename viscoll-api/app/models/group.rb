@@ -32,6 +32,17 @@ class Group
     end
   end
 
+  def mappings
+    mappings_array = []
+    self.memberIDs.each do |memberID|
+      if memberID[0] == "L"
+        member = Leaf.find(memberID)
+        mappings_array += member.mappings if member.mapping?
+      end
+    end
+    mappings_array
+  end
+
   # code here must mirror groupNotation function in PaperManager.js:44
   def group_notation
     outer_groups = project.groups.where(nestLevel: 1).to_a
