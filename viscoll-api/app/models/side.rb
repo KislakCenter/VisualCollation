@@ -21,6 +21,11 @@ class Side
     Leaf.find(parentID)
   end
 
+  # if any terms are attached, mappings exist
+  def mapping?
+    terms.present?
+  end
+
   protected
   # If linked to term(s), remove link from the term(s)'s side
   def unlink_terms

@@ -26,6 +26,11 @@ class Project
   validates_presence_of :title, :message => "Project title is required."
   validates_uniqueness_of :title, :message => "Project title: '%{value}', must be unique.", scope: :user
 
+  # do any groups have mappings?
+  def mapping?
+    groups.any? { |group| group.mapping? }
+  end
+
   def add_groupIDs(groupIDs, index)
     if self.groupIDs.length == 0
       self.groupIDs = groupIDs

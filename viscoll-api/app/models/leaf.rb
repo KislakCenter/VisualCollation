@@ -23,6 +23,15 @@ class Leaf
   before_create :edit_ID, :create_sides
   before_destroy :unlink_terms, :destroy_sides, :update_parent_group
 
+  def mapping?
+    # if terms are attached to leaf, mappings exist
+    return true if terms.present?
+    # check sides for mappings
+    recto = Side.find(self.rectoID)
+    verso = Side.find(self.versoID)
+    [ recto, verso ].compact.any? { |side| side.mapping? }
+  end
+
   def parent_project
     group = Group.find(self.parentID)
     Project.find(group.parentID)
