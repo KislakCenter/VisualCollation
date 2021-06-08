@@ -1,5 +1,6 @@
+
 <?xml version="1.0"?>
-<viscoll xmlns="http://schoenberginstitute.org/schema/collation">
+<viscoll xmlns="http://viscoll.org/schema/collation/">
   <taxonomy xml:id="manuscript_preferences">
     <label>Manuscript preferences</label>
     <term xml:id="manuscript_preferences_ravenna_384_2339_showTips">true</term>

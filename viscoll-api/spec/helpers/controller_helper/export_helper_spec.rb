@@ -100,7 +100,7 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
       ['leaf_material_paper', 'Paper']
     )
     # Check that there are 6 rectos and 6 versos
-    ns = {n: "http://schoenberginstitute.org/schema/collation"}
+    ns = {n: "http://viscoll.org/schema/collation/"}
     expect(result.xpath("//n:mapping/n:map[@side='recto']", ns).size).to eq(6)
     expect(result.xpath("//n:mapping/n:map[@side='verso']", ns).size).to eq(6)
     # Check that the @target contains either Group or Leaf

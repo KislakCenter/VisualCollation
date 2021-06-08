@@ -196,7 +196,7 @@ module ControllerHelper
       end
 
       return Nokogiri::XML::Builder.new { |xml|
-        xml.viscoll :xmlns => "http://schoenberginstitute.org/schema/collation" do
+        xml.viscoll :xmlns => "http://viscoll.org/schema/collation/" do
           idPrefix = project.shelfmark.parameterize.underscore
 
           # STRUCTURE
