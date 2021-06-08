@@ -149,9 +149,9 @@ module ControllerHelper
       @rectos = {}
       @versos = {}
 
-      allGroups = xml.xpath('//x:quire', "x" => "http://schoenberginstitute.org/schema/collation")
-      allLeaves = xml.xpath('//x:leaf', "x" => "http://schoenberginstitute.org/schema/collation")
-      allTerms = xml.xpath('//x:note', "x" => "http://schoenberginstitute.org/schema/collation")
+      allGroups = xml.xpath('//x:quire', "x" => "http://viscoll.org/schema/collation/")
+      allLeaves = xml.xpath('//x:leaf', "x" => "http://viscoll.org/schema/collation/")
+      allTerms = xml.xpath('//x:note', "x" => "http://viscoll.org/schema/collation/")
 
       # Create the Project
       projectInformation = {}
