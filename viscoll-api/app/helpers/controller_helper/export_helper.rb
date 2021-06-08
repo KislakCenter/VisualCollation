@@ -412,6 +412,10 @@ module ControllerHelper
               # map
                 # fleshside attributes = all sides IDs with flesh texture
                 # term target fleshside
+              flesh_att = {target: project.mappings["Flesh"].map{|m| "##{m}"}.join(' ')}
+              xml.map flesh_att do
+                xml.term target: '#id-fs'
+              end
             end
           end
         end

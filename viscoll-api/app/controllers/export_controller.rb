@@ -199,7 +199,6 @@ class ExportController < ApplicationController
     response_hash  = JSON.parse(xproc_response.body)
 
     # TODO: Xproc#retreive_data; returns IO object
-    binding.pry
     job_url           = response_hash["_links"]["job"]["href"]
     job_uri           = URI.parse job_url
     job_req           = Net::HTTP::Get.new(job_uri)
