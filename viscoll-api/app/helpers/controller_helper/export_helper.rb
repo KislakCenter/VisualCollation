@@ -370,27 +370,6 @@ module ControllerHelper
             end
           end
 
-          # Term Attributes Taxonomy
-          if not project.terms.empty?
-            termTitle = {"xml:id": 'term_title'}
-            xml.taxonomy termTitle do
-              xml.label do
-                xml.text 'List of values for Term Titles'
-              end
-              project.terms.each_with_index do |term, index|
-                if not @termTitles.include? term.title
-                  @termTitles.push(term.title)
-                end
-              end
-              @termTitles.each do |termTitle|
-                termID = {"xml:id": "term_title"+"_"+termTitle.parameterize.underscore}
-                xml.term termID do
-                  xml.text termTitle
-                end
-              end
-            end
-          end
-
           # check if any mappings exist
           if project.mapping?
           # MAPPING
