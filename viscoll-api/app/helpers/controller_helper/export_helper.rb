@@ -375,8 +375,8 @@ module ControllerHelper
           end
 
           # Hard-coded parchment sides taxonomy
-          attributes = { 'xml:id': "id-sides", ref: "http://w3id.org/lob/" }
-          xml.taxonomy attributes do
+          parch_att = { 'xml:id': "id-sides", ref: "http://w3id.org/lob/" }
+          xml.taxonomy parch_att do
             xml.label do
               xml.text "Parchment Sides"
             end
@@ -395,6 +395,20 @@ module ControllerHelper
             right_attributes = { 'xml:id': "id-right", ref: "http://w3id.org/lob/concept/3004" }
             xml.term right_attributes do
               xml.text "right"
+            end
+          end
+
+          # terms taxonomy
+          terms_att = {'xml:id': "id-terms"}
+          xml.taxonomy terms_att do
+            xml.label do
+              xml.text "List of all Terms"
+            end
+            project.terms.each do |term|
+              term_att = {'xml:id': "#{term.id}"}
+              xml.term term_att do
+                xml.text term.title
+              end
             end
           end
 
