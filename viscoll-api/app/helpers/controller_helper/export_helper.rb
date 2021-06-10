@@ -410,12 +410,12 @@ module ControllerHelper
             # MAPPING
             xml.mapping do
               # map hairsides
-              hair_att = {target: mappings_hash["Hair"].map{|m| "##{m}"}.join(' ')}
+              hair_att = { target: mappings_hash["Hair"].map { |m| "##{m}" }.join(' ') }
               xml.map hair_att do
                 xml.term target: '#id-hs'
               end
               # map fleshsides
-              flesh_att = {target: mappings_hash["Flesh"].map{|m| "##{m}"}.join(' ')}
+              flesh_att = { target: mappings_hash["Flesh"].map { |m| "##{m}" }.join(' ') }
               xml.map flesh_att do
                 xml.term target: '#id-fs'
               end
