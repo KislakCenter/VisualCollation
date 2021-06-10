@@ -398,24 +398,44 @@ module ControllerHelper
             end
           end
 
+
           # check if any mappings exist
+          binding.pry
           if project.mapping?
+            mappings_hash = {}
+            project.mappings.each do |mapping|
+              mappings_hash[mapping.keys.first] ||= []
+              mappings_hash[mapping.keys.first] << mapping[mapping.keys.first]
+            end
             # MAPPING
             xml.mapping do
-              # map
-                # hairside attributes = all side IDs with hair texture
-                # term target hairside
-              hair_att = {target: project.mappings["Hair"].map{|m| "##{m}"}.join(' ')}
+              # map hairsides
+              hair_att = {target: mappings_hash["Hair"].map{|m| "##{m}"}.join(' ')}
               xml.map hair_att do
                 xml.term target: '#id-hs'
               end
-              # map
-                # fleshside attributes = all sides IDs with flesh texture
-                # term target fleshside
-              flesh_att = {target: project.mappings["Flesh"].map{|m| "##{m}"}.join(' ')}
+              # map fleshsides
+              flesh_att = {target: mappings_hash["Flesh"].map{|m| "##{m}"}.join(' ')}
               xml.map flesh_att do
                 xml.term target: '#id-fs'
               end
+              # map terms
+              # # groups
+              # <map target = IDs of group that term is attached to>
+              #   <term target = ID of term />
+              # </map>
+
+              # group_term_att = {target: group.mappings}
+
+              # # leaves
+              # <map target = IDs of group that term is attached to>
+              #   <term target = ID of term />
+              # </map>
+
+              # # sides
+              # <map target = IDs of group that term is attached to>
+              #   <term target = ID of term />
+              # </map>
             end
           end
         end

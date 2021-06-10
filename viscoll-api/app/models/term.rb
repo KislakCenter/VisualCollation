@@ -19,7 +19,12 @@ class Term
   validates_presence_of :taxonomy, :message => "Taxonomy is required."
 
   # Callbacks
+  before_create :edit_ID
   before_destroy :update_objects_before_delete
+
+  def edit_ID
+    self.id = "Term_" + self.id.to_s unless self.id.to_s[0] == "T"
+  end
 
   def update_objects_before_delete
     self.objects[:Group].each do |groupID|

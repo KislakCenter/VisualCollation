@@ -36,12 +36,7 @@ class Project
     self.groups.each do |group|
       mappings_array += group.mappings if group.mapping?
     end
-    mappings_hash = {}
-    mappings_array.each do |mapping|
-      mappings_hash[mapping.keys.first] ||= []
-      mappings_hash[mapping.keys.first] << mapping[mapping.keys.first]
-    end
-    mappings_hash
+    mappings_array
   end
 
   def add_groupIDs(groupIDs, index)

@@ -38,6 +38,9 @@ class Leaf
     verso = Side.find(self.versoID)
     mappings_array += recto.mappings if recto.mapping?
     mappings_array += verso.mappings if verso.mapping?
+    terms.each do |term|
+      mappings_array.push({term.id => self.id})
+    end
     mappings_array
   end
 
