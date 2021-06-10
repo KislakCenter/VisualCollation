@@ -399,19 +399,18 @@ module ControllerHelper
           end
 
           # terms taxonomy
-          terms_att = {'xml:id': "id-terms"}
+          terms_att = { 'xml:id': "id-terms" }
           xml.taxonomy terms_att do
             xml.label do
               xml.text "List of all Terms"
             end
             project.terms.each do |term|
-              term_att = {'xml:id': "#{term.id}"}
+              term_att = { 'xml:id': "#{term.id}" }
               xml.term term_att do
                 xml.text term.title
               end
             end
           end
-
 
           # check if any mappings exist
           binding.pry
