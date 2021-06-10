@@ -432,9 +432,9 @@ module ControllerHelper
                 xml.term target: '#id-fs'
               end
               # map terms
-              terms_hash = mappings_hash.select{|k| k.include? "Term"}
+              terms_hash = mappings_hash.select { |k| k.include? "Term" }
               terms_hash.each do |termID, targetIDs|
-                term_att = {target: targetIDs.map {|m| "##{m}"}.join(' ')}
+                term_att = { target: targetIDs.map { |m| "##{m}" }.join(' ') }
                 xml.map term_att do
                   xml.term target: "##{termID}"
                 end
