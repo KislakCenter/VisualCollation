@@ -413,7 +413,6 @@ module ControllerHelper
           end
 
           # check if any mappings exist
-          binding.pry
           if project.mapping?
             mappings_hash = {}
             project.mappings.each do |mapping|
@@ -433,22 +432,13 @@ module ControllerHelper
                 xml.term target: '#id-fs'
               end
               # map terms
-              # # groups
-              # <map target = IDs of group that term is attached to>
-              #   <term target = ID of term />
-              # </map>
-
-              # group_term_att = {target: group.mappings}
-
-              # # leaves
-              # <map target = IDs of group that term is attached to>
-              #   <term target = ID of term />
-              # </map>
-
-              # # sides
-              # <map target = IDs of group that term is attached to>
-              #   <term target = ID of term />
-              # </map>
+              terms_hash = mappings_hash.select{|k| k.include? "Term"}
+              terms_hash.each do |termID, targetIDs|
+                term_att = {target: targetIDs.map {|m| "##{m}"}.join(' ')}
+                xml.map term_att do
+                  xml.term target: "##{termID}"
+                end
+              end
             end
           end
         end

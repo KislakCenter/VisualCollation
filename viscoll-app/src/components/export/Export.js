@@ -102,7 +102,6 @@ const Export = props => {
                 {props.exportedType === 'svg' ? (
                     <div>
                         {Array.from(props.exportedData)
-                            .reverse()
                             .map((value, index) => {
                                 return (
                                     <img
