@@ -169,6 +169,20 @@ module ControllerHelper
       end
     end
 
+    def findSideParents hash, key, side
+      id_list = hash[key]
+      return [] if id_list.nil?
+      side_IDs = id_list.select { |i| i[0] == side[0] }
+      side_IDs.map { |s| Side.find(s).parentID }
+    end
+
+    def findNonSides hash, key
+      id_list = hash[key]
+      return [] if id_list.nil?
+      sides = ["R", "V"]
+      id_list.reject { |i| sides.include? i[0]  }
+    end
+
     def buildDotModel(project)
       @groupIDs                = project.groupIDs
       @groups                  = {}
@@ -386,8 +400,9 @@ module ControllerHelper
           end
 
           # Creating taxonomy elements
-          project.taxonomies.each do |taxonomy|
-            taxAtt = { 'xml:id': "id-#{taxonomy.parameterize.dasherize}" }
+          project.taxonomies.each_with_index do |taxonomy|
+            require 'digest'
+            taxAtt = { 'xml:id': "id-#{Digest::MD5.hexdigest(taxonomy)}" }
             xml.taxonomy taxAtt do
               xml.label do
                 xml.text taxonomy
@@ -416,22 +431,37 @@ module ControllerHelper
             end
             # MAPPING
             xml.mapping do
-              # map hairsides
-              hair_att = { target: mappings_hash["Hair"].map { |m| "##{m}" }.join(' ') }
-              xml.map hair_att do
-                xml.term target: '#id-hs'
-              end
-              # map fleshsides
-              flesh_att = { target: mappings_hash["Flesh"].map { |m| "##{m}" }.join(' ') }
-              xml.map flesh_att do
-                xml.term target: '#id-fs'
-              end
-              # map terms
-              terms_hash = mappings_hash.select { |k| k.include? "Term" }
-              terms_hash.each do |termID, targetIDs|
-                term_att = { target: targetIDs.map { |m| "##{m}" }.join(' ') }
-                xml.map term_att do
-                  xml.term target: "##{termID}"
+              mappings_hash.keys.each do |k|
+                xml_id = case k
+                         when "Hair"
+                           "id-hs"
+                         when "Flesh"
+                           "id-fs"
+                         else
+                           k
+                         end
+                term_recto_parents = findSideParents mappings_hash, k, "R"
+                if term_recto_parents.present?
+                  term_recto_att = { target: term_recto_parents.map { |m| "##{m}" }.join(' '), side: project.recto_side }
+                  xml.map term_recto_att do
+                    xml.term target: "##{xml_id}"
+                  end
+                end
+
+                term_verso_parents = findSideParents mappings_hash, k, "V"
+                if term_verso_parents.present?
+                  term_verso_att = { target: term_verso_parents.map { |m| "##{m}" }.join(' '), side: project.verso_side }
+                  xml.map term_verso_att do
+                    xml.term target: "##{xml_id}"
+                  end
+                end
+
+                non_side_IDs = findNonSides mappings_hash, k
+                if non_side_IDs.present?
+                  non_side_att = {target: non_side_IDs.map { |m| "##{m}" }.join(' ')}
+                  xml.map non_side_att do
+                    xml.term target: "##{xml_id}"
+                  end
                 end
               end
             end

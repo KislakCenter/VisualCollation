@@ -31,6 +31,26 @@ class Project
     groups.any? { |group| group.mapping? }
   end
 
+  def text_direction
+    'l-r'
+  end
+
+  def recto_side
+    if text_direction == 'l-r'
+      'left'
+    else
+      'right'
+    end
+  end
+
+  def verso_side
+    if text_direction == 'l-r'
+      'right'
+    else
+      'left'
+    end
+  end
+
   def mappings
     mappings_array = []
     self.groups.each do |group|
