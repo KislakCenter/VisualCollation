@@ -403,9 +403,6 @@ module ControllerHelper
           project.taxonomies.each_with_index do |taxonomy|
             require 'digest'
             taxAtt = { 'xml:id': "id-#{Digest::MD5.hexdigest(taxonomy)}" }
-            if taxonomy.uri.present?
-              taxAtt['ref'] = taxonomy.uri
-            end
             xml.taxonomy taxAtt do
               xml.label do
                 xml.text taxonomy
