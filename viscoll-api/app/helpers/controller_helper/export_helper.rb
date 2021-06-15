@@ -347,33 +347,6 @@ module ControllerHelper
             end
           end
 
-          # Creating taxonomies
-          if not project.terms.empty?
-            project.taxonomies.each do |taxonomy|
-              unless taxonomy == 'Unknown'
-                taxAtt = { 'xml:id': "taxonomy_#{taxonomy.parameterize.underscore}" }
-                xml.taxonomy taxAtt do
-                  xml.label do
-                    xml.text taxonomy
-                  end
-                  # grab an array of terms with the current taxonomy
-                  children = project.terms.select { |term| term.taxonomy == taxonomy }
-
-                  # add proper attributes and crete term elements
-                  children.each do |childTerm|
-                    termAttributes = { 'xml:id': "term_#{childTerm._id}" }
-                    if childTerm.uri.present?
-                      termAttributes['ref'] = childTerm.uri
-                    end
-                    xml.term termAttributes do
-                      xml.text childTerm.title
-                    end
-                  end
-                end
-              end
-            end
-          end
-
           # Hard-coded parchment sides taxonomy
           parch_att = { 'xml:id': "id-sides", ref: "http://w3id.org/lob/" }
           xml.taxonomy parch_att do
@@ -408,6 +381,28 @@ module ControllerHelper
               term_att = { 'xml:id': "#{term.id}" }
               xml.term term_att do
                 xml.text term.title
+              end
+            end
+          end
+
+          # Creating taxonomy elements
+          project.taxonomies.each do |taxonomy|
+            taxAtt = { 'xml:id': "id-#{taxonomy.parameterize.dasherize}" }
+            xml.taxonomy taxAtt do
+              xml.label do
+                xml.text taxonomy
+              end
+              # grab an array of terms with the current taxonomy
+              children = project.terms.select { |term| term.taxonomy == taxonomy }
+              # add proper attributes and crete term elements
+              children.each do |childTerm|
+                termAttributes = { 'xml:id': "#{childTerm.id}" }
+                if childTerm.uri.present?
+                  termAttributes['ref'] = childTerm.uri
+                end
+                xml.term termAttributes do
+                  xml.text childTerm.title
+                end
               end
             end
           end
