@@ -112,8 +112,21 @@ PaperGroup.prototype = {
     return notation;
   },
   setVisibility: function (visibleAttributes) {
+    // get terms to show
+    const groupTermsToShow = this.group.terms
+                                 .filter(termID => {
+                                   return this.Terms[termID].show;
+                                 })
+                                 .reverse();
+    // make array of term titles
+    let termTitles = []
+    // loop through groupTermsToShow
+    for (let termID of groupTermsToShow) {
+      let term = this.Terms[termID];
+      termTitles.push(term.title)
+    }
     this.visibleAttributes = visibleAttributes;
-    let groupText = this.group.type + ' ' + this.groupNotation(this.group);
+    let groupText = this.group.type + ' ' + this.groupNotation(this.group) + ': ' + termTitles.join(', ');
     if (this.visibleAttributes && this.visibleAttributes.title)
       groupText = groupText + ': ' + this.group.title;
     this.text.set({
@@ -126,6 +139,8 @@ function PaperGroup(args) {
   this.manager = args.manager;
   this.group = args.group;
   this.Groups = args.Groups;
+  this.Terms = args.Terms;
+  this.textTerms = new paper.Group();
   this.groupOrder = args.groupIDs.indexOf(args.group.id) + 1;
   this.notation = this.groupNotation(this.group);
   this.y = args.y;
@@ -148,6 +163,7 @@ function PaperGroup(args) {
     fillColor: this.textColor,
     fontSize: args.spacing * 0.48,
   });
+  this.spacing = args.spacing;
   this.setVisibility(args.visibleAttributes);
 }
 export default PaperGroup;

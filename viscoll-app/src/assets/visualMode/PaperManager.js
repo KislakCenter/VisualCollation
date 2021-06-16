@@ -10,6 +10,7 @@ PaperManager.prototype = {
             manager: this,
             group: group,
             Groups: this.Groups,
+            Terms: this.Terms,
             groupIDs: this.groupIDs,
             y: this.groupYs[this.groupIDs.indexOf(group.id)],
             x: (this.paperLeaves.find(g => g.leaf.id === group.memberIDs[0])) ?
