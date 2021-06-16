@@ -32,6 +32,18 @@ class Leaf
     [ recto, verso ].compact.any? { |side| side.mapping? }
   end
 
+  def mappings
+    mappings_array = []
+    recto = Side.find(self.rectoID)
+    verso = Side.find(self.versoID)
+    mappings_array += recto.mappings if recto.mapping?
+    mappings_array += verso.mappings if verso.mapping?
+    terms.each do |term|
+      mappings_array.push({term.id => self.id})
+    end
+    mappings_array
+  end
+
   def parent_project
     group = Group.find(self.parentID)
     Project.find(group.parentID)

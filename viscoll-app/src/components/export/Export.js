@@ -18,18 +18,18 @@ const Export = props => {
             icon={<IconDownload/>}
             style={
                 props.exportedImages
-                    ? {marginRight: 10}
-                    : {display: 'none'}
+                ? { marginRight: 10 }
+                : { display: 'none' }
             }
             onClick={() => {
                 downloadZip();
             }}
         />,
         <FlatButton
-            label={"Download " + props.exportedType}
-            icon={<IconDownload />}
-            style={props.exportedType==="xml"?{marginRight:10}:{display:"none"}}
-            onClick={()=>fileDownload(props.exportedData, `${filename}.${props.exportedType}`)}
+            label={'Download ' + props.exportedType}
+            icon={<IconDownload/>}
+            style={props.exportedType === 'xml' ? { marginRight: 10 } : { display: 'none' }}
+            onClick={() => fileDownload(props.exportedData, `${filename}.${props.exportedType}`)}
         />,
         <FlatButton
             label={'Download ' + props.exportedType}
@@ -38,8 +38,8 @@ const Export = props => {
                 props.exportedImages ||
                 props.exportedType === 'xml' ||
                 props.exportedType === 'share'
-                    ? {display: 'none'}
-                    : {marginRight: 10}
+                ? { display: 'none' }
+                : { marginRight: 10 }
             }
             onClick={() =>
                 downloadZip()
@@ -65,7 +65,7 @@ const Export = props => {
             })
             .then(JSZip.loadAsync)
             .then(function (zip) {
-                zip.generateAsync({type: 'blob'}).then(
+                zip.generateAsync({ type: 'blob' }).then(
                     function (blob) {
                         saveAs(blob, `${props.projectID}_${props.exportedType}.zip`);
                     },
@@ -79,16 +79,16 @@ const Export = props => {
     const exportedData =
         props.exportedType !== 'png' ? (
             <div
-                style={{maxHeight: 500, overflow: 'scroll', background: '#f5f5f5'}}
+                style={{ maxHeight: 500, overflow: 'scroll', background: '#f5f5f5' }}
             >
                 <IconButton
-                    style={{position: 'fixed', right: '40px'}}
+                    style={{ position: 'fixed', right: '40px' }}
                     tooltip="Copy to clipboard"
                     onClick={() => {
                         copy(
                             props.exportedType === 'share'
-                                ? window.location.href + '/viewOnly'
-                                : props.exportedData
+                            ? window.location.href + '/viewOnly'
+                            : props.exportedData
                         );
                         props.showCopyToClipboardNotification();
                     }}
@@ -102,26 +102,25 @@ const Export = props => {
                 {props.exportedType === 'svg' ? (
                     <div>
                         {Array.from(props.exportedData)
-                            .reverse()
-                            .map((value, index) => {
-                                return (
-                                    <img
-                                        alt={'Quire SVG'}
-                                        key={index}
-                                        src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
-                                    ></img>
-                                );
-                            })}
+                              .map((value, index) => {
+                                  return (
+                                      <img
+                                          alt={'Quire SVG'}
+                                          key={index}
+                                          src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
+                                      ></img>
+                                  );
+                              })}
                     </div>
                 ) : (
-                    <pre>{props.exportedData}</pre>
-                )}
+                     <pre>{props.exportedData}</pre>
+                 )}
             </div>
         ) : (
             <div>
                 Please download your PNGs below.
 
-                <div style={{width: 1, height: 1, overflow: 'hidden'}}>
+                <div style={{ width: 1, height: 1, overflow: 'hidden' }}>
                     <canvas id="exportCanvas" width="1" height="1"/>
                 </div>
             </div>
@@ -133,7 +132,7 @@ const Export = props => {
             modal={false}
             open={props.exportOpen}
             onRequestClose={() => props.handleExportToggle(false)}
-            contentStyle={{maxWidth: 1000}}
+            contentStyle={{ maxWidth: 1000 }}
         >
             {props.label === 'XML' ? (
                 <p>
@@ -142,13 +141,13 @@ const Export = props => {
                     collation data, please choose JSON export.
                 </p>
             ) : (
-                ''
-            )}
+                 ''
+             )}
             {props.label === 'Share this project' ? (
                 <p>The URL below shows the view-only mode of your project.</p>
             ) : (
-                ''
-            )}
+                 ''
+             )}
             {exportedData}
         </Dialog>
     );

@@ -32,32 +32,45 @@ class Group
     end
   end
 
+  def mappings
+    mappings_array = []
+    self.memberIDs.each do |memberID|
+      if memberID[0] == "L"
+        member = Leaf.find(memberID)
+        mappings_array += member.mappings if member.mapping?
+      end
+    end
+    terms.each do |term|
+      mappings_array.push({term.id => self.id})
+    end
+    mappings_array
+  end
+
   # code here must mirror groupNotation function in PaperManager.js:44
   def group_notation
-    outer_groups = project.groups.where(nestLevel: 1).to_a
+    outer_groups   = project.groups.where(nestLevel: 1).to_a
     outer_groupIDs = outer_groups.map(&:id)
     if self.nestLevel == 1
       group_order = outer_groupIDs.index(self.id) + 1 # index of this group (self.id) in context of outer_groups + 1
-      notation = group_order.to_s
+      notation    = group_order.to_s
     else
-      parent_group = Group.find(self.parentID)
-      parent_group_children = parent_group.memberIDs.select{ |g| g.start_with? 'G'}
-      subquire_notation = parent_group_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
-      notation = "#{parent_group.group_notation}.#{subquire_notation}"
+      parent_group          = Group.find(self.parentID)
+      parent_group_children = parent_group.memberIDs.select { |g| g.start_with? 'G' }
+      subquire_notation     = parent_group_children.index(self.id) + 1 # index of this group in context of all children of this group's parent
+      notation              = "#{parent_group.group_notation}.#{subquire_notation}"
     end
     notation
   end
 
   def edit_ID
-    self.id = "Group_"+self.id.to_s unless self.id.to_s[0] == "G"
+    self.id = "Group_" + self.id.to_s unless self.id.to_s[0] == "G"
   end
 
   # Add new members to this group
-  def add_members(memberIDs, startOrder, save=true)
-    if self.memberIDs.length==0
+  def add_members(memberIDs, startOrder, save = true)
+    if self.memberIDs.length == 0
       self.memberIDs = memberIDs
-    elsif
-      self.memberIDs.insert(startOrder-1, *memberIDs)
+    elsif self.memberIDs.insert(startOrder - 1, *memberIDs)
     end
     if save
       self.save
@@ -66,7 +79,7 @@ class Group
   end
 
   def remove_members(ids)
-    newList = self.memberIDs.reject{|id| ids.include?(id)}
+    newList        = self.memberIDs.reject { |id| ids.include?(id) }
     self.memberIDs = newList
     self.save
   end
@@ -74,7 +87,7 @@ class Group
   # If linked to term(s), remove link from the term(s)'s side
   def unlink_terms
     if self.terms
-      self.terms.each do | term |
+      self.terms.each do |term|
         term.objects[:Group].delete(self.id.to_s)
         term.save
       end
@@ -94,7 +107,7 @@ class Group
   end
 
   def destroy_members
-    self.memberIDs.each do | memberID |
+    self.memberIDs.each do |memberID|
       if memberID[0] === "G"
         Group.find(memberID).destroy
       elsif memberID[0] === "L"

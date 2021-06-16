@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="http://schoenberginstitute.org/schema/collation" 
-    xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="http://viscoll.org/schema/collation/"
+    xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <start>
         <element name="viscoll">
             <oneOrMore>
                 <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">On viscoll document may contain multiple textblock elements</documentation>
                 <element name="textblock">
-                    <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">Optional @url points to a record describing the textblock, e.g. a catalog
+                    <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">Optional url points to a record describing the textblock, e.g. a catalog
                         record</documentation>
                     <optional>
                         <element name="url">
@@ -16,7 +17,7 @@
                     <optional>
                         <element name="title">
                             <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">Optional
-                                @title provides the title of the textblock as defined by the people
+                                title provides the title of the textblock as defined by the people
                                 or group doing the cataloging (viscoll does not define
                                 title)</documentation>
                             <text/>
@@ -54,17 +55,35 @@
 
                     <optional>
                         <element name="format">
-                            <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">refers to the format, usually of a printed book. Possible values are 2mo, 4mo, 8mo, 12mo, 16mo, 32mo, 64mo</documentation>
+                            <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">refers
+                                to the format, usually of a printed book. Possible values are fol.,
+                                4to, 8vo, 12mo, long 12mo, 16mo, 18mo, 24mo, long 24mo, 32mo, 48mo,
+                                64mo, 72mo, 96mo, 128mo based on the DCRM(B) standard, the national
+                                standard for cataloging rare books in library collections, generally
+                                adopted by English-speaking countries and some non-English-speaking
+                                countries.</documentation>
                             <attribute name="val">
                                 <choice>
-                                    <value>2mo</value>
-                                    <value>4mo</value>
-                                    <value>8mo</value>
+                                    <value>fol.</value>
+                                    <value>4to</value>
+                                    <value>8vo</value>
                                     <value>12mo</value>
+                                    <value>long 12mo</value>
                                     <value>16mo</value>
+                                    <value>18mo</value>
                                     <value>24mo</value>
+                                <value>long 24mo</value>
+                                    <value>32mo</value>
+                                    <value>48mo</value>
+                                    <value>64mo</value>
+                                    <value>72mo</value>
+                                    <value>96mo</value>
+                                    <value>128mo</value>
                                 </choice>
                             </attribute>
+                        <optional>
+                                <ref name="certainty"/>
+                            </optional>
                         </element>
                     </optional>
 
@@ -83,6 +102,9 @@
                                     <value>half-median</value>
                                 </choice>
                             </attribute>
+                        <optional>
+                                <ref name="certainty"/>
+                            </optional>
                         </element>
                     </optional>
 
@@ -156,31 +178,33 @@
                                                 <data type="NCName"/>
                                             </attribute>
                                         </optional>
-                                        <optional>
-                                            <ref name="n"/>
-                                        </optional>
-                                        <optional>
-                                            <element name="conjoin">
-                                                <ref name="certainty"/>
-                                                <ref name="target"/>
-                                                <text/>
-                                            </element>
-                                        </optional>
-                                        <optional>
-                                            <element name="single">
-                                                <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">single only has the value of "yes" and is only used if the
-                                        leaf is a singleton</documentation>
-                                                <attribute name="val">
-                                                    <choice>
-                                                        <value>yes</value>
-                                                    </choice>
-                                                </attribute>
-                                                <optional>
-                                                    <ref name="certainty"/>
+                                        <ref name="n"/>
+                                        <choice>
+                                            <optional>
+                                                <element name="conjoin">
+                                                  <ref name="certainty"/>
+                                                  <ref name="target"/>
+                                                  <!--<text/>-->
+                                                </element>
                                                 </optional>
-                                            </element>
-                                        </optional>
-                                    </element>
+                                        <optional>
+                                                <element name="single">
+                                                  <documentation
+                                                  xmlns="http://relaxng.org/ns/compatibility/annotations/1.0"
+                                                  >single only has the value of "yes" and is only
+                                                  used if the leaf is a singleton</documentation>
+                                                  <attribute name="val">
+                                                  <choice>
+                                                  <value>yes</value>
+                                                  </choice>
+                                                  </attribute>
+                                                  <optional>
+                                                  <ref name="certainty"/>
+                                                  </optional>
+                                                </element>
+                                            </optional>
+                                        </choice>
+                                        </element>
                                 </oneOrMore>
                                 <optional>
                                     <element name="firstLeaf">
@@ -217,23 +241,31 @@
                                 </zeroOrMore>
                                 <zeroOrMore>
                                     <element name="attachment-method">
-                                        <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">defines the values allowed for identifying the methods by which one leaf is attached to another. For "sewn" if there is a @target identified, the two leaves are sewn together, if there is no @target identified it is sewn through the fold. Use "sewn" through the fold only when you see it (i.e., in the center of a quire). Stitching goes through the margin instead of through the fold. Stitching will have one @target identifying the exit point.</documentation>
+                                        <documentation xmlns="http://relaxng.org/ns/compatibility/annotations/1.0">defines the values allowed for identifying the methods
+                                            by which one leaf is attached to another. For "sewn" if
+                                            there is a @target identified, the two leaves are sewn
+                                            together, if there is no @target identified it is sewn
+                                            through the fold. Use "sewn" through the fold only when
+                                            you see it (i.e., in the center of a quire). Stitching
+                                            goes through the margin instead of through the fold.
+                                            Stitching will have one @target identifying the exit
+                                            point. Tacketing works in a similar manner to sewing
+                                            through the fold.</documentation>
                                         <ref name="certainty"/>
                                         <optional>
                                             <ref name="target"/>
                                         </optional>
-                                        <optional>
-                                            <attribute name="type">
-                                                <choice>
-                                                    <value>sewn</value>
-                                                    <value>pasted</value>
-                                                    <value>tipped</value>
-                                                    <value>drummed</value>
-                                                    <value>stitched</value>
-                                                    <value>other</value>
+                                        <attribute name="type">
+                                            <choice>
+                                                <value>sewn</value>
+                                            <value>pasted</value>
+                                                  <value>tipped</value>
+                                                  <value>drummed</value>
+                                                  <value>stitched</value>
+                                                  <value>tacketed</value>
+                                                  <value>other</value>
                                                 </choice>
-                                            </attribute>
-                                        </optional>
+                                        </attribute>
                                     </element>
                                 </zeroOrMore>
                             </element>

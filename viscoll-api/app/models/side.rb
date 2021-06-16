@@ -23,7 +23,17 @@ class Side
 
   # if any terms are attached, mappings exist
   def mapping?
-    terms.present?
+    return true if terms.present?
+    texture != 'None'
+  end
+
+  def mappings
+    mappings_array = []
+    mappings_array.push({self.texture => self.id.to_s}) if self.texture != 'None'
+    terms.each do |term|
+      mappings_array.push({term.id => self.id})
+    end
+    mappings_array
   end
 
   protected
