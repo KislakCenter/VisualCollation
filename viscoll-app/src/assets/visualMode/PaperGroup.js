@@ -52,6 +52,39 @@ PaperGroup.prototype = {
     // Set highlight path to be at the back
     paper.project.activeLayer.insertChild(0, this.highlight);
     paper.project.activeLayer.insertChild(0, this.filterHighlight);
+
+    // group term text location
+    let textX = this.x;
+    let textY = this.y;
+    let fontSize = this.spacing * 0.5;
+    let numChars = (this.path.bounds.width / fontSize) * 2.4;
+
+    // get terms to show
+    const groupTermsToShow = this.group.terms
+                                 .filter(termID => {
+                                   return this.Terms[termID].show;
+                                 })
+                                 .reverse();
+
+    // Draw group term text
+    for (let termIndex = 0; termIndex < groupTermsToShow.length; termIndex++) {
+      const term = this.Terms[groupTermsToShow[termIndex]];
+
+      let textTerm = new paper.PointText({
+        content: '▼ L' + this.order + ' : ' + term.title.substr(0, numChars),
+        point: [
+          textX,
+          textY -
+          groupTermsToShow.length * (this.spacing * 0.7) -
+          termIndex * (this.spacing * 0.7) -
+          this.spacing * 0.3,
+        ],
+        fillColor: this.strokeColor,
+        fontSize: fontSize,
+      });
+      //textTerm.onClick = !this.viewingMode && clickListener(term);
+      this.textTerms.addChild(textTerm);
+    }
   },
   setMouseEventHandlers: function () {
     // Set mouse event handlers
@@ -145,6 +178,7 @@ function PaperGroup(args) {
   this.handleObjectClick = args.handleObjectClick;
   this.visibleAttributes = {};
   this.viewingMode = args.viewingMode;
+  this.spacing = args.spacing;
   this.text = new paper.PointText({
     point: [this.x + args.spacing * 0.6, this.y + args.spacing * 0.6],
     fillColor: this.textColor,
