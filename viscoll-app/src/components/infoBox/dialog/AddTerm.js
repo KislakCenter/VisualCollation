@@ -166,8 +166,8 @@ export default class AddTerm extends React.Component {
             fullWidth
             style={{ marginTop: -20 }}
           />
-          <div className="label" style={{ paddingTop: 20 }}>
-            Show in diagram
+          <div className="label" style={{ paddingTop: 100 }}>
+            Show in diagram (leaves & sides only):
           </div>
           <div className="input">
             <Checkbox

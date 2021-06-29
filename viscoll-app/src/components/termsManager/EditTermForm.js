@@ -395,7 +395,7 @@ export default class EditTermForm extends Component {
           {!this.props.isReadOnly && (
             <div>
               <div className="label" id="termShowLabel">
-                Show in diagram
+                Show in diagram (leaves & sides only):
               </div>
               <div className="input">
                 <Checkbox
