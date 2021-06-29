@@ -575,7 +575,7 @@
   align-items: flex-start; }
   .termForm .label {
     padding-top: 1em;
-    width: 20%; }
+    width: 100%; }
     @media screen and (max-width: 768px) {
       .termForm .label {
         font-size: 0.8em; } }

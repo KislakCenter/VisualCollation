@@ -206,7 +206,7 @@ export default class NewTermForm extends Component {
             />
           </div>
           <div className="label" style={{ paddingTop: 20 }} id="newTermShow">
-            Show in diagram
+            Show in diagram  (leaves & sides only):
           </div>
           <div className="input">
             <Checkbox
