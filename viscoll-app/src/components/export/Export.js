@@ -97,8 +97,8 @@ const Export = props => {
                 </IconButton>
                 <pre>
                    {props.exportedType === 'share'
-          ? window.location.href + '/viewOnly'
-          : props.exportedData}
+                    ? window.location.href + '/viewOnly'
+                    : props.exportedData}
                 </pre>
 
                 {props.exportedType === 'svg' ? (
