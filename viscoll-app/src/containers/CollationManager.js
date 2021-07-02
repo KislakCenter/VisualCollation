@@ -524,7 +524,7 @@ class CollationManager extends Component {
                     })
                 }
             >
-                {this.renderRadioButton('Groups', 'Select All Groups')}
+                {this.renderRadioButton('Quires', 'Select All Quires')}
                 {this.renderRadioButton('Leafs', 'Select All Leaves')}
                 {this.renderRadioButton('Rectos', 'Select All Rectos')}
                 {this.renderRadioButton('Versos', 'Select All Versos')}
