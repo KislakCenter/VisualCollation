@@ -39,9 +39,6 @@ export default class AddGroupDialog extends React.Component {
 
     componentWillReceiveProps() {
         this.resetForm();
-        if (this.props.Groups !== undefined) {
-            this.setState({selectedChild: this.props.Groups[this.props.selectedGroups]['memberIDs'][0]})
-        }
     }
 
     /**
