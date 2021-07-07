@@ -24,7 +24,7 @@ export default class AddGroupDialog extends React.Component {
             conjoin: false,
             oddLeaf: 2,
             copies: 1,
-            location: "",
+            location: "inside",
             placementLocation: "",
             selectedChild: "",
             errorText: {
@@ -289,6 +289,7 @@ export default class AddGroupDialog extends React.Component {
                 } else if (this.state.location === "inside") {
                     // two values need to be calculated here. these values are memberOrder and groupOrder.
                     // memberOrder represents the placement of the new group in context of it's parent group's memberIDs
+                    this.setState({selectedChild: this.props.Groups[this.props.selectedGroups]['memberIDs'][0]})
                     let selectedChildIndex = this.props.Groups[this.props.selectedGroups]['memberIDs'].indexOf(this.state.selectedChild)
                     if (this.state.placementLocation === "above") {
                         memberOrder = selectedChildIndex + 1
@@ -365,9 +366,9 @@ export default class AddGroupDialog extends React.Component {
             conjoin: false,
             oddLeaf: 2,
             copies: 1,
-            location: this.props.selectedGroups.length > 0 ? "" : "inside",
+            location: this.props.selectedGroups.length>0?"":"inside",
             placementLocation: "",
-            selectedChild: "",
+            selectedChild: this.props.Groups !== undefined ? this.props.Groups[this.props.selectedGroups[0]]['memberIDs'][0] : "",
             errorText: {
                 numberOfGroups: "",
                 numberOfLeaves: "",
