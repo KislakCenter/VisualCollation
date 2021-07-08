@@ -584,8 +584,8 @@ export default class AddGroupDialog extends React.Component {
                     id='leafSelect'
                     label='select where the quire should be positioned'
                     onChange={v => this.dropDownChange(v, 'selectedChild')}
-                    value={this.props.Groups[this.props.selectedGroups]['memberIDs'][0]}
-                    data={this.props.Groups[this.props.selectedGroups]['memberIDs'].map((itemID) => {
+                    value={this.props.Groups[this.props.selectedGroups[0]]['memberIDs'][0]}
+                    data={this.props.Groups[this.props.selectedGroups[0]]['memberIDs'].map((itemID) => {
                         if (itemID[0] === 'L') {
                             return { value: itemID, text: `Leaf ${this.props.leafIDs.indexOf(itemID) + 1}` }
                         } else if (itemID[0] === 'G') {
