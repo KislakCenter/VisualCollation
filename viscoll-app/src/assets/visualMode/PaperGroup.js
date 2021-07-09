@@ -93,9 +93,14 @@ PaperGroup.prototype = {
   },
   // code here must mirror group_notation function in group.rb:23
   groupNotation: function(group) {
-    // get all groups as base nest level
-    let outerGroups = Object.values(this.Groups).filter(g => g.nestLevel === 1);
-    let outerGroupIDs = outerGroups.map(g => g.id);
+    // get all groupIDs as base nest level
+    let outerGroupIDs = []
+    this.groupIDs.forEach(gID => {
+      if (this.Groups[gID].nestLevel === 1) {
+        console.log(this.Groups[gID].nestLevel)
+        outerGroupIDs.push(gID)
+      }
+    })
     let notation = '';
     if (group.nestLevel === 1){
       // get index of current group within the context of all outer groups
@@ -126,6 +131,7 @@ function PaperGroup(args) {
   this.manager = args.manager;
   this.group = args.group;
   this.Groups = args.Groups;
+  this.groupIDs = args.groupIDs;
   this.groupOrder = args.groupIDs.indexOf(args.group.id) + 1;
   this.notation = this.groupNotation(this.group);
   this.y = args.y;
