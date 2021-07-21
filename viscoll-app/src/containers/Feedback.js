@@ -83,7 +83,7 @@ class Feedback extends Component {
             tabIndex={this.props.tabIndex}
           />
           <FlatButton
-              label="Credits"
+              label="About"
               labelStyle={{ color: "#ffffff" }}
               onClick={() => { this.handleOpen("credits"); this.props.togglePopUp(true) }}
               backgroundColor="rgba(82, 108, 145, 0.2)"
