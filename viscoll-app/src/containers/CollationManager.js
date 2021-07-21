@@ -769,10 +769,10 @@ class CollationManager extends Component {
                     tabIndex={this.props.popUpActive ? -1 : 0}
                 >
                     <div className="sidebarLogo">
-                        <a href="https://oldbooksnewscience.com/">
+                        <a href="https://oldbooksnewscience.com/" target="_blank">
                             <img src={UTLogo} alt="University of Toronto logo"/>
                         </a>
-                        <a href="https://schoenberginstitute.org/">
+                        <a href="https://schoenberginstitute.org/" target="_blank">
                             <img src={UPLogo} alt="University of Pennsylvania logo"/>
                         </a>
                     </div>
