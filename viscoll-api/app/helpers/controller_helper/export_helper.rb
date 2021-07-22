@@ -386,15 +386,17 @@ module ControllerHelper
           end
 
           # terms taxonomy
-          terms_att = { 'xml:id': "id-terms" }
-          xml.taxonomy terms_att do
-            xml.label do
-              xml.text "List of all Terms"
-            end
-            project.terms.each do |term|
-              term_att = { 'xml:id': "#{term.id}" }
-              xml.term term_att do
-                xml.text term.title
+          if project.terms.present?
+            terms_att = { 'xml:id': "id-terms" }
+            xml.taxonomy terms_att do
+              xml.label do
+                xml.text "List of all Terms"
+              end
+              project.terms.each do |term|
+                term_att = { 'xml:id': "#{term.id}" }
+                xml.term term_att do
+                  xml.text term.title
+                end
               end
             end
           end
@@ -403,20 +405,22 @@ module ControllerHelper
           project.taxonomies.each_with_index do |taxonomy|
             require 'digest'
             taxAtt = { 'xml:id': "id-#{Digest::MD5.hexdigest(taxonomy)}" }
-            xml.taxonomy taxAtt do
-              xml.label do
-                xml.text taxonomy
-              end
-              # grab an array of terms with the current taxonomy
-              children = project.terms.select { |term| term.taxonomy == taxonomy }
-              # add proper attributes and crete term elements
-              children.each do |childTerm|
-                termAttributes = { 'xml:id': "#{childTerm.id}" }
-                if childTerm.uri.present?
-                  termAttributes['ref'] = childTerm.uri
+            # grab an array of terms with the current taxonomy
+            children = project.terms.select { |term| term.taxonomy == taxonomy }
+            if children.present?
+              xml.taxonomy taxAtt do
+                xml.label do
+                  xml.text taxonomy
                 end
-                xml.term termAttributes do
-                  xml.text childTerm.title
+                # add proper attributes and crete term elements
+                children.each do |childTerm|
+                  termAttributes = { 'xml:id': "#{childTerm.id}" }
+                  if childTerm.uri.present?
+                    termAttributes['ref'] = childTerm.uri
+                  end
+                  xml.term termAttributes do
+                    xml.text childTerm.title
+                  end
                 end
               end
             end
