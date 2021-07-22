@@ -15,6 +15,8 @@ import IconClear from 'material-ui/svg-icons/content/clear';
 import IconButton from 'material-ui/IconButton';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import {connect} from 'react-redux';
+import UTLogo from '../assets/ut_logo.png'
+import UPLogo from '../assets/upenn_logo.png'
 import {
     changeViewMode,
     handleObjectClick,
@@ -759,6 +761,20 @@ class CollationManager extends Component {
                             }}
                             tabIndex={this.props.popUpActive ? -1 : 0}
                         />
+                    </div>
+                </Panel>
+                <Panel
+                    title="Credits"
+                    defaultOpen={true}
+                    tabIndex={this.props.popUpActive ? -1 : 0}
+                >
+                    <div className="sidebarLogo">
+                        <a href="https://oldbooksnewscience.com/" target="_blank">
+                            <img src={UTLogo} alt="University of Toronto logo"/>
+                        </a>
+                        <a href="https://schoenberginstitute.org/" target="_blank">
+                            <img src={UPLogo} alt="University of Pennsylvania logo"/>
+                        </a>
                     </div>
                 </Panel>
             </div>
