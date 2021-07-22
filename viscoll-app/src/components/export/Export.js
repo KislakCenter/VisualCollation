@@ -96,9 +96,7 @@ const Export = props => {
                     <IconCopy/>
                 </IconButton>
                 <pre>
-                   {props.exportedType === 'share'
-                    ? window.location.href + '/viewOnly'
-                    : props.exportedData}
+                   { props.exportedType === 'share' && window.location.href + '/viewOnly' }
                 </pre>
 
                 {props.exportedType === 'svg' ? (
@@ -110,7 +108,7 @@ const Export = props => {
                                           alt={'Quire SVG'}
                                           key={index}
                                           src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
-                                      ></img>
+                                      />
                                   );
                               })}
                     </div>
