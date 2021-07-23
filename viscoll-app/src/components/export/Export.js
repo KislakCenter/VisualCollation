@@ -54,7 +54,6 @@ const Export = props => {
     ];
 
     const downloadZip = () => {
-        console.log(props.exportedImages)
         fetch(props.exportedImages)
             .then(function (response) {
                 if (response.status === 200 || response.status === 0) {
@@ -100,18 +99,19 @@ const Export = props => {
                 </pre>
 
                 {props.exportedType === 'svg' ? (
-                    <div>
-                        {Array.from(props.exportedData)
-                              .map((value, index) => {
-                                  return (
-                                      <img
-                                          alt={'Quire SVG'}
-                                          key={index}
-                                          src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
-                                      />
-                                  );
-                              })}
-                    </div>
+                    // <div>
+                    //     {Array.from(props.exportedData)
+                    //           .map((value, index) => {
+                    //               return (
+                    //                   <img
+                    //                       alt={'Quire SVG'}
+                    //                       key={index}
+                    //                       src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
+                    //                   />
+                    //               );
+                    //           })}
+                    // </div>
+                    <pre>Please download your SVGs below.</pre>
                 ) : (
                      <pre>{props.exportedData}</pre>
                  )}
