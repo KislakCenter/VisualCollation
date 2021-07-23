@@ -54,7 +54,6 @@ const Export = props => {
     ];
 
     const downloadZip = () => {
-        console.log(props.exportedImages)
         fetch(props.exportedImages)
             .then(function (response) {
                 if (response.status === 200 || response.status === 0) {
@@ -96,24 +95,23 @@ const Export = props => {
                     <IconCopy/>
                 </IconButton>
                 <pre>
-                   {props.exportedType === 'share'
-                    ? window.location.href + '/viewOnly'
-                    : props.exportedData}
+                   { props.exportedType === 'share' && window.location.href + '/viewOnly' }
                 </pre>
 
                 {props.exportedType === 'svg' ? (
-                    <div>
-                        {Array.from(props.exportedData)
-                              .map((value, index) => {
-                                  return (
-                                      <img
-                                          alt={'Quire SVG'}
-                                          key={index}
-                                          src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
-                                      ></img>
-                                  );
-                              })}
-                    </div>
+                    // <div>
+                    //     {Array.from(props.exportedData)
+                    //           .map((value, index) => {
+                    //               return (
+                    //                   <img
+                    //                       alt={'Quire SVG'}
+                    //                       key={index}
+                    //                       src={`data:image/svg+xml;utf8,${encodeURIComponent(value)}`}
+                    //                   />
+                    //               );
+                    //           })}
+                    // </div>
+                    <pre>Please download your SVGs below.</pre>
                 ) : (
                      <pre>{props.exportedData}</pre>
                  )}
