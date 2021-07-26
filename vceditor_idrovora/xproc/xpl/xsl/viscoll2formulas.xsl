@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:vc="http://schoenberginstitute.org/schema/collation"
+    xmlns:vc="http://viscoll.org/schema/collation/"
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:tei="http://www.tei-c.org/ns/1.0"
-    xpath-default-namespace="http://schoenberginstitute.org/schema/collation"
+    xpath-default-namespace="http://viscoll.org/schema/collation/"
     exclude-result-prefixes="xlink xs xd tei" version="2.0">
 
     <xsl:output name="txt" method="text"/>
@@ -62,13 +62,13 @@
     <xsl:template name="collationFormula1">
         <xsl:param name="tbID"/>
         <xsl:result-document href="{concat($tbID, '-formula_01.xml')}">
-          <vc:formula>
-              <xsl:attribute name="type">
-                  <xsl:text>Formula 1</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="format">
-                  <xsl:text>1(8, -4, +3)</xsl:text>
-              </xsl:attribute>
+            <vc:formula>
+                <xsl:attribute name="type">
+                    <xsl:text>Formula 1</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="format">
+                    <xsl:text>1(8, -4, +3)</xsl:text>
+                </xsl:attribute>
             <xsl:for-each-group select="leaves/leaf"
                 group-by="
                 if (contains(q[1]/@n, '.')) then
@@ -112,7 +112,7 @@
                 </xsl:choose>
                 <xsl:text> </xsl:text>
             </xsl:for-each-group>
-          </vc:formula>
+            </vc:formula>
         </xsl:result-document>
     </xsl:template>
 
@@ -231,7 +231,7 @@
                     </xsl:when>
                 </xsl:choose>
                 <xsl:text> </xsl:text>
-              </xsl:for-each-group>
+            </xsl:for-each-group>
             </vc:formula>
         </xsl:result-document>
     </xsl:template>
