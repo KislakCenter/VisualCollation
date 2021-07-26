@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
-                xmlns:vc="http://schoenberginstitute.org/schema/collation"
+                xmlns:vc="http://viscoll.org/schema/collation/"
                 version="1.0">
   <p:option name="job-dir" required="true"/>
   <p:variable name="css-base" select="'../css/'"/>
