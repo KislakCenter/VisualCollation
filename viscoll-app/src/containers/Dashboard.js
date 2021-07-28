@@ -29,6 +29,9 @@ import {
     unlinkImages,
     deleteImages,
 } from '../actions/backend/imageActions';
+import Panel from '../components/global/Panel';
+import UTLogo from '../assets/ut_logo.png';
+import UPLogo from '../assets/upenn_logo.png';
 
 /** Dashboard where user is directed to upon login.  This is where the user an create a new project or edit an existing project. */
 class Dashboard extends Component {
@@ -155,6 +158,20 @@ class Dashboard extends Component {
                 >
                     Image Collections
                 </button>
+                <Panel
+                    title="Credits"
+                    defaultOpen={true}
+                    tabIndex={this.props.popUpActive ? -1 : 0}
+                >
+                    <div className="sidebarLogo">
+                        <a href="https://oldbooksnewscience.com/" target="_blank">
+                            <img src={UTLogo} alt="University of Toronto logo"/>
+                        </a>
+                        <a href="https://schoenberginstitute.org/" target="_blank">
+                            <img src={UPLogo} alt="University of Pennsylvania logo"/>
+                        </a>
+                    </div>
+                </Panel>
             </div>
         );
         let projectPane = (
