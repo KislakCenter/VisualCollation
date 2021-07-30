@@ -934,6 +934,10 @@
   width: 250px;
   display: inline-block;
   text-align: right; }
+.feedbackDialog a:visited {
+  text-decoration: none;
+  color: dodgerblue;
+}
 
 .newProjectDialog p {
   color: #4e4e4e; }
