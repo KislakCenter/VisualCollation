@@ -138,20 +138,27 @@ class Feedback extends Component {
         >
           <p>
             VCEditor is a tool for building and visualizing the physical structure of manuscripts using the data model
-            provided by <a href="https://github.com/KislakCenter/VisColl">VisColl</a>: Modeling and Visualizing the
+            provided by <a href="https://viscoll.org/" target="_blank">VisColl</a>: Modeling and Visualizing the
             Physical Construction of Codex Manuscripts, a project
-            co-directed by Alberto Campagnolo and Dot Porter. VCEditor is a continuation of development of <a
-              href="https://github.com/utlib/VisualCollation">VisCodex</a>,
+            co-directed by Alberto Campagnolo and Dot Porter.
+          </p>
+
+          <p>
+            VCEditor is a continuation of development of <a
+              href="https://github.com/utlib/VisualCollation" target="_blank">VisCodex</a>,
             developed by the Old Books New Science lab at the University of Toronto, directed by Dr Alexandra Gillespie.
             The VisCodex development team consisted of Monica Ung, Janarthenan Rajakumar, and Rachel Di Cresce.
           </p>
 
           <p>
-            For <a href="https://github.com/KislakCenter/VisualCollation">VCEditor</a> we have made several
+            For <a href="https://github.com/KislakCenter/VisualCollation" target="_blank">VCEditor</a> we have made several
             modification, particularly to the back end, to ensure that the output
             validates to the most recent version of the VisColl data model. Development of the XSLT pipelines for
-            VCEditor, called <a href="https://github.com/gremid/idrovora">Idrovora</a>, was done by Gregor Middel, and
+            VCEditor, called <a href="https://github.com/gremid/idrovora" target="_blank">Idrovora</a>, was done by Gregor Middel, and
             primary development of VCEditor was done by Patrick Perkins.
+          </p>
+
+          <p>
             Supervision of all development was provided by Doug Emery, and organizational support was provided by Lynn
             Ransom. We would like to thank the Schoenberg Institute for Manuscript Studies and the University of
             Pennsylvania Libraries for their continued support of the project.
