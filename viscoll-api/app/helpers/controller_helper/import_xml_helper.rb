@@ -10,7 +10,7 @@ module ControllerHelper
       @leafs = {}
       @rectos = {}
       @versos = {}
-      @notes = {}
+      @terms = {}
       
       # Project Information
       @projectInformation = {
@@ -19,10 +19,10 @@ module ControllerHelper
         metadata: {date: ""},
         preferences: {showTips: true},
         manifests: {},
-        noteTypes: ["Unknown"]
+        taxonomies: ["Unknown"]
       }
       # Grab project Title
-      projectTitleNode = xml.xpath("//x:title", "x" => "http://schoenberginstitute.org/schema/collation")
+      projectTitleNode = xml.xpath("//x:title", "x" => "http://viscoll.org/schema/collation/")
       if projectTitleNode.text.empty?
         @projectInformation[:title] =  "No title" 
       else 
@@ -37,15 +37,15 @@ module ControllerHelper
       rescue Exception => e
       end
       # grab project Shelfmark
-      projectShelfmarkNode = xml.xpath("//x:shelfmark", "x" => "http://schoenberginstitute.org/schema/collation")
+      projectShelfmarkNode = xml.xpath("//x:shelfmark", "x" => "http://viscoll.org/schema/collation/")
       @projectInformation[:shelfmark] = projectShelfmarkNode.text
       # grap prohect Date
-      projectDateNode = xml.xpath("//x:date", "x" => "http://schoenberginstitute.org/schema/collation")
+      projectDateNode = xml.xpath("//x:date", "x" => "http://viscoll.org/schema/collation/")
       if not projectDateNode.empty?
         @projectInformation[:metadata][:date] = projectDateNode.text
       end
       # Map manifests to Project
-      manifestTaxonomy = xml.xpath("//x:taxonomy[@xml:id='manifests']", "x" => "http://schoenberginstitute.org/schema/collation")
+      manifestTaxonomy = xml.xpath("//x:taxonomy[@xml:id='manifests']", "x" => "http://viscoll.org/schema/collation/")
       if not manifestTaxonomy.empty?
         manifestTaxonomy.children.each do |child|
           if child.name=="term"
@@ -57,7 +57,7 @@ module ControllerHelper
       end
      
       # Groups Information
-      allGroupNodes = xml.xpath('//x:quire', "x" => "http://schoenberginstitute.org/schema/collation")
+      allGroupNodes = xml.xpath('//x:quire', "x" => "http://viscoll.org/schema/collation/")
       # Generate all attributes for Groups
       allGroupNodes.each_with_index do |groupNode, index|
         groupNodeID = groupNode.attributes["id"].value
@@ -67,7 +67,7 @@ module ControllerHelper
         nestLevel = 1
         while parentNodeID do
           nodeSearchText = "//x:quire[@xml:id='"+parentNodeID+"']"
-          parentGroupNode = xml.xpath(nodeSearchText, "x" => "http://schoenberginstitute.org/schema/collation")
+          parentGroupNode = xml.xpath(nodeSearchText, "x" => "http://viscoll.org/schema/collation/")
           if not parentGroupNode.empty?
             parentNodeID = parentGroupNode[0].attributes["parent"]? parentGroupNode[0].attributes["parent"].value : nil
           else
@@ -94,13 +94,13 @@ module ControllerHelper
       @groups.each do |groupOrder, attributes|
         groupNodeID = @allGroupNodeIDsInOrder[groupOrder-1]
         mapTargetSearchText = "//x:map[@target='#"+groupNodeID+"']"
-        groupMappingNodes = xml.xpath(mapTargetSearchText, "x" => "http://schoenberginstitute.org/schema/collation")
+        groupMappingNodes = xml.xpath(mapTargetSearchText, "x" => "http://viscoll.org/schema/collation/")
         if not groupMappingNodes.empty?
           groupMappingNode = groupMappingNodes[0] # Only 1 mapping per group
           groupTermTargets = groupMappingNode.children[1].attributes["target"].value.split(" ")
           groupTermTargets.each do |target|
             termSearchText = "//x:term[@xml:id='"+target[1..-1]+"']"
-            groupTerm = xml.xpath(termSearchText, "x" => "http://schoenberginstitute.org/schema/collation")[0]
+            groupTerm = xml.xpath(termSearchText, "x" => "http://viscoll.org/schema/collation/")[0]
             groupTermTaxonomyID = groupTerm.parent.attributes["id"].value
             groupTermTaxonomyID=="group_title" ? @groups[groupOrder][:params][:title]=groupTerm.text : nil
             groupTermTaxonomyID=="group_type" ? @groups[groupOrder][:params][:type]=groupTerm.text : nil
@@ -113,13 +113,12 @@ module ControllerHelper
           end
         end
       end
-    
 
       # Generate all attributes for Leafs
-      allLeafNodes = xml.xpath('//x:leaf', "x" => "http://schoenberginstitute.org/schema/collation")
+      allLeafNodes = xml.xpath('//x:leaf', "x" => "http://viscoll.org/schema/collation/")
       allLeafNodes.each_with_index do |leafNode, index|
         leafNodeID = leafNode.attributes["id"].value
-        stub = leafNode.attributes["stub"] ? "Original" : "None"
+        stub = leafNode.attributes["stub"] ? "Original" : "No"
         type = "None"
         conjoinedToNodeID = nil
         leafOrder = index+1
@@ -147,6 +146,7 @@ module ControllerHelper
         end
         @leafs[leafOrder] = {
           params: {
+            folio_number: nil,
             material: "None",
             type: type,
             attached_above: "None",
@@ -162,7 +162,6 @@ module ControllerHelper
         }
         @rectos[leafOrder] = {
           params: {
-            folio_number: nil,
             page_number: nil,
             texture: "None",
             image: {},
@@ -173,7 +172,6 @@ module ControllerHelper
         }
         @versos[leafOrder] = {
           params: {
-            folio_number: nil,
             page_number: nil,
             texture: "None",
             image: {},
@@ -211,7 +209,7 @@ module ControllerHelper
         end
         leafNodeID = @allLeafNodeIDsInOrder[leafOrder-1]
         mapTargetSearchText = "//x:map[@target='#"+leafNodeID+"']"
-        leafMappingNodes = xml.xpath(mapTargetSearchText, "x" => "http://schoenberginstitute.org/schema/collation")    
+        leafMappingNodes = xml.xpath(mapTargetSearchText, "x" => "http://viscoll.org/schema/collation/")
         if not leafMappingNodes.empty?
           leafMappingNodes.each do |leafMappingNode|
             if leafMappingNode.attributes["side"]
@@ -236,7 +234,7 @@ module ControllerHelper
                   end
                 else
                   termSearchText = "//x:term[@xml:id='"+target[1..-1]+"']"
-                  sideTerms = xml.xpath(termSearchText, "x" => "http://schoenberginstitute.org/schema/collation")
+                  sideTerms = xml.xpath(termSearchText, "x" => "http://viscoll.org/schema/collation/")
                   if not sideTerms.empty?
                     sideTerm = sideTerms[0]
                     sideTermTaxonomyID = sideTerm.parent.attributes["id"].value
@@ -264,7 +262,7 @@ module ControllerHelper
               leafTermTargets = leafMappingNode.children[1].attributes["target"].value.split(" ")
               leafTermTargets.each do |target|
                 termSearchText = "//x:term[@xml:id='"+target[1..-1]+"']"
-                leafTerms = xml.xpath(termSearchText, "x" => "http://schoenberginstitute.org/schema/collation")
+                leafTerms = xml.xpath(termSearchText, "x" => "http://viscoll.org/schema/collation/")
                 if not leafTerms.empty?
                   leafTerm = leafTerms[0]
                   leafTermTaxonomyID = leafTerm.parent.attributes["id"].value
@@ -283,78 +281,11 @@ module ControllerHelper
         end
       end
 
-      # Generate all attributes for Notes
-      allNotes = xml.xpath('//x:note', "x" => "http://schoenberginstitute.org/schema/collation")
-      allNotes.each_with_index do |noteNode, noteOrder|
-        noteNodeID = noteNode.attributes["id"].value
-        type = noteNode.attributes["type"].value
-        title = ""
-        description = noteNode.text
-        show = false
-        @projectInformation[:noteTypes].push(type)
-        # MAP the noteTitle and show for all notes
-        mapTargetSearchText = "//x:map[@target='#"+noteNodeID+"']"
-        noteMappingNodes = xml.xpath(mapTargetSearchText, "x" => "http://schoenberginstitute.org/schema/collation")
-        if not noteMappingNodes.empty?
-          noteMappingNode = noteMappingNodes[0] # Only 1 mapping per note
-          noteTermTargets = noteMappingNode.children[1].attributes["target"].value.split(" ")
-          noteTermTargets.each do |target|
-            termSearchText = "//x:term[@xml:id='"+target[1..-1]+"']"
-            noteTerms = xml.xpath(termSearchText, "x" => "http://schoenberginstitute.org/schema/collation")
-            if not noteTerms.empty?
-              noteTerm = noteTerms[0]
-              noteTermTaxonomyID = noteTerm.parent.attributes["id"].value
-              noteTermTaxonomyID=="note_title" ? title=noteTerm.text : nil
-              noteTermTaxonomyID=="note_show" ? show=true : nil
-            end
-          end
-        end
-        # MAP Groups, Leafs, Rectos, Versos for this Note
-        groupOrders = []
-        @groups.each do |groupOrder, attributes|
-          if attributes[:noteTitles].include? title
-            groupOrders.push(groupOrder)
-          end
-        end
-        leafOrders = []
-        @leafs.each do |leafOrder, attributes|
-          if attributes[:noteTitles].include? title
-            leafOrders.push(leafOrder)
-          end
-        end
-        rectoOrders = []
-        @rectos.each do |rectoOrder, attributes|
-          if attributes[:noteTitles].include? title
-            rectoOrders.push(rectoOrder)
-          end
-        end
-        versoOrders = []
-        @versos.each do |versoOrder, attributes|
-          if attributes[:noteTitles].include? title
-            versoOrders.push(versoOrder)
-          end
-        end
-        @notes[noteOrder] = {
-          params: {
-            title: title,
-            type: type,
-            description: description,
-            show: show
-          },
-          objects: {
-            Group: groupOrders,
-            Leaf: leafOrders,
-            Recto: rectoOrders,
-            Verso: versoOrders
-          }
-        }
-      end
-
       # Everything is fine upto this point unless the xml import is driectly from Dot's Model. 
       # In that case, we have to generate the memberOrders attribute for each Group manually.
       # We will loose the actual memberOrders. Here we add the Group members first and then Leaf members.
       taxonomySearchText = "//x:taxonomy[@xml:id='group_members']"
-      groupMembersTermNodes = xml.xpath(taxonomySearchText, "x" => "http://schoenberginstitute.org/schema/collation")
+      groupMembersTermNodes = xml.xpath(taxonomySearchText, "x" => "http://viscoll.org/schema/collation/")
       if groupMembersTermNodes.empty?
         # Need to handle adding members to Groups
         @groups.each do |groupOrder, attributes|
@@ -375,7 +306,7 @@ module ControllerHelper
         Leafs: @leafs,
         Rectos: @rectos,
         Versos: @versos,
-        Notes: @notes
+        Terms: @terms
       }
 
       handleJSONImport(JSON.parse(jsonImport.to_json))

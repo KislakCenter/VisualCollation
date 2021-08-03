@@ -1,18 +1,24 @@
 export const initialState = {
   project: {
-    id: "",
-    title: "",
-    shelfmark: "",
-    uri: "",
+    id: '',
+    title: '',
+    shelfmark: '',
+    uri: '',
+    notationStyle: {
+      name: 'notationStyle',
+      displayName: 'Notation Style',
+      options: ['r-v', 'recto-verso', 'a-b'],
+      isDropdown: true,
+    },
     metadata: {
-      date: ""
+      date: '',
     },
     manifests: {
-      "DIYImages": {
-        id: "DIYImages",
-        name: "Uploaded Images",
+      DIYImages: {
+        id: 'DIYImages',
+        name: 'Uploaded Images',
         images: [],
-      }
+      },
     },
     groupIDs: [],
     leafIDs: [],
@@ -22,27 +28,35 @@ export const initialState = {
     Leafs: {},
     Rectos: {},
     Versos: {},
-    noteTypes: [],
-    Notes: {},
+    Taxonomies: [],
+    Terms: {},
     preferences: {
-      showTips: true
-    }
+      showTips: true,
+    },
   },
 
-  managerMode: "collationManager",
+  managerMode: 'collationManager',
   collationManager: {
-    selectedObjects: { 
-      type: "", 
-      members: [], 
-      lastSelected: "" 
+    selectedObjects: {
+      type: '',
+      members: [],
+      lastSelected: '',
     },
-    viewMode: "VISUAL",
+    viewMode: 'VISUAL',
     defaultAttributes: {
       leaf: [
         {
           name: 'type',
           displayName: 'Type',
-          options: ['None', 'Original', 'Added', 'Missing', 'Hook', 'Endleaf', 'Replaced'],
+          options: [
+            'None',
+            'Original',
+            'Added',
+            'Missing',
+            'Hook',
+            'Endleaf',
+            'Replaced',
+          ],
           isDropdown: true,
         },
         {
@@ -59,20 +73,40 @@ export const initialState = {
         {
           name: 'attached_above',
           displayName: 'Attached Above',
-          options: ['None', 'Glued (Partial)', 'Glued (Complete)', 'Glued (Drumming)', 'Other'],
+          options: [
+            'None',
+            'Sewn',
+            'Pasted',
+            'Tipped',
+            'Drummed',
+            'Stitched',
+            'Other',
+          ],
           isDropdown: true,
         },
         {
           name: 'attached_below',
           displayName: 'Attached Below',
-          options: ['None', 'Glued (Partial)', 'Glued (Complete)', 'Glued (Drumming)', 'Other'],
+          options: [
+            'None',
+            'Sewn',
+            'Pasted',
+            'Tipped',
+            'Drummed',
+            'Stitched',
+            'Other',
+          ],
           isDropdown: true,
         },
         {
           name: 'stub',
           displayName: 'Stub',
-          options: ['None', 'Original', 'Added'],
+          options: ['No', 'Yes'],
           isDropdown: true,
+        },
+        {
+          name: 'folio_number',
+          displayName: 'Folio Number',
         },
       ],
       group: [
@@ -95,87 +129,86 @@ export const initialState = {
           isDropdown: true,
         },
         {
-          name: 'folio_number',
-          displayName: 'Folio Number',
-        },
-        {
-          name: 'page_number',
-          displayName: 'Page Number',
-        },
-        {
           name: 'script_direction',
           displayName: 'Script Direction',
           options: ['None', 'Left-to-Right', 'Right-To-Left', 'Top-To-Bottom'],
           isDropdown: true,
         },
         {
+          name: 'page_number',
+          displayName: 'Page Number',
+        },
+        {
           name: 'uri',
           displayName: 'URI',
         },
       ],
-      note: [
-        {  
+      term: [
+        {
           name: 'title',
           displayName: 'Title',
         },
-        {  
-          name: 'type',
-          displayName: 'Type',
+        {
+          name: 'taxonomy',
+          displayName: 'Taxonomy',
           isDropdown: true,
         },
-        {  
+        {
           name: 'description',
           displayName: 'Description',
         },
-      ]
+        {
+          name: 'uri',
+          displayName: 'URI',
+        },
+      ],
     },
     filters: {
       filterPanelOpen: false,
       Groups: [],
       Leafs: [],
       Sides: [],
-      Notes: [],
+      Terms: [],
       GroupsOfMatchingLeafs: [],
       LeafsOfMatchingSides: [],
       GroupsOfMatchingSides: [],
-      GroupsOfMatchingNotes: [],
-      LeafsOfMatchingNotes: [],
-      SidesOfMatchingNotes: [],
+      GroupsOfMatchingTerms: [],
+      LeafsOfMatchingTerms: [],
+      SidesOfMatchingTerms: [],
       active: false,
       hideOthers: false,
       queries: [
         {
           type: null,
-          attribute: "",
-          attributeIndex: "",
+          attribute: '',
+          attributeIndex: '',
           values: [],
-          condition: "",
-          conjunction: "",
-        }
+          condition: '',
+          conjunction: '',
+        },
       ],
-      selection: ""
+      selection: '',
     },
-    flashItems: { 
+    flashItems: {
       leaves: [],
-      groups: []
+      groups: [],
     },
     visualizations: {
-      tacketed: "",
-      sewing: "",
-    }
+      tacketed: '',
+      sewing: '',
+    },
   },
-  notesManager: {
-    activeTab: "MANAGE",
+  termsManager: {
+    activeTab: 'MANAGE',
   },
   imageManager: {
-    activeTab: "MANAGE",
+    activeTab: 'MANAGE',
     manageSources: {
-      error: ""
-    }
+      error: '',
+    },
   },
-  exportedData: "",
-  exportedImages: ""
+  exportedData: '',
+  exportedImages: '',
 };
-
 
 export default initialState;

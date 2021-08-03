@@ -31,14 +31,19 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
   config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.default_url_options = { :host => "localhost", :port => 3000 }
+  config.action_mailer.default_url_options = { :host => "localhost", :port => 3000 }
+  # config.action_mailer.smtp_settings = {
+  #   :address => 'smtp.ethereal.email',
+  #   :port => 587,
+  #   :user_name => 'brady.wiegand@ethereal.email',
+  #   :password => '2DzDyRf6Q22n21FV2q'
+  # }
   config.action_mailer.smtp_settings = {
-    :address => 'smtp.ethereal.email',
-    :port => 587,
-    :user_name => 'libby.corkery17@ethereal.email',
-    :password => 'RP4P6zMm3rVW9adMZF'
+    :address => ENV['MAILER_HOST'],
+    :port => ENV['MAILER_PORT'],
+    :user_name => ENV['MAILER_USR'],
+    :password => ENV['MAILER_PWD']
   }
-
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
@@ -56,5 +61,9 @@ Rails.application.configure do
       resource '*', :headers => :any, :methods => [:get, :post, :put, :patch, :options, :delete]
     end
   end
+
+  logger           = ActiveSupport::Logger.new(STDOUT)
+  logger.formatter = config.log_formatter
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
 
 end

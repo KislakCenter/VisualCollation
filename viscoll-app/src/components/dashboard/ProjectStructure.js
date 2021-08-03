@@ -103,6 +103,9 @@ const ProjectStructure = (props) => {
           Pre-populate your collation with quires and leaves by using the formula below.  
           Generate the items by clicking the "Add" button.  You can add multiple times.
         </p>
+          <p style={{paddingTop: 20, textAlign:"center"}}>
+              Note: you can change this later.
+          </p>
         <div style={{width: "100%", margin: "auto", display: "flex", justifyContent:"space-evenly", alignItems: "center", padding:"1em 0em", background:"#f8f8f8", border:"solid 1px #e2e2e2"}}>
           <label id="numQuires" style={{color:"#4e4e4e"}}>
             # of Quires 

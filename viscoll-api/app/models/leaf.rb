@@ -3,12 +3,13 @@ class Leaf
   include Mongoid::Timestamps
 
   # Fields
+  field :folio_number, type: String, default: nil
   field :material, type: String, default: "None"
-  field :type, type: String, default: "None"
+  field :type, type: String, default: "Original"
   field :conjoined_to, type: String
   field :attached_above, type: String, default: "None"
   field :attached_below, type: String, default: "None"
-  field :stubType, :as => :stub, type: String, default: "None"
+  field :stubType, :as => :stub, type: String, default: "No"
   field :parentID, type: String
   field :nestLevel, type: Integer, default: 1
   field :rectoID, type: String
@@ -16,16 +17,55 @@ class Leaf
 
   # Relations
   belongs_to :project
-  has_and_belongs_to_many :notes, inverse_of: nil
+  has_and_belongs_to_many :terms, inverse_of: nil
 
   # Callbacks
   before_create :edit_ID, :create_sides
-  before_destroy :unlink_notes, :destroy_sides, :update_parent_group
+  before_destroy :unlink_terms, :destroy_sides, :update_parent_group
 
+  def mapping?
+    # if terms are attached to leaf, mappings exist
+    return true if terms.present?
+    # check sides for mappings
+    recto = Side.find(self.rectoID)
+    verso = Side.find(self.versoID)
+    [ recto, verso ].compact.any? { |side| side.mapping? }
+  end
+
+  def mappings
+    mappings_array = []
+    recto = Side.find(self.rectoID)
+    verso = Side.find(self.versoID)
+    mappings_array += recto.mappings if recto.mapping?
+    mappings_array += verso.mappings if verso.mapping?
+    terms.each do |term|
+      mappings_array.push({term.id => self.id})
+    end
+    mappings_array
+  end
+
+  def parent_project
+    group = Group.find(self.parentID)
+    Project.find(group.parentID)
+  end
 
   # Remove itself from its parent group
   def remove_from_group
     Group.find(self.parentID).remove_members([self.id.to_s])
+  end
+
+  def top_level_group
+    parent = Group.find(self.parentID)
+    nest_level = parent.nestLevel
+    while nest_level > 1
+      parent = Group.find(parent.parentID)
+      nest_level = parent.nestLevel
+    end
+    parent
+  end
+
+  def position_in_top_level_group
+    self.top_level_group.all_leafIDs_in_order.index(self.id) + 1
   end
 
   protected
@@ -33,11 +73,11 @@ class Leaf
     self.id = "Leaf_"+self.id.to_s unless self.id.to_s[0]=="L"
   end
 
-  # If linked to note(s), remove link from the note(s)'s side
-  def unlink_notes 
-    self.notes.each do | note | 
-      note.objects[:Leaf].delete(self.id.to_s)
-      note.save
+  # If linked to term(s), remove link from the term(s)'s side
+  def unlink_terms
+    self.terms.each do | term |
+      term.objects[:Leaf].delete(self.id.to_s)
+      term.save
     end
   end
 

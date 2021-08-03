@@ -13,20 +13,28 @@ class Feedback extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: false,
+      feedbackOpen: false,
+      creditsOpen: false,
       title: "",
       feedback: "",
     }
   }
-  handleOpen = () => {
-    this.setState({ open: true });
+  handleOpen = (type) => {
+    if (type === "feedback") {
+      this.setState({ feedbackOpen: true });
+    } else if (type === "credits") {
+      this.setState({ creditsOpen: true });
+    }
   }
-  handleClose = () => {
-    this.setState({
-      open: false,
-      title: "",
-      feedback: "",
-    });
+  handleClose = (type) => {
+    if (type === "feedback") {
+      this.setState({
+        feedbackOpen: false,
+        title: "",
+        feedback: "",
+      });} else if (type === "credits") {
+      this.setState({ creditsOpen: false });
+    }
     this.props.togglePopUp(false);
   }
   onChange = (type, value) => {
@@ -44,11 +52,11 @@ class Feedback extends Component {
     this.handleClose();
   }
   render() {
-    const actions = [
+    const feedbackActions = [
       <FlatButton
         label="Cancel"
         primary={true}
-        onClick={() => this.handleClose()}
+        onClick={() => this.handleClose("feedback")}
       />,
       <RaisedButton
         label="Submit"
@@ -57,22 +65,36 @@ class Feedback extends Component {
         onClick={() => this.submit()}
       />,
     ];
+    const creditsActions = [
+      <FlatButton
+          label="Cancel"
+          primary={true}
+          onClick={() => this.handleClose("credits")}
+      />
+    ]
     return (
       <div>
         <div className="feedback">
           <FlatButton
             label="Feedback"
             labelStyle={{ color: "#ffffff" }}
-            onClick={() => { this.handleOpen(); this.props.togglePopUp(true) }}
+            onClick={() => { this.handleOpen("feedback"); this.props.togglePopUp(true) }}
             backgroundColor="rgba(82, 108, 145, 0.2)"
             tabIndex={this.props.tabIndex}
+          />
+          <FlatButton
+              label="About"
+              labelStyle={{ color: "#ffffff" }}
+              onClick={() => { this.handleOpen("credits"); this.props.togglePopUp(true) }}
+              backgroundColor="rgba(82, 108, 145, 0.2)"
+              tabIndex={this.props.tabIndex}
           />
         </div>
         <Dialog
           title="Share your feedback"
-          actions={actions}
+          actions={feedbackActions}
           modal={true}
-          open={this.state.open}
+          open={this.state.feedbackOpen}
           paperClassName="feedbackDialog"
           contentStyle={{ width: "450px" }}
         >
@@ -105,6 +127,35 @@ class Feedback extends Component {
               />
             </div>
           </div>
+        </Dialog>
+        <Dialog
+            title="Credits"
+            actions={creditsActions}
+            modal={true}
+            open={this.state.creditsOpen}
+            paperClassName="feedbackDialog"
+            contentStyle={{ width: "1000px" }}
+        >
+          <p>
+            VCEditor is a tool for building and visualizing the physical structure of manuscripts using the data model
+            provided by <a href="https://github.com/KislakCenter/VisColl">VisColl</a>: Modeling and Visualizing the
+            Physical Construction of Codex Manuscripts, a project
+            co-directed by Alberto Campagnolo and Dot Porter. VCEditor is a continuation of development of <a
+              href="https://github.com/utlib/VisualCollation">VisCodex</a>,
+            developed by the Old Books New Science lab at the University of Toronto, directed by Dr Alexandra Gillespie.
+            The VisCodex development team consisted of Monica Ung, Janarthenan Rajakumar, and Rachel Di Cresce.
+          </p>
+
+          <p>
+            For <a href="https://github.com/KislakCenter/VisualCollation">VCEditor</a> we have made several
+            modification, particularly to the back end, to ensure that the output
+            validates to the most recent version of the VisColl data model. Development of the XSLT pipelines for
+            VCEditor, called <a href="https://github.com/gremid/idrovora">Idrovora</a>, was done by Gregor Middel, and
+            primary development of VCEditor was done by Patrick Perkins.
+            Supervision of all development was provided by Doug Emery, and organizational support was provided by Lynn
+            Ransom. We would like to thank the Schoenberg Institute for Manuscript Studies and the University of
+            Pennsylvania Libraries for their continued support of the project.
+          </p>
         </Dialog>
       </div>
     );

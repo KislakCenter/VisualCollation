@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  traefik:
+    image: traefik:v2.3
+    command:
+      - "--entrypoints.production.address=:80"
+      - "--entryPoints.production.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.0/16,172.16.0.0/12,10.0.0.0/8"
+      - "--entrypoints.staging.address=:8080"
+      - "--entryPoints.staging.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.0.0/16,172.16.0.0/12,10.0.0.0/8"
+      - "--providers.docker=true"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.swarmModeRefreshSeconds=15"
+      - "--providers.docker.watch=true"
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  traefik:
+    driver: overlay
+    name: traefik
+    attachable: true

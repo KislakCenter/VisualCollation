@@ -1,4 +1,5 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'utlviscoll@library.utoronto.ca'
+  # TODO
+  default from: Rails.application.secrets.mailer_default_from
   layout 'mailer'
 end

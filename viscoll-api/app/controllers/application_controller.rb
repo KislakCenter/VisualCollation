@@ -1,7 +1,8 @@
 class ApplicationController < ActionController::API
     before_action :set_base_api_url
     def set_base_api_url
-      @base_api_url = Rails.application.secrets.api_url ? Rails.application.secrets.api_url : 'https://dummy.library.utoronto.ca/api'
+      # TODO: we need an env var with a complete URL for this
+      @base_api_url = Rails.application.secrets.api_url ? Rails.application.secrets.api_url : "https://#{ENV['APPLICATION_HOST']}"
     end
 
     include RailsJwtAuth::WardenHelper

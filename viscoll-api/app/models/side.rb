@@ -3,32 +3,51 @@ class Side
   include Mongoid::Timestamps
 
   # Fields
-  field :folio_number, type: String, default: nil
   field :page_number, type: String, default: nil
   field :texture, type: String, default: "None"
   field :script_direction, type: String, default: "None"
   field :image, type: Hash, default: lambda { { } } # {manifestID: 123, label: "bla, " url: "https://iiif.library.utoronto.ca/image/v2/hollar:Hollar_a_3002_0001"}
   field :parentID, type: String
-    
+  field :side, type: String # either 'r' or 'v'
+
   # Relations
   belongs_to :project
-  has_and_belongs_to_many :notes, inverse_of: nil
+  has_and_belongs_to_many :terms, inverse_of: nil
 
   # Callbacks
-  before_destroy :unlink_notes, :unlink_image
+  before_destroy :unlink_terms, :unlink_image
+
+  def parent_leaf
+    Leaf.find(parentID)
+  end
+
+  # if any terms are attached, mappings exist
+  def mapping?
+    return true if terms.present?
+    texture != 'None'
+  end
+
+  def mappings
+    mappings_array = []
+    mappings_array.push({self.texture => self.id.to_s}) if self.texture != 'None'
+    terms.each do |term|
+      mappings_array.push({term.id => self.id})
+    end
+    mappings_array
+  end
 
   protected
-  # If linked to note(s), remove link from the note(s)'s side
-  def unlink_notes 
-    self.notes.each do | note | 
-      note.objects[:Recto].delete(self.id.to_s)
-      note.objects[:Verso].delete(self.id.to_s)
-      note.save
+  # If linked to term(s), remove link from the term(s)'s side
+  def unlink_terms
+    self.terms.each do | term |
+      term.objects[:Recto].delete(self.id.to_s)
+      term.objects[:Verso].delete(self.id.to_s)
+      term.save
     end
   end
 
   # If linked to image, remove link from the image's sides list
-  def unlink_image 
+  def unlink_image
     if not self.image.empty?
       if (image = Image.where(:id => self.image[:url].split("/")[-1].split("_", 2)[0]).first)
         image.sideIDs.delete(self.id.to_s)

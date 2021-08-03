@@ -13,8 +13,9 @@ export default class NetworkErrorScreen extends React.Component {
 
   componentWillMount() {
     let that = this;
+    let healthCheckURL = API_URL + '/status';
     let apiRequest = () => {
-      fetch(API_URL)
+      fetch(healthCheckURL)
         .then(() => {
             if (that.state.isOffline) that.setState({isOffline:false});
         }).catch(e=> {

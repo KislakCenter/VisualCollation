@@ -1,50 +1,67 @@
-version: '3.7'
+version: "3.7"
 
 services:
-  api:
-    build: .
-    image: viscoll
-    container_name: viscoll-api
-    volumes:
-      - ./viscoll-api:/app
-    working_dir: /app
-    command: bash -c "rm -f tmp/pids/server.pid && bundle i && bundle exec rails s -p 3001 -b '0.0.0.0'"
-    ports:
-      - 3001:3001
-    depends_on:
-      - mongo
-      - mongo-express
-
   app:
-    build: .
-    image: viscoll
-    container_name: viscoll-app
+    image: "quay.io/upennlibraries/vceditor_web:${RELEASE_TAG}"
+    command: server -b 0.0.0.0
+    environment:
+      - ADMIN_EMAIL
+      - APPLICATION_HOST
+      - MAILER_DEFAULT_FROM
+      - MAILER_DOMAIN
+      - MAILER_HOST
+      - MAILER_PORT
+      - MAILER_PWD
+      - MAILER_USR
+      - PROJECT_URL
+      - RAILS_ENV
+      - RAILS_SERVE_STATIC_FILES
+      - RELEASE_TAG
+      - SECRET_KEY_BASE
+      - XPROC_URL
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.${INSTANCE}-app.rule=Host(`${PROJECT_URL}`)"
+        - "traefik.http.routers.${INSTANCE}-app.entrypoints=${INSTANCE}"
+        - "traefik.http.services.${INSTANCE}-app.loadbalancer.server.port=3000"
+    networks:
+      - internal
+      - traefik
     volumes:
-      - ./viscoll-app:/app
-    working_dir: /app
-    command: bash -c "npm install && npm start"
-    ports:
-      - 3000:3000
-    depends_on:
-      - api
+      - images:/usr/src/app/public/uploads
 
   mongo:
-    container_name: viscoll-mongo
     image: mongo:4.0
     volumes:
-      - mongo:/data/db
+      - db:/data/db
+    networks:
+      - internal
 
-  mongo-express:
-    image: mongo-express
-    container_name: viscoll-mongo-express
-    ports:
-      - 127.0.0.1:3002:8081
-    depends_on:
-      - mongo
-    environment:
-     ME_CONFIG_MONGODB_SERVER: mongo
-    depends_on:
-      - mongo
+  xproc:
+    image: "quay.io/upennlibraries/vceditor_idrovora:${RELEASE_TAG}"
+    command: --http 2000 --http-context-path /xproc --http-doc-root /docs /xpl
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.${INSTANCE}-xproc.rule=Host(`${PROJECT_URL}`) && PathPrefix(`/xproc`)"
+        - "traefik.http.routers.${INSTANCE}-xproc.entrypoints=${INSTANCE}"
+        - "traefik.http.services.${INSTANCE}-xproc.loadbalancer.server.port=2000"
+    networks:
+      - internal
+      - traefik
+    volumes:
+      - xproc:/docs
+
+networks:
+  internal:
+  traefik:
+    external: true
 
 volumes:
-  mongo:
+  db:
+    name: ${INSTANCE}-db
+  xproc:
+    name: ${INSTANCE}-xproc
+  images:
+    name: ${INSTANCE}-images
