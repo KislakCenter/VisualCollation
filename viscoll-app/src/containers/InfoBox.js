@@ -160,6 +160,7 @@ class InfoBox extends React.Component {
     resetTacket = (groupID) => {
         let group = {};
         group['tacketed'] = [];
+        group['sewing'] = []
         let parentID = this.props.Groups[groupID].parentID
         this.updateGroup(parentID, group);
     }
