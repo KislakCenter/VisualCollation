@@ -97,7 +97,6 @@ PaperGroup.prototype = {
     let outerGroupIDs = []
     this.groupIDs.forEach(gID => {
       if (this.Groups[gID].nestLevel === 1) {
-        console.log(this.Groups[gID].nestLevel)
         outerGroupIDs.push(gID)
       }
     })
