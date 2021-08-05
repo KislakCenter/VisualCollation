@@ -67,7 +67,7 @@ class Feedback extends Component {
     ];
     const creditsActions = [
       <FlatButton
-          label="Cancel"
+          label="Close"
           primary={true}
           onClick={() => this.handleClose("credits")}
       />
