@@ -88,18 +88,20 @@ class TopBar extends Component {
 
   render() {
     // User icon menu on the right corner of Toolbar
-    let UserMenu;
-    if (this.props.user.name) {
-      UserMenu = (
+    let UserMenu = (
         <IconMenu
           iconButtonElement={
             <IconButton
               tabIndex={this.props.tabIndex}
               style={{ padding: 0 }}
-              aria-label="User icon"
+              tooltip={"User settings"}
+              aria-label="User settings"
             >
               <Avatar color="#3A4B55" backgroundColor="#dfdfdf">
-                {this.props.user.name.charAt(0).toUpperCase()}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     className="bi bi-person-fill" viewBox="0 0 16 16">
+                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
               </Avatar>
             </IconButton>
           }
@@ -116,7 +118,6 @@ class TopBar extends Component {
           />
         </IconMenu>
       );
-    }
 
     let topbarClasses = 'topbar';
     if (this.props.popUpActive) topbarClasses += ' lowerZIndex';
