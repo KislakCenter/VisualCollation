@@ -67,10 +67,12 @@ title = "gitleaks config"
 [allowlist]
   description = "Global Allowlists"
   files = [
-    '''(.*?)(jpg|gif|doc|pdf|bin|md|xml)$''',
+    '''(.*?)(jpg|gif|doc|pdf|bin|md)$''',
     '''\.gitleaks\.toml'''
   ]
   regexes = [
+    # Ignore resetPasswordRequest method
+    '''resetPasswordRequest''',
     # Ignore docker set secrets
     '''(?i)(/run/secrets/)''',
     # Values set by Ansible variables
