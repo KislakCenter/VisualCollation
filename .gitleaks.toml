@@ -11,6 +11,7 @@ title = "gitleaks config"
       '''reference_data\.rb''',
       '''lib/sdbmss/legacy\.rb''',
       '''lib/sdbmss/seed_data.rb''',
+      '''viscoll-api/config/environments/development.rb''',
       '''jena/jena.env''',
       '''.lando.yml''',
       '''config/initializers/mailer.rb''',
@@ -68,6 +69,9 @@ title = "gitleaks config"
   description = "Global Allowlists"
   files = [
     '''(.*?)(jpg|gif|doc|pdf|bin|md)$''',
+    '''viscoll-api/config/environments/development.rb''',
+    '''.*__test__.*`''',
+    '''viscoll-api/app/mailers/mailer\.rb''',
     '''\.gitleaks\.toml'''
   ]
   regexes = [
@@ -79,6 +83,29 @@ title = "gitleaks config"
     '''{{ *[\S]+ *}}''',
     # Values set by environment variables
     '''ENV\[['"][\S]+['"]\]''',
-    # Ignore XML namespace@key
-    '''namespace key="\d+"''' 
+    # ansible
+    '''security_ssh_password_authentication''',
+    # miscallaneous false positives
+    # password in comments
+    '''^\s*# password:''',
+    # state resets in React
+    '''update: \{password: "", current_password: "", email: ""\}''',
+    '''register: \{email: "", password: ""\}''',
+    '''[Pp]assword\w*:\s*""''',
+    '''[Pp]assword\w*:\s*false''',
+    '''newPasswordConfirm:\s*false''',
+    '''current_password: this\.state\.currentPassword''',
+    '''password: this\.state\.newPassword''',
+    '''currentPassword:\s*nextProps\.currentPasswordError\.toString''',
+    '''password_confirmation: this.state.passwordConfirm''',
+    '''password: this.state.password''',
+    '''[Pp]assword\w*:\s*PropTypes\.''',
+    # method names and non-password vars
+    '''resetPassword: \(reset_token, password\)''',
+    '''@reset_password_url =''',
+    # error message
+    '''password:\s*\["can't be''',
+    # test data
+    '''reset_password_token = "5951303fc9bf3c7b9a573a3f"''',
+    '''password\w*: "secret"'''
   ]
