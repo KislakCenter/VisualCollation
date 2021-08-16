@@ -1,0 +1,130 @@
+include:
+  - project: "devops/gitlab/ci-templates/docker"
+    ref: "master"
+    file:
+      - ".build_docker_image.yml"
+      - ".push_docker_image.yml"
+      - ".remove_docker_image.yml"
+  - project: "devops/gitlab/ci-templates/sast"
+    ref: "master"
+    file:
+      - ".shiftleft_container_scanning.yml"
+      - ".trivy_container_scanning.yml"
+  - template: "Workflows/MergeRequest-Pipelines.gitlab-ci.yml"
+
+stages:
+  - sast:project
+  - build:web
+  - build:idrovora
+  - sast:web
+  - sast:idrovora
+  - push:web
+  - push:idrovora
+  - remove:web
+  - remove:idrovora
+
+shiftleft_project_scanning:
+  stage: sast:project
+  extends:
+    - .shiftleft_container_scanning
+  tags:
+    - build
+  allow_failure: true
+
+build_web_image:
+  stage: build:web
+  extends:
+    - .build_docker_image
+  needs:
+    - shiftleft_project_scanning
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
+  tags:
+    - build
+
+build_idrovora_image:
+  stage: build:idrovora
+  extends:
+    - .build_docker_image
+  needs:
+    - shiftleft_project_scanning
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
+    DOCKER_BUILD_CONTEXT: "vceditor_idrovora/"
+    DOCKERFILE_PATH: "vceditor_idrovora/"
+  tags:
+    - build
+
+trivy_web_container_scanning:
+  stage: sast:web
+  extends:
+    - .trivy_container_scanning
+  needs:
+    - build_web_image
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
+  tags:
+    - build
+  allow_failure: true
+
+trivy_idrovora_container_scanning:
+  stage: sast:idrovora
+  extends:
+    - .trivy_container_scanning
+  needs:
+    - build_idrovora_image
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
+  tags:
+    - build
+  allow_failure: true
+
+push_web_image_to_registry:
+  stage: push:web
+  extends:
+    - .push_docker_image
+  needs:
+    - trivy_web_container_scanning
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
+    DOCKER_IMAGE_NAME: "vceditor_web"
+  tags:
+    - build
+
+push_idrovora_image_to_registry:
+  stage: push:idrovora
+  extends:
+    - .push_docker_image
+  needs:
+    - trivy_idrovora_container_scanning
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
+    DOCKER_IMAGE_NAME: "vceditor_idrovora"
+  tags:
+    - build
+
+remove_web_image:
+  stage: remove:web
+  extends:
+    - .remove_docker_image
+  needs:
+    - push_web_image_to_registry
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
+  rules:
+    - when: always
+  tags:
+    - build
+
+remove_idrovora_image:
+  stage: remove:idrovora
+  extends:
+    - .remove_docker_image
+  needs:
+    - push_idrovora_image_to_registry
+  variables:
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
+  rules:
+    - when: always
+  tags:
+    - build
