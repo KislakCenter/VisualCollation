@@ -403,7 +403,9 @@ module ControllerHelper
               project.terms.each do |term|
                 term_att = { 'xml:id': "#{term.id}" }
                 xml.term term_att do
-                  xml.text term.title
+                  xml.label do
+                    xml.text term.title
+                  end
                 end
               end
             end
