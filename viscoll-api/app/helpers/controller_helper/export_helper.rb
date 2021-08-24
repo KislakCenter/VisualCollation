@@ -429,7 +429,9 @@ module ControllerHelper
                     termAttributes['ref'] = childTerm.uri
                   end
                   xml.term termAttributes do
-                    xml.text childTerm.title
+                    xml.label do
+                      xml.text childTerm.title
+                    end
                   end
                 end
               end
