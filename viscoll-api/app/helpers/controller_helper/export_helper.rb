@@ -209,8 +209,15 @@ module ControllerHelper
         end
       end
 
+      schema_xml = Nokogiri::XML File.open("public/viscoll-datamodel2.0.rng")
+      schema_xml.remove_namespaces!
+      path = <<~X
+        /grammar/start/element[@name = "viscoll"]/optional/attribute[@name="version"]/choice/value/text()
+      X
+      version = schema_xml.xpath path
+
       return Nokogiri::XML::Builder.new { |xml|
-        xml.viscoll :xmlns => "http://viscoll.org/schema/collation/" do
+        xml.viscoll :xmlns => "http://viscoll.org/schema/collation/", :version => version do
           idPrefix = project.shelfmark.parameterize.underscore
 
           # STRUCTURE
