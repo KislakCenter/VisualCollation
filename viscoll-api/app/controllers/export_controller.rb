@@ -39,6 +39,15 @@ class ExportController < ApplicationController
       schema     = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel2.0.rng"))
       errors     = schema.validate(xml)
 
+      # schema_xml = Nokogiri::XML File.open("public/viscoll-datamodel2.0.rng")
+      # xpath = <<~X
+      #   /grammar[@ns="http://viscoll.org/schema/collation/"]/start/element[@name="viscoll"]/optional[1]/attribute[@name="version"]/choice/value
+      # X
+      # xpath2 = <<~X
+      #   /grammar/start/element/optional/attribute/choice/value
+      # X
+      # schema_xml.xpath(xpath2)
+
       if errors.empty?
         case @format
         when "xml"
