@@ -209,8 +209,15 @@ module ControllerHelper
         end
       end
 
+      schema_xml = Nokogiri::XML File.open("public/viscoll-datamodel2.0.rng")
+      schema_xml.remove_namespaces!
+      path = <<~X
+        /grammar/start/element[@name = "viscoll"]/optional/attribute[@name="version"]/choice/value/text()
+      X
+      version = schema_xml.xpath path
+
       return Nokogiri::XML::Builder.new { |xml|
-        xml.viscoll :xmlns => "http://viscoll.org/schema/collation/" do
+        xml.viscoll :xmlns => "http://viscoll.org/schema/collation/", :version => version do
           idPrefix = project.shelfmark.parameterize.underscore
 
           # STRUCTURE
@@ -369,19 +376,27 @@ module ControllerHelper
             end
             hs_attributes = { 'xml:id': "id-hs", ref: "http://w3id.org/lob/concept/1381" }
             xml.term hs_attributes do
-              xml.text "hairside"
+              xml.label do
+                xml.text "hairside"
+              end
             end
             fs_attributes = { 'xml:id': "id-fs", ref: "http://w3id.org/lob/concept/1336" }
             xml.term fs_attributes do
-              xml.text "fleshside"
+              xml.label do
+                xml.text "fleshside"
+              end
             end
             left_attributes = { 'xml:id': "id-left", ref: "http://w3id.org/lob/concept/2947" }
             xml.term left_attributes do
-              xml.text "left"
+              xml.label do
+                xml.text "left"
+              end
             end
             right_attributes = { 'xml:id': "id-right", ref: "http://w3id.org/lob/concept/3004" }
             xml.term right_attributes do
-              xml.text "right"
+              xml.label do
+                xml.text "right"
+              end
             end
           end
 
@@ -395,7 +410,9 @@ module ControllerHelper
               project.terms.each do |term|
                 term_att = { 'xml:id': "#{term.id}" }
                 xml.term term_att do
-                  xml.text term.title
+                  xml.label do
+                    xml.text term.title
+                  end
                 end
               end
             end
@@ -419,7 +436,9 @@ module ControllerHelper
                     termAttributes['ref'] = childTerm.uri
                   end
                   xml.term termAttributes do
-                    xml.text childTerm.title
+                    xml.label do
+                      xml.text childTerm.title
+                    end
                   end
                 end
               end

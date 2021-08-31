@@ -471,8 +471,12 @@ class CollationManager extends Component {
                 ? batchEditTip
                 : singleEditTip,
             "Generate folio/page numbers by selecting multiple leaves and clicking on the 'Generate folio/page numbers' button in the infobox on the right.",
-            'View a zoomed out version of the collation diagram by selecting PNG export in the Export section of this sidebar.',
+            'Try exporting your collation in a multitude of different formats by selecting "EXPORT" in the sidebar.',
             'Undo an action with CTRL+Z (or CMD+Z for Mac users), and redo an action with CTRL+Y (or CMD+Y for Mac users).',
+            'To add a subgroup (group inside a group), select a group and click the "ADD" button in the popup to the right of the diagram.',
+            "You can share your collation with others, even if they don't have an account. Click 'Share' and copy the link.",
+            'You can easily import a set of images from a IIIF manifest. Select "Images" in the sidebar, paste a IIIF link in the "Manifest URL" box, and click "ADD".',
+            'If you have suggestions, please fill out the feedback form by clicking the "FEEDBACK" button at the bottom of the sidebar.'
         ];
         let tipsDiv;
         if (

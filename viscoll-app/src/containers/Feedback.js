@@ -49,7 +49,7 @@ class Feedback extends Component {
       browserInformation = JSON.stringify(result);
     } catch (e) { }
     this.props.sendFeedback(this.state.title, feedback, browserInformation, this.props.projectID);
-    this.handleClose();
+    this.handleClose("feedback");
   }
   render() {
     const feedbackActions = [
