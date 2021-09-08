@@ -72,6 +72,10 @@ class Feedback extends Component {
           onClick={() => this.handleClose("credits")}
       />
     ]
+    const openInNewTab = (url) => {
+      const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+      if (newWindow) newWindow.opener = null
+    }
     return (
       <div>
         <div className="feedback">
@@ -86,6 +90,13 @@ class Feedback extends Component {
               label="About"
               labelStyle={{ color: "#ffffff" }}
               onClick={() => { this.handleOpen("credits"); this.props.togglePopUp(true) }}
+              backgroundColor="rgba(82, 108, 145, 0.2)"
+              tabIndex={this.props.tabIndex}
+          />
+          <FlatButton
+              label="Help"
+              labelStyle={{ color: "#ffffff" }}
+              onClick={() => openInNewTab("https://viscoll.org/help/")}
               backgroundColor="rgba(82, 108, 145, 0.2)"
               tabIndex={this.props.tabIndex}
           />
