@@ -45,6 +45,9 @@ export default class MapImages extends Component {
     let imageBacklog = [];
     for (let manifest of Object.entries(props.manifests)) {
       imageBacklog = imageBacklog.concat(manifest[1].images);
+      if (manifest[0] === "DIYImages") {
+        imageBacklog = imageBacklog.sort((a, b) => (a.label > b.label) ? 1 : -1);
+      }
     }
     let sideBacklog = [...rectoIDs].map((rectoID, index) => [rectoID, versoIDs[index]]).reduce((a,b)=> a.concat(b), []);
     let imageMapBoard = [];
