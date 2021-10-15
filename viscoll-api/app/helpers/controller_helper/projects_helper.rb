@@ -49,16 +49,33 @@ module ControllerHelper
 
     def getManifestInformation(url)
       images = []
-      begin
-        response = JSON.parse(Net::HTTP.get(URI(url)))
-        response["sequences"][0]["canvases"].each do |canvas|
-          images.push({label: canvas["label"], url: canvas["images"][0]["resource"]["service"]["@id"]})
+      iiif_version = 3
+      case iiif_version
+      when 2
+        begin
+          response = JSON.parse(Net::HTTP.get(URI(url)))
+          response["sequences"][0]["canvases"].each do |canvas|
+            images.push({label: canvas["label"], url: canvas["images"][0]["resource"]["service"]["@id"]})
+          end
+        rescue
+          return {name: "Unparseable manifest URL", images: images}
         end
-      rescue
-        return {name: "Unparseable manifest URL", images: images}
+        return {name: response["label"][0..150], images: images} unless response["label"].empty?
+        return {name: "Unnamed manifest", images: images}
+      when 3
+        begin
+          response = JSON.parse(Net::HTTP.get(URI(url)))
+          response["items"].each do |item|
+            puts item["items"][0]["items"][0]["label"]["none"][0]
+            images.push({label: item["items"][0]["items"][0]["label"]["none"][0], url: item["items"][0]["items"][0]["body"]["id"]})
+          end
+          binding.pry
+        rescue
+          return {name: "Unparseable manifest URL", images: images}
+        end
+        return {name: response["label"]["none"][0][0..150], images: images} unless response["label"]["none"][0].empty?
+        return {name: "Unnamed manifest", images: images}
       end
-      return {name: response["label"][0..150], images: images} unless response["label"].empty?
-      return {name: "Unnamed manifest", images: images}
     end
 
     def assignTexture(leaves, startingTexture)
