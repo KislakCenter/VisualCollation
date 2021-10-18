@@ -29,7 +29,7 @@ export default class ImageViewer extends React.Component {
     this.setState({
       osd: OpenSeadragon({
         id: this.state.suffixedID,
-        prefixUrl: 'https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/images/',
+        prefixUrl: 'https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.2/images/',
         showNavigationControl: true,
         showFullPageControl: false,
         showRotationControl: true,
