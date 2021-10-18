@@ -69,7 +69,6 @@ module ControllerHelper
             puts item["items"][0]["items"][0]["label"]["none"][0]
             images.push({label: item["items"][0]["items"][0]["label"]["none"][0], url: item["items"][0]["items"][0]["body"]["id"]})
           end
-          binding.pry
         rescue
           return {name: "Unparseable manifest URL", images: images}
         end
