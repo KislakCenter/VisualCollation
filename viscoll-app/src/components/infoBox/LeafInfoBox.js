@@ -738,6 +738,8 @@ export default class LeafInfoBox extends React.Component {
         const isVersoDIY = verso.image.manifestID
           ? verso.image.manifestID.includes('DIY')
           : false;
+        const isRecto3 = !!(recto.image.url && recto.image.url.includes("full"));
+        const isVerso3 = !!(verso.image.url && verso.image.url.includes("full"));
         imageModalContent = (
           <ImageViewer
             isRectoDIY={isRectoDIY}
@@ -759,7 +761,8 @@ export default class LeafInfoBox extends React.Component {
               <img
                 alt={recto.memberType}
                 src={
-                  isRectoDIY ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
+                  // isRectoDIY ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
+                  (isRecto3 || isRectoDIY) ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
                 }
                 style={{ cursor: 'pointer' }}
                 width={80}
@@ -782,7 +785,8 @@ export default class LeafInfoBox extends React.Component {
               <img
                 alt={verso.memberType}
                 src={
-                  isVersoDIY ? versoURL : versoURL + '/full/80,/0/default.jpg'
+                  // isVersoDIY ? versoURL : versoURL + '/full/80,/0/default.jpg'
+                  (isVerso3 || isVersoDIY) ? versoURL : versoURL + '/full/80,/0/default.jpg'
                 }
                 style={{ cursor: 'pointer' }}
                 width={80}

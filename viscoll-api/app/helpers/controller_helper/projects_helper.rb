@@ -49,9 +49,9 @@ module ControllerHelper
 
     def getManifestInformation(url)
       images = []
-      iiif_version = 3
+      iiif_version = /(?<=iiif\/)(\d+)/.match(url).to_s
       case iiif_version
-      when 2
+      when "2"
         begin
           response = JSON.parse(Net::HTTP.get(URI(url)))
           response["sequences"][0]["canvases"].each do |canvas|
@@ -62,11 +62,11 @@ module ControllerHelper
         end
         return {name: response["label"][0..150], images: images} unless response["label"].empty?
         return {name: "Unnamed manifest", images: images}
-      when 3
+      when "3"
         begin
           response = JSON.parse(Net::HTTP.get(URI(url)))
           response["items"].each do |item|
-            puts item["items"][0]["items"][0]["label"]["none"][0]
+            # puts item["items"][0]["items"][0]["label"]["none"][0]
             images.push({label: item["items"][0]["items"][0]["label"]["none"][0], url: item["items"][0]["items"][0]["body"]["id"]})
           end
         rescue

@@ -15,13 +15,25 @@ export default class ImageViewer extends React.Component {
 
   componentDidMount() {
     var tilesSources = [];
+    // .+?(?=full)
+    // https://exhibits.library.stonybrook.edu/iiif-img/3/5846/full/800,476/0/default.jpg
     if (this.props.rectoURL && !this.props.isRectoDIY) {
-      tilesSources.push(this.props.rectoURL + "/info.json");
+      if (this.props.rectoURL.includes('full')) {
+        let cleanURL = /.+?(?=full)/.exec(this.props.rectoURL)[0]
+        tilesSources.push(cleanURL + 'info.json')
+      } else {
+        tilesSources.push(this.props.rectoURL + '/info.json');
+      }
     } else if (this.props.rectoURL && this.props.isRectoDIY) {
       tilesSources.push({type: "image", url: this.props.rectoURL});
     }
     if (this.props.versoURL && !this.props.isVersoDIY) {
-      tilesSources.push(this.props.versoURL + "/info.json");
+      if (this.props.versoURL.includes('full')) {
+        let cleanURL = /.+?(?=full)/.exec(this.props.versoURL)[0]
+        tilesSources.push(cleanURL + "info.json");
+      } else {
+        tilesSources.push(this.props.versoURL + '/info.json');
+      }
     } else if (this.props.versoURL && this.props.isVersoDIY) {
       tilesSources.push({type: "image", url: this.props.versoURL});
     }
@@ -83,12 +95,22 @@ export default class ImageViewer extends React.Component {
     if (this.state.osd) {
       var tilesSources = [];
       if (r && !rDIY) {
-        tilesSources.push(r + "/info.json");
+        if (r.includes("full")) {
+          let cleanURL = /.+?(?=full)/.exec(r)[0]
+          tilesSources.push(cleanURL + 'info.json')
+        } else {
+          tilesSources.push(r + "/info.json");
+        }
       } else if (r && rDIY) {
         tilesSources.push({type: "image", url: r});
       }
       if (v && !vDIY) {
-        tilesSources.push(v + "/info.json");
+        if (v.includes("full")) {
+          let cleanURL = /.+?(?=full)/.exec(v)[0]
+          tilesSources.push(cleanURL + 'info.json')
+        } else {
+          tilesSources.push(v + "/info.json");
+        }
       } else if (v && vDIY) {
         tilesSources.push({type: "image", url: v});
       }
