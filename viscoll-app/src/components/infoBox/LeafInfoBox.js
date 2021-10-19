@@ -565,6 +565,7 @@ export default class LeafInfoBox extends React.Component {
                   inputStyle={{
                     fontSize: this.props.windowWidth <= 768 ? '12px' : '16px',
                   }}
+                  fullWidth
                 />
                 {textboxButtons}
               </form>
