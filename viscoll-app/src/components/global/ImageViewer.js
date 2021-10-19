@@ -91,24 +91,14 @@ export default class ImageViewer extends React.Component {
 
   addTiles(rDIY, vDIY, r, v) {
     if (this.state.osd) {
-      var tilesSources = [];
+      let tilesSources = [];
       if (r && !rDIY) {
-        if (r.includes("full")) {
-          let cleanURL = /.+?(?=full)/.exec(r)[0]
-          tilesSources.push(cleanURL + 'info.json')
-        } else {
-          tilesSources.push(r + "/info.json");
-        }
+        tilesSources.push(this.getInfoUrl(r))
       } else if (r && rDIY) {
         tilesSources.push({type: "image", url: r});
       }
       if (v && !vDIY) {
-        if (v.includes("full")) {
-          let cleanURL = /.+?(?=full)/.exec(v)[0]
-          tilesSources.push(cleanURL + 'info.json')
-        } else {
-          tilesSources.push(v + "/info.json");
-        }
+        tilesSources.push(this.getInfoUrl(v))
       } else if (v && vDIY) {
         tilesSources.push({type: "image", url: v});
       }
