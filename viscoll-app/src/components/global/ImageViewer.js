@@ -18,12 +18,12 @@ export default class ImageViewer extends React.Component {
     // .+?(?=full)
     // https://exhibits.library.stonybrook.edu/iiif-img/3/5846/full/800,476/0/default.jpg
     if (this.props.rectoURL && !this.props.isRectoDIY) {
-        tilesSources.push(this.getInfoUrl(this.props.rectoURL));
+        tilesSources.push(this.getInfoURL(this.props.rectoURL));
     } else if (this.props.rectoURL && this.props.isRectoDIY) {
       tilesSources.push({type: "image", url: this.props.rectoURL});
     }
     if (this.props.versoURL && !this.props.isVersoDIY) {
-      tilesSources.push(this.getInfoUrl(this.props.versoURL))
+      tilesSources.push(this.getInfoURL(this.props.versoURL))
     } else if (this.props.versoURL && this.props.isVersoDIY) {
       tilesSources.push({type: "image", url: this.props.versoURL});
     }
@@ -81,7 +81,7 @@ export default class ImageViewer extends React.Component {
     this.addTiles(nextProps.isRectoDIY, nextProps.isVersoDIY, nextProps.rectoURL, nextProps.versoURL);
   }
 
-  getInfoUrl(url) {
+  getInfoURL(url) {
     if (url.includes("full")) {
        return /.+?(?=\/full)/.exec(url)[0] + '/info.json'
     } else {
@@ -93,12 +93,12 @@ export default class ImageViewer extends React.Component {
     if (this.state.osd) {
       let tilesSources = [];
       if (r && !rDIY) {
-        tilesSources.push(this.getInfoUrl(r))
+        tilesSources.push(this.getInfoURL(r))
       } else if (r && rDIY) {
         tilesSources.push({type: "image", url: r});
       }
       if (v && !vDIY) {
-        tilesSources.push(this.getInfoUrl(v))
+        tilesSources.push(this.getInfoURL(v))
       } else if (v && vDIY) {
         tilesSources.push({type: "image", url: v});
       }
