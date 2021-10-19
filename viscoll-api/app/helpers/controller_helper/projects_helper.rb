@@ -51,29 +51,31 @@ module ControllerHelper
     def getManifestInformation(url)
       images   = []
       response = JSON.parse(Net::HTTP.get(URI(url)))
-      # iiif_version = /(?<=iiif\/)(\d+)/.match(url).to_s
       iiif_version = response["@context"]
       if iiif_version.include? "2"
         begin
           response["sequences"][0]["canvases"].each do |canvas|
-            images.push({ label: canvas["label"], url: canvas["images"][0]["resource"]["service"]["@id"] })
+            images.push({ label: canvas["label"],
+                          url: canvas["images"][0]["resource"]["service"]["@id"] })
           end
         rescue
           return { name: "Unparseable manifest URL", images: images }
         end
-        return { name: response["label"][0..150], images: images } unless response["label"].empty?
+        return { name: response["label"][0..150],
+                 images: images } unless response["label"].empty?
         return { name: "Unnamed manifest", images: images }
       elsif iiif_version.include? "3"
         begin
           response["items"].each do |item|
-            # binding.pry
-            images.push({ label: item["label"].values.first[0], url: item["items"][0]["items"][0]["body"]["id"] })
+            images.push({ label: item["label"].values.first[0],
+                          url: item["items"][0]["items"][0]["body"]["id"] })
           end
         rescue
           return { name: "Unparseable manifest URL", images: images }
         end
-        return { name:   response["label"].values.first[0][0..150],
-                 images: images } unless response["label"].values.first[0].empty?
+        unless response["label"].values.first[0].empty?
+          return { name: response["label"].values.first[0][0..150], images: images }
+        end
         return { name: "Unnamed manifest", images: images }
       else
         raise "IIIF Version: #{iiif_version}"

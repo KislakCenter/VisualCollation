@@ -18,22 +18,12 @@ export default class ImageViewer extends React.Component {
     // .+?(?=full)
     // https://exhibits.library.stonybrook.edu/iiif-img/3/5846/full/800,476/0/default.jpg
     if (this.props.rectoURL && !this.props.isRectoDIY) {
-      if (this.props.rectoURL.includes('full')) {
-        let cleanURL = /.+?(?=full)/.exec(this.props.rectoURL)[0]
-        tilesSources.push(cleanURL + 'info.json')
-      } else {
-        tilesSources.push(this.props.rectoURL + '/info.json');
-      }
+        tilesSources.push(this.getInfoUrl(this.props.rectoURL));
     } else if (this.props.rectoURL && this.props.isRectoDIY) {
       tilesSources.push({type: "image", url: this.props.rectoURL});
     }
     if (this.props.versoURL && !this.props.isVersoDIY) {
-      if (this.props.versoURL.includes('full')) {
-        let cleanURL = /.+?(?=full)/.exec(this.props.versoURL)[0]
-        tilesSources.push(cleanURL + "info.json");
-      } else {
-        tilesSources.push(this.props.versoURL + '/info.json');
-      }
+      tilesSources.push(this.getInfoUrl(this.props.versoURL))
     } else if (this.props.versoURL && this.props.isVersoDIY) {
       tilesSources.push({type: "image", url: this.props.versoURL});
     }
@@ -89,6 +79,14 @@ export default class ImageViewer extends React.Component {
 
   componentWillUpdate(nextProps) {
     this.addTiles(nextProps.isRectoDIY, nextProps.isVersoDIY, nextProps.rectoURL, nextProps.versoURL);
+  }
+
+  getInfoUrl(url) {
+    if (url.includes("full")) {
+       return /.+?(?=\/full)/.exec(url)[0] + '/info.json'
+    } else {
+      return url + '/info.json'
+    }
   }
 
   addTiles(rDIY, vDIY, r, v) {
