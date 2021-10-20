@@ -53,8 +53,9 @@ export default class ManageManifests extends Component {
                     tabIndex={this.props.tabIndex}
                   >
                     <img 
-                      src={img.manifestID.includes("DIY")? img.url : img.url+"/full/40,/0/default.jpg"}
-                      alt={"Thumbnail of "+img.label} 
+                      src={(img.url.includes("full") || img.manifestID.includes("DIY"))
+                           ? img.url : img.url + "/full/40,/0/default.jpg"}
+                      alt={"Thumbnail of "+img.label}
                       style={{cursor: "pointer"}}
                       width="40px"
                     />

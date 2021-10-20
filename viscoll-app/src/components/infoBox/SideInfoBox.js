@@ -581,9 +581,9 @@ export default class SideInfoBox extends React.Component {
               <img
                 alt={side.id}
                 src={
-                  side.image.manifestID.includes('DIY')
-                    ? side.image.url
-                    : side.image.url + '/full/80,/0/default.jpg'
+                  (side.image.manifestID.includes('DIY') || side.image.url.includes("full"))
+                     ? side.image.url
+                     : side.image.url + '/full/80,/0/default.jpg'
                 }
                 style={{ cursor: 'pointer' }}
                 width={80}
