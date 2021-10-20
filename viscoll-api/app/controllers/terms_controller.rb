@@ -171,6 +171,9 @@ class TermsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_term
       begin
+        # when the ID is first sent to the backend to be created,
+        # it doesn't have 'Term_' - we need to append it in the
+        # controller in order for our Mongo query to execute
         term_id = if params[:id].include? 'Term_'
                     params[:id]
                   else
