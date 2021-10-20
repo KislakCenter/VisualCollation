@@ -625,7 +625,7 @@ export default class LeafInfoBox extends React.Component {
           input = 'None';
         }
       } else if (attributeDict.name === 'folio_number') {
-        input = 'test';
+        input = this.props.Leafs[this.props.selectedLeaves[0]].folio_number
       }
       attributeDivs.push(
         <div className="row" key={attributeDict.name}>
