@@ -724,79 +724,77 @@ export default class LeafInfoBox extends React.Component {
 
     let imageModalContent;
     let imageThumbnails = [];
-    if (this.props.viewMode !== 'VIEWING') {
-      // Show the side image if available
-      if (this.props.selectedLeaves.length === 1) {
-        const leaf = this.props.Leafs[this.props.selectedLeaves[0]];
-        const recto = this.props.Rectos[leaf.rectoID];
-        const verso = this.props.Versos[leaf.versoID];
-        // replace imageModalContent view OSD component
-        const rectoURL = recto.image ? recto.image.url : null;
-        const versoURL = verso.image ? verso.image.url : null;
-        const isRectoDIY = recto.image.manifestID
-          ? recto.image.manifestID.includes('DIY')
-          : false;
-        const isVersoDIY = verso.image.manifestID
-          ? verso.image.manifestID.includes('DIY')
-          : false;
-        const isRecto3 = !!(recto.image.url && recto.image.url.includes("full"));
-        const isVerso3 = !!(verso.image.url && verso.image.url.includes("full"));
-        imageModalContent = (
-          <ImageViewer
-            isRectoDIY={isRectoDIY}
-            isVersoDIY={isVersoDIY}
-            rectoURL={rectoURL}
-            versoURL={versoURL}
-          />
+    // Show the side image if available
+    if (this.props.selectedLeaves.length === 1) {
+      const leaf = this.props.Leafs[this.props.selectedLeaves[0]];
+      const recto = this.props.Rectos[leaf.rectoID];
+      const verso = this.props.Versos[leaf.versoID];
+      // replace imageModalContent view OSD component
+      const rectoURL = recto.image ? recto.image.url : null;
+      const versoURL = verso.image ? verso.image.url : null;
+      const isRectoDIY = recto.image.manifestID
+        ? recto.image.manifestID.includes('DIY')
+        : false;
+      const isVersoDIY = verso.image.manifestID
+        ? verso.image.manifestID.includes('DIY')
+        : false;
+      const isRecto3 = !!(recto.image.url && recto.image.url.includes("full"));
+      const isVerso3 = !!(verso.image.url && verso.image.url.includes("full"));
+      imageModalContent = (
+        <ImageViewer
+          isRectoDIY={isRectoDIY}
+          isVersoDIY={isVersoDIY}
+          rectoURL={rectoURL}
+          versoURL={versoURL}
+        />
+      );
+      if (rectoURL) {
+        imageThumbnails.push(
+          <button
+            className="image"
+            aria-label="Recto image"
+            key="rectoThumbnail"
+            style={{ display: 'inline-block' }}
+            onClick={() => this.toggleImageModal(true)}
+            tabIndex={this.props.tabIndex}
+          >
+            <img
+              alt={recto.memberType}
+              src={
+                // isRectoDIY ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
+                (isRecto3 || isRectoDIY) ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
+              }
+              style={{ cursor: 'pointer' }}
+              width={80}
+            />
+            <br />
+            {recto.memberType}
+          </button>
         );
-        if (rectoURL) {
-          imageThumbnails.push(
-            <button
-              className="image"
-              aria-label="Recto image"
-              key="rectoThumbnail"
-              style={{ display: 'inline-block' }}
-              onClick={() => this.toggleImageModal(true)}
-              tabIndex={this.props.tabIndex}
-            >
-              <img
-                alt={recto.memberType}
-                src={
-                  // isRectoDIY ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
-                  (isRecto3 || isRectoDIY) ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
-                }
-                style={{ cursor: 'pointer' }}
-                width={80}
-              />
-              <br />
-              {recto.memberType}
-            </button>
-          );
-        }
-        if (versoURL) {
-          imageThumbnails.push(
-            <button
-              className="image"
-              aria-label="Verso image"
-              key="versoThumbnail"
-              style={{ paddingLeft: 5, display: 'inline-block' }}
-              onClick={() => this.toggleImageModal(true)}
-              tabIndex={this.props.tabIndex}
-            >
-              <img
-                alt={verso.memberType}
-                src={
-                  // isVersoDIY ? versoURL : versoURL + '/full/80,/0/default.jpg'
-                  (isVerso3 || isVersoDIY) ? versoURL : versoURL + '/full/80,/0/default.jpg'
-                }
-                style={{ cursor: 'pointer' }}
-                width={80}
-              />
-              <br />
-              {verso.memberType}
-            </button>
-          );
-        }
+      }
+      if (versoURL) {
+        imageThumbnails.push(
+          <button
+            className="image"
+            aria-label="Verso image"
+            key="versoThumbnail"
+            style={{ paddingLeft: 5, display: 'inline-block' }}
+            onClick={() => this.toggleImageModal(true)}
+            tabIndex={this.props.tabIndex}
+          >
+            <img
+              alt={verso.memberType}
+              src={
+                // isVersoDIY ? versoURL : versoURL + '/full/80,/0/default.jpg'
+                (isVerso3 || isVersoDIY) ? versoURL : versoURL + '/full/80,/0/default.jpg'
+              }
+              style={{ cursor: 'pointer' }}
+              width={80}
+            />
+            <br />
+            {verso.memberType}
+          </button>
+        );
       }
     }
 

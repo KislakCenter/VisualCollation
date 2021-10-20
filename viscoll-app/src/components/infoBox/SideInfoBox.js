@@ -549,48 +549,46 @@ export default class SideInfoBox extends React.Component {
 
     let imageModalContent;
     let imageThumbnail = [];
-    if (this.props.viewMode !== 'VIEWING') {
-      // Show the side image if available
-      if (this.props.selectedSides.length === 1) {
-        const side = this.props.Sides[this.props.selectedSides[0]];
-        // replace imageModalContent view OSD component
-        const rectoURL = side.memberType === 'Recto' ? side.image.url : null;
-        const versoURL = side.memberType === 'Verso' ? side.image.url : null;
-        const isRectoDIY =
-          side.image.manifestID && side.image.manifestID.includes('DIY');
-        const isVersoDIY =
-          side.image.manifestID && side.image.manifestID.includes('DIY');
-        imageModalContent = (
-          <ImageViewer
-            isRectoDIY={isRectoDIY}
-            isVersoDIY={isVersoDIY}
-            rectoURL={rectoURL}
-            versoURL={versoURL}
-          />
+    // Show the side image if available
+    if (this.props.selectedSides.length === 1) {
+      const side = this.props.Sides[this.props.selectedSides[0]];
+      // replace imageModalContent view OSD component
+      const rectoURL = side.memberType === 'Recto' ? side.image.url : null;
+      const versoURL = side.memberType === 'Verso' ? side.image.url : null;
+      const isRectoDIY =
+        side.image.manifestID && side.image.manifestID.includes('DIY');
+      const isVersoDIY =
+        side.image.manifestID && side.image.manifestID.includes('DIY');
+      imageModalContent = (
+        <ImageViewer
+          isRectoDIY={isRectoDIY}
+          isVersoDIY={isVersoDIY}
+          rectoURL={rectoURL}
+          versoURL={versoURL}
+        />
+      );
+      if (side.image.url) {
+        imageThumbnail.push(
+          <button
+            className="image"
+            aria-label={side.memberType + ' image'}
+            key="sideImage"
+            style={{ paddingTop: 5, textAlign: 'center' }}
+            onClick={() => this.toggleImageModal(true)}
+            tabIndex={this.props.tabIndex}
+          >
+            <img
+              alt={side.id}
+              src={
+                (side.image.manifestID.includes('DIY') || side.image.url.includes("full"))
+                   ? side.image.url
+                   : side.image.url + '/full/80,/0/default.jpg'
+              }
+              style={{ cursor: 'pointer' }}
+              width={80}
+            />
+          </button>
         );
-        if (side.image.url) {
-          imageThumbnail.push(
-            <button
-              className="image"
-              aria-label={side.memberType + ' image'}
-              key="sideImage"
-              style={{ paddingTop: 5, textAlign: 'center' }}
-              onClick={() => this.toggleImageModal(true)}
-              tabIndex={this.props.tabIndex}
-            >
-              <img
-                alt={side.id}
-                src={
-                  (side.image.manifestID.includes('DIY') || side.image.url.includes("full"))
-                     ? side.image.url
-                     : side.image.url + '/full/80,/0/default.jpg'
-                }
-                style={{ cursor: 'pointer' }}
-                width={80}
-              />
-            </button>
-          );
-        }
       }
     }
 
