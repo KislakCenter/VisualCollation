@@ -171,7 +171,12 @@ class TermsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_term
       begin
-        @term    = Term.find(params[:id])
+        term_id = if params[:id].include? 'Term_'
+                    params[:id]
+                  else
+                    'Term_' + params[:id]
+                  end
+        @term    = Term.find(term_id)
         @project = Project.find(@term.project_id)
         if (@project.user_id!=current_user.id)
           render json: {error: ""}, status: :unauthorized and return
