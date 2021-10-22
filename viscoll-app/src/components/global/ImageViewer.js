@@ -15,13 +15,15 @@ export default class ImageViewer extends React.Component {
 
   componentDidMount() {
     var tilesSources = [];
+    // .+?(?=full)
+    // https://exhibits.library.stonybrook.edu/iiif-img/3/5846/full/800,476/0/default.jpg
     if (this.props.rectoURL && !this.props.isRectoDIY) {
-      tilesSources.push(this.props.rectoURL + "/info.json");
+        tilesSources.push(this.getInfoURL(this.props.rectoURL));
     } else if (this.props.rectoURL && this.props.isRectoDIY) {
       tilesSources.push({type: "image", url: this.props.rectoURL});
     }
     if (this.props.versoURL && !this.props.isVersoDIY) {
-      tilesSources.push(this.props.versoURL + "/info.json");
+      tilesSources.push(this.getInfoURL(this.props.versoURL))
     } else if (this.props.versoURL && this.props.isVersoDIY) {
       tilesSources.push({type: "image", url: this.props.versoURL});
     }
@@ -29,7 +31,7 @@ export default class ImageViewer extends React.Component {
     this.setState({
       osd: OpenSeadragon({
         id: this.state.suffixedID,
-        prefixUrl: 'https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/images/',
+        prefixUrl: 'https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.2/images/',
         showNavigationControl: true,
         showFullPageControl: false,
         showRotationControl: true,
@@ -79,16 +81,24 @@ export default class ImageViewer extends React.Component {
     this.addTiles(nextProps.isRectoDIY, nextProps.isVersoDIY, nextProps.rectoURL, nextProps.versoURL);
   }
 
+  getInfoURL(url) {
+    if (url.includes("full")) {
+       return /.+?(?=\/full)/.exec(url)[0] + '/info.json'
+    } else {
+      return url + '/info.json'
+    }
+  }
+
   addTiles(rDIY, vDIY, r, v) {
     if (this.state.osd) {
-      var tilesSources = [];
+      let tilesSources = [];
       if (r && !rDIY) {
-        tilesSources.push(r + "/info.json");
+        tilesSources.push(this.getInfoURL(r))
       } else if (r && rDIY) {
         tilesSources.push({type: "image", url: r});
       }
       if (v && !vDIY) {
-        tilesSources.push(v + "/info.json");
+        tilesSources.push(this.getInfoURL(v))
       } else if (v && vDIY) {
         tilesSources.push({type: "image", url: v});
       }
