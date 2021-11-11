@@ -96,34 +96,35 @@ export default class ImportProject extends React.Component {
             />
           </div>
           <br/>
-          <h3>Import format:</h3>
-          <div className="section" role="radiogroup">
-            <RadioButtonGroup 
-              name="exportType" 
-              defaultSelected="json"
-              style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start'}}
-              valueSelected={this.state.importFormat}
-              onChange={(e,v)=>this.onChange(v, "importFormat")}
-            >
-                <RadioButton
-                  role="radio"
-                  aria-label="JSON"
-                  aria-checked={this.state.importFormat==="json"}
-                  value="json"
-                  label="JSON"
-                  style={{display: 'inline-block', width: '125px'}}
-                />
-                <RadioButton
-                  role="radio"
-                  aria-label="XML"
-                  aria-checked={this.state.importFormat==="xml"}
-                  value="xml"
-                  label="XML"
-                  style={{display: 'inline-block', width: '125px'}}
-                />
-            </RadioButtonGroup>
-            {xmlMessage}
-          </div>
+          {/*<h3>Import format:</h3>*/}
+          {/*<div className="section" role="radiogroup">*/}
+            {/* disable import selection radio, since we only upload JSON (default)*/}
+            {/*<RadioButtonGroup */}
+            {/*  name="exportType" */}
+            {/*  defaultSelected="json"*/}
+            {/*  style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start'}}*/}
+            {/*  valueSelected={this.state.importFormat}*/}
+            {/*  onChange={(e,v)=>this.onChange(v, "importFormat")}*/}
+            {/*>*/}
+            {/*    <RadioButton*/}
+            {/*      role="radio"*/}
+            {/*      aria-label="JSON"*/}
+            {/*      aria-checked={this.state.importFormat==="json"}*/}
+            {/*      value="json"*/}
+            {/*      label="JSON"*/}
+            {/*      style={{display: 'inline-block', width: '125px'}}*/}
+            {/*    />*/}
+            {/*    <RadioButton*/}
+            {/*      role="radio"*/}
+            {/*      aria-label="XML"*/}
+            {/*      aria-checked={this.state.importFormat==="xml"}*/}
+            {/*      value="xml"*/}
+            {/*      label="XML"*/}
+            {/*      style={{display: 'inline-block', width: '125px'}}*/}
+            {/*    />*/}
+            {/*</RadioButtonGroup>*/}
+            {/*{xmlMessage}*/}
+          {/*</div>*/}
           <h2>Import images</h2>
           <p>If you have images in your collation, upload the zipped file.</p>
           <div className="section" style={{paddingBottom:"1em"}}>
