@@ -42,7 +42,7 @@ const NewProjectSelection = (props) => {
           </div>
           <div className="text">
             <span id="importTitle">Import</span>
-            <span id="importDescription">Import a collation from VCEditor JSON</span>
+            <span id="importDescription">Import a collation from VCEditor (JSON Only)</span>
           </div>
         </div>
       </button>
