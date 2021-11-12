@@ -78,12 +78,4 @@ Rails.application.configure do
     logger.formatter = config.log_formatter
     config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
-
-  config.middleware.use ExceptionNotification::Rack,
-                        email: {
-                          deliver_with: :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
-                          email_prefix:         '[VCEditor] ',
-                          sender_address:       %{"notifier" <pperkins@upenn.edu>},
-                          exception_recipients: %w{pperkins@upenn.edu emeryr@upenn.edu}
-                        }
 end
