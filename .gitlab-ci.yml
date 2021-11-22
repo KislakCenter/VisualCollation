@@ -17,6 +17,7 @@ workflow:
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'master'
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'development'
 
 stages:
   - sast:project

@@ -73,9 +73,6 @@ GEM
     down (4.8.1)
       addressable (~> 2.5)
     erubi (1.10.0)
-    exception_notification (4.4.3)
-      actionmailer (>= 4.0, < 7)
-      activesupport (>= 4.0, < 7)
     factory_girl (4.9.0)
       activesupport (>= 3.0.0)
     factory_girl_rails (4.9.0)
@@ -102,6 +99,7 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.0.1)
+    honeybadger (4.9.0)
     i18n (1.8.9)
       concurrent-ruby (~> 1.0)
     jbuilder (2.11.2)
@@ -253,10 +251,10 @@ PLATFORMS
 DEPENDENCIES
   byebug
   database_cleaner (~> 1.6, >= 1.6.1)
-  exception_notification
   factory_girl_rails (~> 4.8)
   faker (~> 1.7, >= 1.7.3)
   guard-rspec
+  honeybadger (~> 4.0)
   jbuilder (~> 2.7)
   listen (~> 3.0.5)
   mongoid (~> 6.2)
