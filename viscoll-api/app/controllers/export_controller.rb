@@ -80,7 +80,8 @@ class ExportController < ApplicationController
                 if File.extname(input_entry.name) == '.svg'
                   # use SecureRandom to prevent file name collisions;
                   #  e.g., MST1-1.svg => MST1-1.svg-d40498e50a.svg, MST1-1.svg-d40498e50a.svg.png
-                  tmp_svg = File.join Dir.tmpdir, "#{File.basename(input_entry.name)}-#{SecureRandom.hex 5}.svg"
+                  basename = File.basename(input_entry.name, ".svg").parameterize
+                  tmp_svg = File.join Dir.tmpdir, "#{basename}-#{SecureRandom.hex 5}.svg"
                   tmp_png = "#{tmp_svg}.png"
 
                   # write the svg to disk
