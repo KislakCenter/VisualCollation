@@ -322,8 +322,12 @@ export default class AddGroupDialog extends React.Component {
                         }
                     })
                     // add 1 to determine the new groupOrder
-                    if (this.state.selectedChild[0] === 'G') {
-                        groupCount += this.countGroupChildren(this.state.selectedChild)
+                    if (this.state.selectedChild) {
+                        if (this.state.selectedChild[0] === 'G') {
+                            groupCount += this.countGroupChildren(this.state.selectedChild)
+                        }
+                    } else {
+                        groupCount = 1
                     }
                     groupOrder = groupCount + 1;
                     data.additional['parentGroupID'] = group.id;
@@ -555,52 +559,56 @@ export default class AddGroupDialog extends React.Component {
                 />
             </div>
         </div> : '';
-        let groupPosition = this.props.Groups !== undefined && this.state.location === 'inside' ? <div>
-            <div className="label">
-                <h4
-                    style={{ marginBottom: '1em' }}
-                >Group position</h4>
-            </div>
-            <div>
-                <RadioButtonGroup name="group_position" defaultSelected={this.state.placementLocation}
-                                  onChange={(e, v) => this.onPlacementLocationChange(v)}>
-                    <RadioButton
-                        aria-label="Add new group above selected leaf"
-                        value="above"
-                        label="above"
-                        style={styles.radioButton}
-                        autoFocus
-                    />
-                    <RadioButton
-                        aria-label="Add new group below selected leaf"
-                        value="below"
-                        label="below"
-                        style={styles.radioButton}
-                    />
-                </RadioButtonGroup>
-            </div>
-            <div className="input">
-                <SelectField
-                    id='leafSelect'
-                    label='select where the quire should be positioned'
-                    onChange={v => this.dropDownChange(v, 'selectedChild')}
-                    value={this.props.Groups[this.props.selectedGroups[0]]['memberIDs'][0]}
-                    data={this.props.Groups[this.props.selectedGroups[0]]['memberIDs'].map((itemID) => {
-                        if (itemID[0] === 'L') {
-                            return { value: itemID, text: `Leaf ${this.props.leafIDs.indexOf(itemID) + 1}` }
-                        } else if (itemID[0] === 'G') {
-                            let groupType = this.props.Groups[itemID].type
-                            // quireNumber should be the notation value, which means we have to have
-                            // the notation logic here as well
-                            let groupNotation = this.groupNotation(this.props.Groups[itemID])
-                            return { value: itemID, text: `${groupType} ${groupNotation}` }
-                        }
+        let groupPosition = this.props.Groups !== undefined
+                            && this.props.Groups[this.props.selectedGroups[0]].memberIDs.length != 0
+                            && this.state.location === 'inside' ? <div>
+                                <div className="label">
+                                    <h4
+                                        style={{ marginBottom: '1em' }}
+                                    >Group position</h4>
+                                </div>
 
-                    })}
-                    width={250}
-                />
-            </div>
-        </div> : '';
+                                <div>
+                                    <RadioButtonGroup name="group_position" defaultSelected={this.state.placementLocation}
+                                                      onChange={(e, v) => this.onPlacementLocationChange(v)}>
+                                        <RadioButton
+                                            aria-label="Add new group above selected leaf"
+                                            value="above"
+                                            label="above"
+                                            style={styles.radioButton}
+                                            autoFocus
+                                        />
+                                        <RadioButton
+                                            aria-label="Add new group below selected leaf"
+                                            value="below"
+                                            label="below"
+                                            style={styles.radioButton}
+                                        />
+                                    </RadioButtonGroup>
+                                </div>
+
+                                <div className="input">
+                                    <SelectField
+                                        id='leafSelect'
+                                        label='select where the quire should be positioned'
+                                        onChange={v => this.dropDownChange(v, 'selectedChild')}
+                                        value={this.props.Groups[this.props.selectedGroups[0]]['memberIDs'][0]}
+                                        data={this.props.Groups[this.props.selectedGroups[0]]['memberIDs'].map((itemID) => {
+                                            if (itemID[0] === 'L') {
+                                                return { value: itemID, text: `Leaf ${this.props.leafIDs.indexOf(itemID) + 1}` }
+                                            } else if (itemID[0] === 'G') {
+                                                let groupType = this.props.Groups[itemID].type
+                                                // quireNumber should be the notation value, which means we have to have
+                                                // the notation logic here as well
+                                                let groupNotation = this.groupNotation(this.props.Groups[itemID])
+                                                return { value: itemID, text: `${groupType} ${groupNotation}` }
+                                            }
+
+                                        })}
+                                        width={250}
+                                    />
+                                </div>
+                            </div> : '';
 
 
         if (!this.props.selectedGroups) {

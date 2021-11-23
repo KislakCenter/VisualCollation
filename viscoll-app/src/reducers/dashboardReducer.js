@@ -13,6 +13,12 @@ export default function dashboardReducer(state = initialState, action) {
       break;
     case 'LOAD_PROJECTS_SUCCESS':
     case 'CREATE_PROJECT_SUCCESS':
+    case 'CLONE_PROJECT_SUCCESS':
+      state = {
+        projects: action.payload.projects,
+        images: action.payload.images,
+      }
+      break;
     case 'CLONE_PROJECT_IMPORT_SUCCESS':
     case 'IMPORT_MANIFEST_SUCCESS':
       state = action.payload;
