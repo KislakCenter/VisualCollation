@@ -49,30 +49,22 @@ module ControllerHelper
     end
 
     def getManifestInformation(url)
-      images   = []
       begin
-        response = JSON.parse(Net::HTTP.get(URI(url)))
+        images       = []
+        response     = JSON.parse(Net::HTTP.get(URI(url)))
         iiif_version = response["@context"]
         if iiif_version.include? "2"
-          begin
-            response["sequences"][0]["canvases"].each do |canvas|
-              images.push({ label: canvas["label"],
-                            url: canvas["images"][0]["resource"]["service"]["@id"] })
-            end
-          rescue
-            return { name: "Unparseable manifest URL", images: images }
+          response["sequences"][0]["canvases"].each do |canvas|
+            images.push({ label: canvas["label"],
+                          url:   canvas["images"][0]["resource"]["service"]["@id"] })
           end
-          return { name: response["label"][0..150],
+          return { name:   response["label"][0..150],
                    images: images } unless response["label"].empty?
           return { name: "Unnamed manifest", images: images }
         elsif iiif_version.include? "3"
-          begin
-            response["items"].each do |item|
-              images.push({ label: item["label"].values.first[0],
-                            url: item["items"][0]["items"][0]["body"]["id"] })
-            end
-          rescue
-            return { name: "Unparseable manifest URL", images: images }
+          response["items"].each do |item|
+            images.push({ label: item["label"].values.first[0],
+                          url:   item["items"][0]["items"][0]["body"]["id"] })
           end
           unless response["label"].values.first[0].empty?
             return { name: response["label"].values.first[0][0..150], images: images }
@@ -81,7 +73,8 @@ module ControllerHelper
         else
           raise "IIIF Version: #{iiif_version}"
         end
-      rescue
+      rescue Exception => e
+        Honeybadger.notify e
         return { name: "Unparseable manifest URL", images: images }
       end
     end
