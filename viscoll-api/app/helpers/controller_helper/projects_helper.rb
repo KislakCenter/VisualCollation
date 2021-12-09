@@ -235,16 +235,16 @@ module ControllerHelper
             "objects":     term.objects,
         }
         term.objects["Group"].each do |id|
-          @groups[id][:terms].append(term.id.to_s)
+          @groups[id][:terms].append(term.id.to_s) unless @groups[id].nil?
         end
         term.objects["Leaf"].each do |id|
-          @leafs[id][:terms].append(term.id.to_s)
+          @leafs[id][:terms].append(term.id.to_s) unless @leafs[id].nil?
         end
         term.objects["Recto"].each do |id|
-          @rectos[id][:terms].append(term.id.to_s)
+          @rectos[id][:terms].append(term.id.to_s) unless @rectos[id].nil?
         end
         term.objects["Verso"].each do |id|
-          @versos[id][:terms].append(term.id.to_s)
+          @versos[id][:terms].append(term.id.to_s) unless @versos[id].nil?
         end
       end
 
