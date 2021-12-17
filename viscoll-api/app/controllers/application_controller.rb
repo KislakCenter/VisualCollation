@@ -1,4 +1,12 @@
 class ApplicationController < ActionController::API
+    class VCError < StandardError; end
+
+    rescue_from StandardError do |e|
+        Honeybadger.notify(e)
+        Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
+        render json: { errors: e.message }, status: :bad_request
+    end
+
     before_action :set_base_api_url
     def set_base_api_url
       # TODO: we need an env var with a complete URL for this
