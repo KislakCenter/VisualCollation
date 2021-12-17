@@ -121,33 +121,21 @@ class LeafsController < ApplicationController
 
   # PATCH/PUT /leafs
   def updateMultiple
-    begin
-      allLeafs = leaf_params_batch_update.to_h[:leafs]
-      begin
-        @project = Project.find(leaf_params_batch_update.to_h[:project_id])
-      rescue Mongoid::Errors::DocumentNotFound => e
-        render json: {error: "project not found with id "+params[:project_id]}, status: :unprocessable_entity and return
+    allLeafs = leaf_params_batch_update.to_h[:leafs]
+    @project = Project.find(leaf_params_batch_update.to_h[:project_id])
+    allLeafs.each do |leaf_params, index|
+      @leaf = Leaf.find(leaf_params[:id])
+      if @leaf.project.user_id != current_user.id
+        render json: { error: "" }, status: :unauthorized and return
       end
-      allLeafs.each do |leaf_params, index|
-        begin
-          @leaf = Leaf.find(leaf_params[:id])
-        rescue Exception => e
-          render json: {leafs: ["leaf not found with id "+leaf_params[:id]]}, status: :unprocessable_entity and return
-        end
-        if @leaf.project.user_id != current_user.id
-          render json: {error: ""}, status: :unauthorized and return
-        end
-        if !@leaf.update(leaf_params[:attributes])
-          render json: {leafs: {attributes: {index: @leaf.errors}}}, status: :unprocessable_entity and return
-        end
-        if (leaf_params[:attributes].key?(:attached_below)||leaf_params[:attributes].key?(:attached_above))
-          update_attached_to()
-        elsif leaf_params[:attributes].key?(:material) and leaf_params[:attributes][:material] == "Paper"
-          handle_paper_update(@leaf)
-        end
+      if !@leaf.update(leaf_params[:attributes])
+        render json: { leafs: { attributes: { index: @leaf.errors } } }, status: :unprocessable_entity and return
       end
-    rescue Exception => e
-      render json: {error: e.message}, status: :unprocessable_entity and return
+      if (leaf_params[:attributes].key?(:attached_below) || leaf_params[:attributes].key?(:attached_above))
+        update_attached_to()
+      elsif leaf_params[:attributes].key?(:material) and leaf_params[:attributes][:material] == "Paper"
+        handle_paper_update(@leaf)
+      end
     end
   end
 
