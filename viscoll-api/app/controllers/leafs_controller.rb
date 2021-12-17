@@ -125,9 +125,7 @@ class LeafsController < ApplicationController
     @project = Project.find(leaf_params_batch_update.to_h[:project_id])
     allLeafs.each do |leaf_params, index|
       @leaf = Leaf.find(leaf_params[:id])
-      if @leaf.project.user_id != current_user.id
-        render json: { error: "" }, status: :unauthorized and return
-      end
+      authorize_project! @project
       if !@leaf.update(leaf_params[:attributes])
         render json: { leafs: { attributes: { index: @leaf.errors } } }, status: :unprocessable_entity and return
       end
