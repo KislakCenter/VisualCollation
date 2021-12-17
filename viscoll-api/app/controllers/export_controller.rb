@@ -33,7 +33,6 @@ class ExportController < ApplicationController
     rescue Exception => e
     end
 
-    begin
       exportData = buildDotModel(@project)
       xml        = Nokogiri::XML(exportData)
       schema     = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel2.0.rng"))
@@ -148,14 +147,12 @@ class ExportController < ApplicationController
 
           render json: { data: exportData, type: 'formula', Images: { exportedImages: @zipFilePath ? @zipFilePath : false } }, status: :ok and return
         else
-          render json: { error: "Export format must be one of [json, xml, svg, formula, html]" }, status: :unprocessable_entity and return
+          raise VCError, "Export format must be one of [json, xml, svg, formula, html]. The format received is: '#{@format}'."
         end
       else
         render json: { data: errors, type: @format }, status: :unprocessable_entity and return
       end
-    rescue Exception => e
-      render json: { error: e.message }, status: :internal_server_error and return
-    end
+
   end
 
   private
