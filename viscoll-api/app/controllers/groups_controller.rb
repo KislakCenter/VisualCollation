@@ -24,19 +24,15 @@ class GroupsController < ApplicationController
       end
     end
     if (hasAdditionalErrors)
-      render json: { additional: @additionalErrors }, status: :unprocessable_entity and return
+      raise VCError, "Additional group errors: #{@additionalErrors}"
     end
     @groupErrors = { project_id: [] }
     if (project_id == nil)
-      @groupErrors[:project_id].push("not found")
-      render json: { group: @groupErrors }, status: :unprocessable_entity and return
+      raise VCError, "Project ID is nil. Group has following errors: #{@groupErrors}"
     end
-    begin
-      @project = Project.find(project_id)
-    rescue Exception => e
-      @groupErrors[:project_id].push("project not found with id " + project_id)
-      render json: { group: @groupErrors }, status: :unprocessable_entity and return
-    end
+
+    @project = Project.find(project_id)
+
     new_groups    = []
     new_group_ids = []
     groupIDIndex  = 0
@@ -92,25 +88,19 @@ class GroupsController < ApplicationController
 
   # PATCH/PUT /groups
   def updateMultiple
-    begin
-      allGroups = group_params_batch_update.to_h[:groups]
-      # Run validations
-      errors = validateGroupBatchUpdate(allGroups)
-      if not errors.empty?
-        render json: {groups: errors}, status: :unprocessable_entity and return
+    allGroups = group_params_batch_update.to_h[:groups]
+    # Run validations
+    errors = validateGroupBatchUpdate(allGroups)
+    if not errors.empty?
+      raise VCError, "Batch update error: #{errors}"
+    end
+    allGroups.each do |group_params|
+      @group   = Group.find(group_params[:id])
+      @project = Project.find(@group.project_id)
+      authorize_project! @project
+      if !@group.update(group_params[:attributes])
+        raise VCError, "Group: #{@group} could not be updated. Errors: #{errors}"
       end
-      allGroups.each do |group_params|
-        @group = Group.find(group_params[:id])
-        @project = Project.find(@group.project_id)
-        if (@project.user_id!=current_user.id)
-          render json: {error: ""}, status: :unauthorized and return
-        end
-        if !@group.update(group_params[:attributes])
-          render json: @group.errors, status: :unprocessable_entity and return
-        end
-      end
-    rescue Exception => e
-      render json: {error: e.message}, status: :unprocessable_entity and return
     end
   end
 
