@@ -1,4 +1,4 @@
-class ImagesController < ApplicationController 
+class ImagesController < ApplicationController
   before_action :authenticate!, except: [:show, :getZipImages]
 
   def authorize_image! image
@@ -79,7 +79,7 @@ class ImagesController < ApplicationController
     end
     images = []
     imageIDs.each do |imageID|
-      image = Image.find(imageID)
+      image         = Image.find(imageID)
       image.user_id = "test"
       authorize_image! image
       images.push(image)
@@ -96,7 +96,6 @@ class ImagesController < ApplicationController
     @images   = current_user.images
     render :'projects/index', status: :ok and return
   end
-
 
   # PUT/PATCH /images/unlink
   def unlink
@@ -136,26 +135,25 @@ class ImagesController < ApplicationController
     render :'projects/index', status: :ok and return
   end
 
-
   # DELETE /images
   def destroy
     images = []
     images_destroy_params.to_h[:imageIDs].each do |imageIDParam|
-        imageID = imageIDParam.split("_", 2)[0]
-        image = Image.find(imageID)
-        images.push(image)
-        authorize_image! image
+      imageID = imageIDParam.split("_", 2)[0]
+      image   = Image.find(imageID)
+      images.push(image)
+      authorize_image! image
     end
     images.each do |image|
       image.destroy
     end
     @projects = current_user.projects
-    @images = current_user.images
+    @images   = current_user.images
     render :'projects/index', status: :ok and return
   end
 
+  private
 
-  private 
   def image_create_params
     params.permit(:projectID, :images => [:filename, :content])
   end
