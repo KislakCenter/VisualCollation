@@ -77,7 +77,9 @@ class GroupsController < ApplicationController
 
   # PATCH/PUT /groups/1
   def update
-    @group.update!(group_params)
+    unless @group.update(group_params)
+      raise VCError, "Some failed to update Group #{@group.id}"
+    end
   end
 
   # PATCH/PUT /groups
@@ -111,16 +113,10 @@ class GroupsController < ApplicationController
     # Delete groups
     groupIDs.each do |groupID|
       # Wrapping destroy in begin/rescue because group may no longer exist when it's nested
-      begin
-        group    = Group.find(groupID)
-        @project = Project.find(group.project_id)
-        if (@project.user_id != current_user.id)
-          render json: { error: "" }, status: :unauthorized and return
-        end
-        group.destroy
-      rescue Exception => e
-        next
-      end
+      group    = Group.find(groupID)
+      @project = Project.find(group.project_id)
+      authorize_project! @project
+      group.destroy
     end
   end
 
