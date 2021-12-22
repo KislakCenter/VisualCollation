@@ -100,12 +100,8 @@ class GroupsController < ApplicationController
 
   # DELETE /groups/1
   def destroy
-    begin
-      @group = Group.find(params[:id])
-      @group.destroy
-    rescue Exception => e
-      render json: {error: e.message}, status: :unprocessable_entity and return
-    end
+    @group = Group.find(params[:id])
+    @group.destroy
   end
 
   # DELETE /groups
