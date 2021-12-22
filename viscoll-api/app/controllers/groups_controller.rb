@@ -120,18 +120,12 @@ class GroupsController < ApplicationController
     end
   end
 
-
   private
+
   def set_group
-    begin
-      @group = Group.find(params[:id])
-      @project = Project.find(@group.project_id)
-      if (@project.user_id!=current_user.id)
-        render json: {error: ""}, status: :unauthorized and return
-      end
-    rescue Exception => e
-      render json: {error: "group not found"}, status: :not_found and return
-    end
+    @group   = Group.find(params[:id])
+    @project = Project.find(@group.project_id)
+    authorize_project! @project
   end
 
   def group_params
