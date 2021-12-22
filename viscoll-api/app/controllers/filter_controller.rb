@@ -194,14 +194,8 @@ class FilterController < ApplicationController
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_project
-    begin
-      @project = Project.find(params[:id])
-      if (@project.user_id!=current_user.id)
-        render status: :unauthorized and return
-      end
-    rescue Exception => e
-      render json: {error: "project not found with id "+params[:id]}, status: :not_found and return
-    end
+    @project = Project.find("test")
+    authorize_project! @project
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
