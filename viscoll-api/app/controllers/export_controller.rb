@@ -9,28 +9,25 @@ class ExportController < ApplicationController
   # GET /projects/:id/export/:format
   def show
     # Zip all DIY images and provide the link to download the file
-    begin
-      @zipFilePath = nil
-      images       = []
-      current_user.images.all.each do |image|
-        if image.projectIDs.include? @project.id.to_s
-          images.push(image)
+    @zipFilePath = nil
+    images       = []
+    current_user.images.all.each do |image|
+      if image.projectIDs.include? @project.id.to_s
+        images.push(image)
+      end
+    end
+    if !images.empty?
+      basePath    = "#{Rails.root}/public/uploads/"
+      zipFilename = "#{basePath}#{@project.id.to_s}_images.zip"
+      File.delete(zipFilename) if File.exist?(zipFilename)
+      ::Zip::File.open(zipFilename, Zip::File::CREATE) do |zipFile|
+        images.each do |image|
+          fileExtension = image.metadata['mime_type'].split('/')[1]
+          filenameOnly  = image.filename.rpartition(".")[0]
+          zipFile.add("#{filenameOnly}_#{image.fileID}.#{fileExtension}", "#{basePath}#{image.fileID}")
         end
       end
-      if !images.empty?
-        basePath    = "#{Rails.root}/public/uploads/"
-        zipFilename = "#{basePath}#{@project.id.to_s}_images.zip"
-        File.delete(zipFilename) if File.exist?(zipFilename)
-        ::Zip::File.open(zipFilename, Zip::File::CREATE) do |zipFile|
-          images.each do |image|
-            fileExtension = image.metadata['mime_type'].split('/')[1]
-            filenameOnly  = image.filename.rpartition(".")[0]
-            zipFile.add("#{filenameOnly}_#{image.fileID}.#{fileExtension}", "#{basePath}#{image.fileID}")
-          end
-        end
-        @zipFilePath = "#{@base_api_url}/images/zip/#{@project.id.to_s}"
-      end
-    rescue Exception => e
+      @zipFilePath = "#{@base_api_url}/images/zip/#{@project.id.to_s}"
     end
 
       exportData = buildDotModel(@project)
@@ -158,15 +155,9 @@ class ExportController < ApplicationController
   private
 
   def set_project
-    begin
       @project = Project.find(params[:id])
-      if (@project.user_id != current_user.id)
-        render json: { error: "" }, status: :unauthorized and return
-      end
+      authorize_project! @project
       @format = params[:format]
-    rescue Exception => e
-      render json: { error: "project not found with id " + params[:id] }, status: :not_found and return
-    end
   end
 
   def remove_xml_declaration zip_file, input_file
