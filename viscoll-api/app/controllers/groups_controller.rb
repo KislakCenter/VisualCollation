@@ -1,7 +1,7 @@
-class GroupsController < ApplicationController 
+class GroupsController < ApplicationController
   before_action :authenticate!
   before_action :set_group, only: [:update, :destroy]
-  
+
   # POST /groups
   def create
     noOfGroups       = additional_params.to_h[:noOfGroups]
@@ -106,25 +106,21 @@ class GroupsController < ApplicationController
 
   # DELETE /groups
   def destroyMultiple
-    begin
-      groupIDs = group_params_batch_delete.to_h[:groups]
-      projectID = group_params_batch_delete.to_h[:projectID]
-      # Delete groups
-      groupIDs.each do |groupID|
-        # Wrapping destroy in begin/rescue because group may no longer exist when it's nested
-        begin
-          group = Group.find(groupID)
-          @project = Project.find(group.project_id)
-          if (@project.user_id!=current_user.id)
-            render json: {error: ""}, status: :unauthorized and return
-          end
-          group.destroy
-        rescue Exception => e
-          next
+    groupIDs  = group_params_batch_delete.to_h[:groups]
+    projectID = group_params_batch_delete.to_h[:projectID]
+    # Delete groups
+    groupIDs.each do |groupID|
+      # Wrapping destroy in begin/rescue because group may no longer exist when it's nested
+      begin
+        group    = Group.find(groupID)
+        @project = Project.find(group.project_id)
+        if (@project.user_id != current_user.id)
+          render json: { error: "" }, status: :unauthorized and return
         end
+        group.destroy
+      rescue Exception => e
+        next
       end
-    rescue Exception => e
-      render json: {error: e.message}, status: :unprocessable_entity and return
     end
   end
 
@@ -139,7 +135,7 @@ class GroupsController < ApplicationController
       end
     rescue Exception => e
       render json: {error: "group not found"}, status: :not_found and return
-    end    
+    end
   end
 
   def group_params
