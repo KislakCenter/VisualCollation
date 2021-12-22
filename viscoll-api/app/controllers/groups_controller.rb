@@ -54,7 +54,7 @@ class GroupsController < ApplicationController
         new_groups.push(group)
         new_group_ids.push(group.id.to_s)
       else
-        render json: { group: group.errors }, status: :unprocessable_entity and return
+        raise VCError, "Group (#{group.id}) was unable to save: #{group.errors.join('\n')}"
       end
     end
     # Add new group(s) to parent
