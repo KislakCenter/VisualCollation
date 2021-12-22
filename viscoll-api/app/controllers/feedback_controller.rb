@@ -3,8 +3,7 @@ class FeedbackController < ApplicationController
 
   # POST /feedback
   def create
-    begin
-      if not current_user
+      unless current_user
         render json: {}, status: :unprocessable_entity and return
       end
       @title = feedback_params[:title]
@@ -22,9 +21,6 @@ class FeedbackController < ApplicationController
         current_user
       ).deliver_now
       render json: {}, status: :ok and return
-    rescue Exception => e
-      render json: {error: e.message}, status: :unprocessable_entity and return
-    end
   end
 
   private 
