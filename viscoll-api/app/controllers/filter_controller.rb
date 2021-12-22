@@ -4,45 +4,39 @@ class FilterController < ApplicationController
 
   # PUT /projects/filter
   def show
-    begin
-      queries = filter_params.to_h[:queries]
-      errors = runValidations(queries)
-      if errors != []
-        render json: {errors: errors}, status: :unprocessable_entity and return
-      end
-      @objectIDs = {Groups: [], Leafs: [], Sides: [], Terms: []}
-      @visibleAttributes = {
-        group: {type:false, title:false},
-        leaf: {type:false, material:false, conjoined_leaf_order:false, attached_below:false, attached_above:false, stub:false},
-        side: {folio_number:false, texture:false, script_direction:false, uri:false}
-      }
-      combinedResult = performFilter(queries)
-      finalResponse = buildResponse(combinedResult)
-      @groups = finalResponse[:Groups]
-      @leafs = finalResponse[:Leafs]
-      @sides = finalResponse[:Sides]
-      @terms = finalResponse[:Terms]
-      @groupsOfMatchingLeafs = finalResponse[:GroupsOfMatchingLeafs]
-      @leafsOfMatchingSides = finalResponse[:LeafsOfMatchingSides]
-      @groupsOfMatchingSides = finalResponse[:GroupsOfMatchingSides]
-      @groupsOfMatchingTerms = finalResponse[:GroupsOfMatchingTerms]
-      @leafsOfMatchingTerms = finalResponse[:LeafsOfMatchingTerms]
-      @sidesOfMatchingTerms = finalResponse[:SidesOfMatchingTerms]
-      if @groups == []
-        @visibleAttributes[:group] = {type:false, title:false}
-      end
-      if @leafs == []
-        @visibleAttributes[:leaf] = {type:false, material:false, conjoined_leaf_order:false, attached_below:false, attached_above:false, stub:false}
-      end
-      if @sides == []
-        @visibleAttributes[:side] = {folio_number:false, texture:false, script_direction:false, uri:false}
-      end
-    rescue Exception => e
-      render json: {errors: e.message}, status: :unprocessable_entity and return
+    queries = filter_params.to_h[:queries]
+    errors  = runValidations(queries)
+    if errors != []
+      render json: { errors: errors }, status: :unprocessable_entity and return
+    end
+    @objectIDs             = { Groups: [], Leafs: [], Sides: [], Terms: [] }
+    @visibleAttributes     = {
+      group: { type: false, title: false },
+      leaf:  { type: false, material: false, conjoined_leaf_order: false, attached_below: false, attached_above: false, stub: false },
+      side:  { folio_number: false, texture: false, script_direction: false, uri: false }
+    }
+    combinedResult         = performFilter(queries)
+    finalResponse          = buildResponse(combinedResult)
+    @groups                = finalResponse[:Groups]
+    @leafs                 = finalResponse[:Leafs]
+    @sides                 = finalResponse[:Sides]
+    @terms                 = finalResponse[:Terms]
+    @groupsOfMatchingLeafs = finalResponse[:GroupsOfMatchingLeafs]
+    @leafsOfMatchingSides  = finalResponse[:LeafsOfMatchingSides]
+    @groupsOfMatchingSides = finalResponse[:GroupsOfMatchingSides]
+    @groupsOfMatchingTerms = finalResponse[:GroupsOfMatchingTerms]
+    @leafsOfMatchingTerms  = finalResponse[:LeafsOfMatchingTerms]
+    @sidesOfMatchingTerms  = finalResponse[:SidesOfMatchingTerms]
+    if @groups == []
+      @visibleAttributes[:group] = { type: false, title: false }
+    end
+    if @leafs == []
+      @visibleAttributes[:leaf] = { type: false, material: false, conjoined_leaf_order: false, attached_below: false, attached_above: false, stub: false }
+    end
+    if @sides == []
+      @visibleAttributes[:side] = { folio_number: false, texture: false, script_direction: false, uri: false }
     end
   end
-
-
 
   def performFilter(queries)
     sets = []
