@@ -5,7 +5,6 @@ class SidesController < ApplicationController
   # PATCH/PUT /sides/1
   def update
     if !@side.update(side_params)
-      render json: @side.errors, status: :unprocessable_entity and return
       raise VCError, "Side (#{@side.id} could not be updated: #{@side.errors.join "\n"})"
     end
   end
