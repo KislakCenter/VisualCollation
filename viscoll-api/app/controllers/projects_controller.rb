@@ -25,7 +25,6 @@ class ProjectsController < ApplicationController
 
   # POST /projects
   def create
-    begin
       # Run validatins for groups params
       allGroups = group_params.to_h["groups"]
       folioNumber = group_params.to_h["folioNumber"]
@@ -34,7 +33,7 @@ class ProjectsController < ApplicationController
 
       validationResult = validateProjectCreateGroupsParams(allGroups)
       if (not validationResult[:status])
-        render json: {groups: validationResult[:errors]}, status: :unprocessable_entity and return
+        raise VCError, "Validation of create groups params failed: #{validationResult[:errors]}"
       end
       # Instantiate a new project with the given params
       @project = Project.new(project_params)
@@ -54,27 +53,20 @@ class ProjectsController < ApplicationController
         @images = current_user.images
         render :index, status: :ok and return
       else
-        render json: {project: @project.errors}, status: :unprocessable_entity and return
+        raise VCError, "Project could not save: #{@project.errors.join "\n"}"
       end
-    rescue Exception => e
-      render json: {errors: e.message}, status: :bad_request and return
-    end
   end
 
   # PATCH/PUT /projects/1
   def update
-    begin
       @project = Project.find(params[:id])
       if @project.update(project_params)
         @projects = current_user.projects
         @images = current_user.images
         render :index, status: :ok and return
       else
-        render json: {project: @project.errors}, status: :unprocessable_entity and return
+        raise VCError, "Project could not update: #{@project.errors.join "\n"}"
       end
-    rescue Exception => e
-      render json: {errors: e.message}, status: :bad_request and return
-    end
   end
 
   # DELETE /projects/1
@@ -93,8 +85,6 @@ class ProjectsController < ApplicationController
       @projects = current_user.projects
       @images = current_user.images
       render :index, status: :ok and return
-    rescue Exception => e
-      render json: {errors: e.message}, status: :bad_request and return
     ensure
       # Enable callbacks again
       Image.set_callback(:destroy, :before, :unlink_sides_before_delete)
@@ -104,48 +94,39 @@ class ProjectsController < ApplicationController
 
   # POST /projects/:id/manifests
   def createManifest
-    begin
-      manifest = manifest_params.to_h
-      if not manifest.key?("id")
-        manifestID = Project.new.id.to_s
-      else
-        manifestID = manifest[:id]
-      end
-      @project.manifests[manifestID] = {id: manifestID, url: manifest[:url]}
-      @project.save
-      @data = generateResponse()
-      @projects = current_user.projects
-      @images = current_user.images
-      render :show, status: :ok and return
-    rescue Exception => e
-      render json: {errors: e}, status: :bad_request and return
+    manifest = manifest_params.to_h
+    if not manifest.key?("id")
+      manifestID = Project.new.id.to_s
+    else
+      manifestID = manifest[:id]
     end
+    @project.manifests[manifestID] = { id: manifestID, url: manifest[:url] }
+    @project.save
+    @data     = generateResponse()
+    @projects = current_user.projects
+    @images   = current_user.images
+    render :show, status: :ok and return
   end
 
   # PATCH/PUT /projects/:id/manifests
   def updateManifest
-    begin
       manifest = manifest_params.to_h
       if not manifest.key?("id")
-        render json: {error: "Param required: id."}, status: :unprocessable_entity and return
+        raise VCError, "ID is required."
       end
       if not @project.manifests.key?(manifest["id"])
-        render json: {error: "Manifest with id: " + manifest["id"] + " not found in project with id: " + @project.id.to_s + "."}, status: :unprocessable_entity and return
+        raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
       end
       # ONLY UPDATING MANIFEST NAME FOR NOW
       @project.manifests[manifest["id"]]["name"] = manifest["name"]
       @project.save
-    rescue Exception => e
-      render json: {errors: e.message}, status: :bad_request and return
-    end
   end
 
   # DELETE /projects/:id/manifests
   def deleteManifest
-    begin
       manifestIDToDelete = manifest_params.to_h[:id]
       if not @project.manifests.key?(manifestIDToDelete)
-        render json: {error: "Manifest with id: " + manifestIDToDelete + " not found in project with id: " + @project.id.to_s + "."}, status: :unprocessable_entity and return
+        raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
       end
       @project.manifests.delete(manifestIDToDelete)
       # Update all sides that have the deleted manuscripts mapping
@@ -155,54 +136,41 @@ class ProjectsController < ApplicationController
         end
       end
       @project.save
-    rescue Exception => e
-      render json: {errors: e.message}, status: :bad_request and return
-    end
   end
 
 
   # GET /projects/:id/clone
   def clone
-    begin
-      exportedData = buildJSON(@project)
-      export = {
-          project: exportedData[:project],
-          Groups: exportedData[:groups],
-          Leafs: exportedData[:leafs],
-          Rectos: exportedData[:rectos],
-          Versos: exportedData[:versos],
-          Terms: exportedData[:terms],
-      }
-      handleJSONImport(JSON.parse(export.to_json))
-      newProject = current_user.projects.order_by(:updated_at => 'desc').first
-      newProject.sides.each do |side|
-        if !side.image.empty? and side.image["manifestID"]=="DIYImages"
-          filename = side.image["label"]
-          image = current_user.images.where(:filename => filename).first
-          !(image.sideIDs.include?(side.id.to_s)) ? image.sideIDs.push(side.id.to_s) : nil
-          !(image.projectIDs.include?(newProject.id.to_s)) ? image.projectIDs.push(newProject.id.to_s) : nil
-          image.save
-        end
+    exportedData = buildJSON(@project)
+    export       = {
+      project: exportedData[:project],
+      Groups:  exportedData[:groups],
+      Leafs:   exportedData[:leafs],
+      Rectos:  exportedData[:rectos],
+      Versos:  exportedData[:versos],
+      Terms:   exportedData[:terms],
+    }
+    handleJSONImport(JSON.parse(export.to_json))
+    newProject = current_user.projects.order_by(:updated_at => 'desc').first
+    newProject.sides.each do |side|
+      if !side.image.empty? and side.image["manifestID"] == "DIYImages"
+        filename = side.image["label"]
+        image    = current_user.images.where(:filename => filename).first
+        !(image.sideIDs.include?(side.id.to_s)) ? image.sideIDs.push(side.id.to_s) : nil
+        !(image.projectIDs.include?(newProject.id.to_s)) ? image.projectIDs.push(newProject.id.to_s) : nil
+        image.save
       end
-      @projects = current_user.projects.order_by(:updated_at => 'desc')
-      @images = current_user.images
-      render :index, status: :ok and return
-    rescue Exception => e
-      p e.message
     end
+    @projects = current_user.projects.order_by(:updated_at => 'desc')
+    @images   = current_user.images
+    render :index, status: :ok and return
   end
 
 
   private
   def set_project
-    begin
-      @project = Project.find(params[:id])
-      if (@project.user_id != current_user.id)
-        render json: {error: ""}, status: :unauthorized and return
-      end
-    rescue Exception => e
-      render json: {error: "project not found with id "+params[:id]}, status: :not_found and return
-    end
+    @project = Project.find(params[:id])
+    authorize_project! @project
   end
 
   # Never trust parameters from the scary Internet, only allow the white list through.
