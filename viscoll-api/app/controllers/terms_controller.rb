@@ -5,7 +5,7 @@ class TermsController < ApplicationController
 
   # POST /terms
   def create
-    @term = Term.new(term_create_params)
+    @term    = Term.new(term_create_params)
     @project = Project.find(@term.project_id)
     authorize_project! @project
     if @term.save
@@ -94,8 +94,6 @@ class TermsController < ApplicationController
     end
   end
 
-
-
   # POST /terms/taxonomy
   def createTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
@@ -106,7 +104,6 @@ class TermsController < ApplicationController
       @project.save
     end
   end
-
 
   # DELETE /terms/taxonomy
   def deleteTaxonomy
@@ -123,17 +120,16 @@ class TermsController < ApplicationController
     end
   end
 
-
   # PUT /terms/taxonomy
   def updateTaxonomy
     old_taxonomy = taxonomy_params.to_h[:old_taxonomy]
-    taxonomy = taxonomy_params.to_h[:taxonomy]
+    taxonomy     = taxonomy_params.to_h[:taxonomy]
     if not @project.taxonomies.include?(old_taxonomy)
       raise VCError, "Taxonomy (#{taxonomy}) does not exist in the project (#{@project.id})"
     elsif @project.taxonomies.include?(taxonomy)
       raise VCError, "Taxonomy (#{taxonomy}) already exists in the project (#{@project.id})"
     else
-      indexToEdit = @project.taxonomies.index(old_taxonomy)
+      indexToEdit                      = @project.taxonomies.index(old_taxonomy)
       @project.taxonomies[indexToEdit] = taxonomy
       @project.save
       @project.terms.where(taxonomy: old_taxonomy).each do |term|
@@ -143,46 +139,44 @@ class TermsController < ApplicationController
     end
   end
 
-
-
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_term
-        # when the ID is first sent to the backend to be created,
-        # it doesn't have 'Term_' - we need to append it in the
-        # controller in order for our Mongo query to execute
-        term_id = if params[:id].include? 'Term_'
-                    params[:id]
-                  else
-                    'Term_' + params[:id]
-                  end
-        @term    = Term.find(term_id)
-        @project = Project.find(@term.project_id)
-        authorize_project! @project
-    end
 
-    def set_attached_project
-      project_id = taxonomy_params.to_h[:project_id]
-        @project = Project.find(project_id)
-        authorize_project! @project
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_term
+    # when the ID is first sent to the backend to be created,
+    # it doesn't have 'Term_' - we need to append it in the
+    # controller in order for our Mongo query to execute
+    term_id  = if params[:id].include? 'Term_'
+                 params[:id]
+               else
+                 'Term_' + params[:id]
+               end
+    @term    = Term.find(term_id)
+    @project = Project.find(@term.project_id)
+    authorize_project! @project
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def term_create_params
-      params.require(:term).permit(:project_id, :id, :title, :taxonomy, :description, :uri, :show)
-    end
+  def set_attached_project
+    project_id = taxonomy_params.to_h[:project_id]
+    @project   = Project.find(project_id)
+    authorize_project! @project
+  end
 
-    def term_update_params
-      params.require(:term).permit(:title, :taxonomy, :description, :uri, :show)
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def term_create_params
+    params.require(:term).permit(:project_id, :id, :title, :taxonomy, :description, :uri, :show)
+  end
 
-    def term_object_link_params
-      params.permit(:objects => [:id, :type])
-    end
+  def term_update_params
+    params.require(:term).permit(:title, :taxonomy, :description, :uri, :show)
+  end
 
-    def taxonomy_params
-      params.require(:taxonomy).permit(:taxonomy, :project_id, :old_taxonomy)
-    end
+  def term_object_link_params
+    params.permit(:objects => [:id, :type])
+  end
 
+  def taxonomy_params
+    params.require(:taxonomy).permit(:taxonomy, :project_id, :old_taxonomy)
+  end
 
 end
