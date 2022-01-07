@@ -3,11 +3,9 @@ class ImportController < ApplicationController
 
   # PUT /projects/import
   def index
-    errorMessage = "Sorry, the imported data cannot be validated. Please check your file for errors and make sure the correct import format is selected above."
     importData = imported_data.to_h[:importData]
     importFormat = imported_data.to_h[:importFormat]
     imageData = imported_data.to_h[:imageData]
-    begin
       case importFormat
       when "json"
         handleJSONImport(JSON.parse(importData))
@@ -20,7 +18,7 @@ class ImportController < ApplicationController
         if errors.empty? || errors2.empty?
           handleXMLImport(xml)
         else
-          render json: {error: errors+errors2}, status: :unprocessable_entity and return
+          raise VCError, "XML import failed: #{(errors+errors2).join "\n"}"
         end
       end
       newProject = current_user.projects.order_by(:updated_at => 'desc').first
@@ -29,10 +27,6 @@ class ImportController < ApplicationController
       @projects = current_user.projects.order_by(:updated_at => 'desc')
       @images = current_user.images
       render :'projects/index', status: :ok and return
-    rescue Exception => e
-      render json: {error: errorMessage}, status: :unprocessable_entity and return
-    ensure
-    end
   end
 
 
