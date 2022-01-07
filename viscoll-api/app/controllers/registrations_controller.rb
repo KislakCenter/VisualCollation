@@ -1,13 +1,8 @@
 class RegistrationsController < RailsJwtAuth::RegistrationsController
-  
-  def create
-    begin
-      user = RailsJwtAuth.model.new(registration_create_params)
-      user.save ? render_registration(user) : render_422(user.errors)
-    rescue Exception => e
-      render json: {error: e.message}, status: :unprocessable_entity and return
-    end
 
+  def create
+    user = RailsJwtAuth.model.new(registration_create_params)
+    user.save ? render_registration(user) : render_422(user.errors)
   end
 
   private
