@@ -9,6 +9,7 @@ class XprocController < ApplicationController
   end
 
   private
+
   def zip_params
     params.permit(:job_id)
   end
