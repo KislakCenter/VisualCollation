@@ -2,71 +2,70 @@ class ProjectsController < ApplicationController
   before_action :authenticate!, except: [:viewOnly]
   before_action :set_project, only: [:show, :update, :destroy, :createManifest, :updateManifest, :deleteManifest, :clone]
 
-
   # GET /projects
   def index
     @projects = current_user.projects
-    @images = current_user.images
+    @images   = current_user.images
   end
 
   # GET /projects/1
   def show
-    @data = generateResponse()
+    @data     = generateResponse()
     @projects = current_user.projects
-    @images = current_user.images
+    @images   = current_user.images
   end
 
   # GET /projects/1/viewOnly
   def viewOnly
     @project = Project.find(params[:id])
-    @data = generateResponse()
+    @data    = generateResponse()
     render json: @data, status: :ok and return
   end
 
   # POST /projects
   def create
-      # Run validatins for groups params
-      allGroups = group_params.to_h["groups"]
-      folioNumber = group_params.to_h["folioNumber"]
-      pageNumber = group_params.to_h["pageNumber"]
-      startingTexture = group_params.to_h["startingTexture"]
+    # Run validatins for groups params
+    allGroups       = group_params.to_h["groups"]
+    folioNumber     = group_params.to_h["folioNumber"]
+    pageNumber      = group_params.to_h["pageNumber"]
+    startingTexture = group_params.to_h["startingTexture"]
 
-      validationResult = validateProjectCreateGroupsParams(allGroups)
-      if (not validationResult[:status])
-        raise VCError, "Validation of create groups params failed: #{validationResult[:errors]}"
+    validationResult = validateProjectCreateGroupsParams(allGroups)
+    if (not validationResult[:status])
+      raise VCError, "Validation of create groups params failed: #{validationResult[:errors]}"
+    end
+    # Instantiate a new project with the given params
+    @project = Project.new(project_params)
+    # If the project contains taxonomies, add the 'Unknown' type if its not present
+    if (not @project.taxonomies.empty? and not @project.taxonomies.include?('Unknown'))
+      @project.taxonomies.push('Unknown')
+    end
+    # Associate the current logged_in user to this project
+    @project.user = current_user
+    if @project.save
+      # If groups params were given, create the Groups & Leaves & auto-conjoin if required
+      if (not allGroups.empty?)
+        addGroupsLeafsConjoin(@project, allGroups, folioNumber, pageNumber, startingTexture)
       end
-      # Instantiate a new project with the given params
-      @project = Project.new(project_params)
-      # If the project contains taxonomies, add the 'Unknown' type if its not present
-      if (not @project.taxonomies.empty? and not @project.taxonomies.include?('Unknown'))
-        @project.taxonomies.push('Unknown')
-      end
-       # Associate the current logged_in user to this project
-      @project.user = current_user
-      if @project.save
-        # If groups params were given, create the Groups & Leaves & auto-conjoin if required
-        if (not allGroups.empty?)
-          addGroupsLeafsConjoin(@project, allGroups, folioNumber, pageNumber, startingTexture)
-        end
-        # Get list of all projects of current user to return in response
-        @projects = current_user.projects.order_by(:updated_at => 'desc')
-        @images = current_user.images
-        render :index, status: :ok and return
-      else
-        raise VCError, "Project could not save: #{@project.errors.join "\n"}"
-      end
+      # Get list of all projects of current user to return in response
+      @projects = current_user.projects.order_by(:updated_at => 'desc')
+      @images   = current_user.images
+      render :index, status: :ok and return
+    else
+      raise VCError, "Project could not save: #{@project.errors.join "\n"}"
+    end
   end
 
   # PATCH/PUT /projects/1
   def update
-      @project = Project.find(params[:id])
-      if @project.update(project_params)
-        @projects = current_user.projects
-        @images = current_user.images
-        render :index, status: :ok and return
-      else
-        raise VCError, "Project could not update: #{@project.errors.join "\n"}"
-      end
+    @project = Project.find(params[:id])
+    if @project.update(project_params)
+      @projects = current_user.projects
+      @images   = current_user.images
+      render :index, status: :ok and return
+    else
+      raise VCError, "Project could not update: #{@project.errors.join "\n"}"
+    end
   end
 
   # DELETE /projects/1
@@ -77,13 +76,13 @@ class ProjectsController < ApplicationController
       Leaf.skip_callback(:destroy, :before, :unlink_terms)
       if deleteUnlinkedImages
         Image.skip_callback(:destroy, :before, :unlink_sides_before_delete)
-        current_user.images.where({ "projectIDs" => { '$eq': [@project.id.to_s] } }).each do | image |
+        current_user.images.where({ "projectIDs" => { '$eq': [@project.id.to_s] } }).each do |image|
           image.destroy
         end
       end
       @project.destroy
       @projects = current_user.projects
-      @images = current_user.images
+      @images   = current_user.images
       render :index, status: :ok and return
     ensure
       # Enable callbacks again
@@ -110,34 +109,33 @@ class ProjectsController < ApplicationController
 
   # PATCH/PUT /projects/:id/manifests
   def updateManifest
-      manifest = manifest_params.to_h
-      if not manifest.key?("id")
-        raise VCError, "ID is required."
-      end
-      if not @project.manifests.key?(manifest["id"])
-        raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
-      end
-      # ONLY UPDATING MANIFEST NAME FOR NOW
-      @project.manifests[manifest["id"]]["name"] = manifest["name"]
-      @project.save
+    manifest = manifest_params.to_h
+    if not manifest.key?("id")
+      raise VCError, "ID is required."
+    end
+    if not @project.manifests.key?(manifest["id"])
+      raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
+    end
+    # ONLY UPDATING MANIFEST NAME FOR NOW
+    @project.manifests[manifest["id"]]["name"] = manifest["name"]
+    @project.save
   end
 
   # DELETE /projects/:id/manifests
   def deleteManifest
-      manifestIDToDelete = manifest_params.to_h[:id]
-      if not @project.manifests.key?(manifestIDToDelete)
-        raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
+    manifestIDToDelete = manifest_params.to_h[:id]
+    if not @project.manifests.key?(manifestIDToDelete)
+      raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
+    end
+    @project.manifests.delete(manifestIDToDelete)
+    # Update all sides that have the deleted manuscripts mapping
+    @project.sides.each do |side|
+      if side[:image][:manifestID] == manifestIDToDelete
+        side.update(image: {})
       end
-      @project.manifests.delete(manifestIDToDelete)
-      # Update all sides that have the deleted manuscripts mapping
-      @project.sides.each do |side|
-        if side[:image][:manifestID] == manifestIDToDelete
-          side.update(image: {})
-        end
-      end
-      @project.save
+    end
+    @project.save
   end
-
 
   # GET /projects/:id/clone
   def clone
@@ -166,8 +164,8 @@ class ProjectsController < ApplicationController
     render :index, status: :ok and return
   end
 
-
   private
+
   def set_project
     @project = Project.find(params[:id])
     authorize_project! @project
@@ -175,7 +173,7 @@ class ProjectsController < ApplicationController
 
   # Never trust parameters from the scary Internet, only allow the white list through.
   def project_params
-    params.require(:project).permit(:title, :shelfmark, :notationStyle, :metadata=>{}, :taxonomies=>[], :preferences=>{})
+    params.require(:project).permit(:title, :shelfmark, :notationStyle, :metadata => {}, :taxonomies => [], :preferences => {})
   end
 
   def project_delete_params
