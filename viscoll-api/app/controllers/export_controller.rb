@@ -147,7 +147,7 @@ class ExportController < ApplicationController
           raise VCError, "Export format must be one of [json, xml, svg, formula, html]. The format received is: '#{@format}'."
         end
       else
-        render json: { data: errors, type: @format }, status: :unprocessable_entity and return
+        raise VCError, "Something went wrong when exporting #{@format}: #{errors}"
       end
 
   end
