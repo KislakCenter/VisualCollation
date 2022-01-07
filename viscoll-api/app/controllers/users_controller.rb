@@ -28,21 +28,22 @@ class UsersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-      if (@user != current_user)
-        raise VCError, "Unauthorized. User's do not match."
-      end
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def user_params
-      params.require(:user).permit(:email, :name)
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id])
+    if (@user != current_user)
+      raise VCError, "Unauthorized. User's do not match."
     end
+  end
 
-    # Only allow a trusted parameter "white list" through.
-    def user_params_with_password
-      params.require(:user).permit(:email, :name, :current_password, :password)
-    end
+  # Only allow a trusted parameter "white list" through.
+  def user_params
+    params.require(:user).permit(:email, :name)
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def user_params_with_password
+    params.require(:user).permit(:email, :name, :current_password, :password)
+  end
 end
