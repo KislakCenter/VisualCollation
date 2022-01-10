@@ -27,13 +27,9 @@ class SessionsController < RailsJwtAuth::SessionsController
   end
 
   def destroy
-    begin
-      authenticateDestroy!
-      current_user.destroy_auth_token Jwt::Request.new(request).auth_token
-      render_204
-    rescue Exception => e
-      render json: {error: "Authorization Header: "+e.message}, status: :unprocessable_entity
-    end
+    authenticateDestroy!
+    current_user.destroy_auth_token Jwt::Request.new(request).auth_token
+    render_204
   end
 end
 
