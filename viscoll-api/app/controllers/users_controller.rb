@@ -17,7 +17,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      render json: current_user.errors, status: :unprocessable_entity and return
+      raise VCError, "User update failed: #{current_user.errors.join "\n"}"
     end
 
   end
@@ -28,25 +28,22 @@ class UsersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      begin
-        @user = User.find(params[:id])
-        if (@user!=current_user)
-          render json: {error: ""}, status: :unauthorized and return
-        end
-      rescue Exception => e
-        render json: {error: "user not found with id "+params[:id]}, status: :not_found and return
-      end
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def user_params
-      params.require(:user).permit(:email, :name)
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id])
+    if (@user != current_user)
+      raise VCError, "Unauthorized. User's do not match."
     end
+  end
 
-    # Only allow a trusted parameter "white list" through.
-    def user_params_with_password
-      params.require(:user).permit(:email, :name, :current_password, :password)
-    end
+  # Only allow a trusted parameter "white list" through.
+  def user_params
+    params.require(:user).permit(:email, :name)
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def user_params_with_password
+    params.require(:user).permit(:email, :name, :current_password, :password)
+  end
 end
