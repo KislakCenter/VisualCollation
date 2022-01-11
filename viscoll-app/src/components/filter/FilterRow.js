@@ -164,7 +164,7 @@ class FilterRow extends Component {
             disabled={this.props.lastRow}
             errorText={(!this.props.lastRow && this.props.conjunction==="")?"Required":""}
             tabIndex={this.props.tabIndex}
-            data={[{value:"AND", text:"AND"},{value:"OR", text:"OR"}]}
+            data={[{value:"OR", text:"OR"}]}
             {...floatFieldLight}
           >
           </SelectField>
