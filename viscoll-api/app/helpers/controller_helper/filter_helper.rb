@@ -68,7 +68,7 @@ module ControllerHelper
             'description' => ['equals', 'not equals', 'contains', 'not contains']
           }
         },
-        'conjunction' => ['AND', 'OR']
+        'conjunction' => ['OR']
       }
     end
 
