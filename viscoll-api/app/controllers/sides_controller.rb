@@ -5,7 +5,7 @@ class SidesController < ApplicationController
   # PATCH/PUT /sides/1
   def update
     if !@side.update(side_params)
-      raise VCError, "Side (#{@side.id} could not be updated: #{@side.errors.join "\n"})"
+      raise VCError, "Side (#{@side.id} could not be updated: #{@side.errors.full_messages.join "\n"})"
     end
   end
 
@@ -34,7 +34,7 @@ class SidesController < ApplicationController
       side              = sides[index]
       previousSideImage = side.image.clone
       if !side.update(side_params[:attributes])
-        raise VCError, "Errors occurred when updating sides: #{side.errors.join "\n"}"
+        raise VCError, "Errors occurred when updating sides: #{side.errors.full_messages.join "\n"}"
       else
         # SPEICAL CASE FOR DIY IMAGE MAPPING
         if side_params[:attributes]["image"]

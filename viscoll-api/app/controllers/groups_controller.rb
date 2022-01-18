@@ -54,7 +54,7 @@ class GroupsController < ApplicationController
         new_groups.push(group)
         new_group_ids.push(group.id.to_s)
       else
-        raise VCError, "Group (#{group.id}) was unable to save: #{group.errors.join('\n')}"
+        raise VCError, "Group (#{group.id}) was unable to save: #{group.errors.full_messages.join('\n')}"
       end
     end
     # Add new group(s) to parent

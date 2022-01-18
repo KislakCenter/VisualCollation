@@ -14,7 +14,7 @@ class TermsController < ApplicationController
         raise VCError, "Taxonomy (#{@term.taxonomy}) does not belong to project (#{@project.id})."
       end
     else
-      raise VCError, "Something went wrong with saving terms: #{@term.errors}"
+      raise VCError, "Something went wrong with saving terms: #{@term.errors.full_messages.join("\n")}"
     end
   end
 
@@ -25,7 +25,7 @@ class TermsController < ApplicationController
       raise VCError, "Taxonomy (#{@term.taxonomy}) does not belong to project (#{@project.id})."
     end
     if !@term.update(term_update_params)
-      raise VCError, "Term (#{@term.id}) could not update: #{@term.errors.join "\n"}"
+      raise VCError, "Term (#{@term.id}) could not update: #{@term.errors.full_messages.join "\n"}"
     end
   end
 
