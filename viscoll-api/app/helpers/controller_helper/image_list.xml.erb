@@ -44,7 +44,7 @@
         <Row>
           <Cell><Data ss:Type="String"><%= leaf.folio_number %>r</Data></Cell>
           <% if Side.find(leaf.rectoID).image["url"].present? %>
-            <Cell><Data ss:Type="String"><%= Side.find(leaf.rectoID).image["url"] %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= Side.find(leaf.rectoID).image_url %></Data></Cell>
           <% else %>
             <Cell><Data ss:Type="String">https://cdn.rawgit.com/leoba/VisColl/master/data/support/images/x.jpg</Data></Cell>
           <% end %>
@@ -52,7 +52,7 @@
         <Row>
           <Cell><Data ss:Type="String"><%= leaf.folio_number %>v</Data></Cell>
           <% if Side.find(leaf.versoID).image["url"].present? %>
-            <Cell><Data ss:Type="String"><%= Side.find(leaf.versoID).image["url"] %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= Side.find(leaf.versoID).image_url %></Data></Cell>
           <% else %>
             <Cell><Data ss:Type="String">https://cdn.rawgit.com/leoba/VisColl/master/data/support/images/x.jpg</Data></Cell>
           <% end %>
