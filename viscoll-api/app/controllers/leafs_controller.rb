@@ -65,7 +65,7 @@ class LeafsController < ApplicationController
             @leaf.save
           end
         else
-          raise VCError, @leaf.errors
+          raise VCError, @leaf.errors.full_messages.join("\n")
         end
         sideIDIndex += 2
       end
@@ -111,7 +111,7 @@ class LeafsController < ApplicationController
         handle_paper_update(@leaf)
       end
     else
-      raise VCError, "Leaf failed to update: #{@leaf.errors.join "\n"}"
+      raise VCError, "Leaf failed to update: #{@leaf.errors.full_messages.join "\n"}"
     end
   end
 
@@ -123,7 +123,7 @@ class LeafsController < ApplicationController
       @leaf = Leaf.find(leaf_params[:id])
       authorize_project! @project
       if !@leaf.update(leaf_params[:attributes])
-        raise VCError, "Leaf could not be updated: #{leaf.errors.join "\n"}"
+        raise VCError, "Leaf could not be updated: #{leaf.errors.full_messages.join "\n"}"
       end
       if (leaf_params[:attributes].key?(:attached_below) || leaf_params[:attributes].key?(:attached_above))
         update_attached_to()

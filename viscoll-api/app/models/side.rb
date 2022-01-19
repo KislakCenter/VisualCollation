@@ -36,6 +36,11 @@ class Side
     mappings_array
   end
 
+  def image_url
+    return image["url"] if image["manifestID"].include? "DIY"
+    image["url"] + '/full/,1000/0/default.jpg'
+  end
+
   protected
   # If linked to term(s), remove link from the term(s)'s side
   def unlink_terms

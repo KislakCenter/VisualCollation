@@ -36,7 +36,7 @@ class ImagesController < ApplicationController
             copyCounter += 1
           else
             image.destroy
-            raise VCError, "Image failed: #{image.errors}"
+            raise VCError, "Image failed: #{image.errors.full_messages.join("\n")}"
           end
         end
       end
