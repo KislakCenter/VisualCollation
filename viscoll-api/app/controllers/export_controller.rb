@@ -81,7 +81,7 @@ class ExportController < ApplicationController
                   tmp_png = "#{tmp_svg}.png"
 
                   # write the svg to disk
-                  File.open(tmp_svg, 'w+') { |f| f.puts input_entry.get_input_stream.read }
+                  File.open(tmp_svg, 'w+') { |f| f.puts input_entry.get_input_stream.read.force_encoding("UTF-8") }
                   system "rsvg-convert -w 1024 #{tmp_svg} > #{tmp_png}"
 
                   # the png has the same name as the svg
