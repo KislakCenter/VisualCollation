@@ -52,7 +52,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      raise VCError, "Project could not save: #{@project.errors.join "\n"}"
+      raise VCError, "Project could not save: #{@project.errors.full_messages.join "\n"}"
     end
   end
 
@@ -64,7 +64,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      raise VCError, "Project could not update: #{@project.errors.join "\n"}"
+      raise VCError, "Project could not update: #{@project.errors.full_messages.join "\n"}"
     end
   end
 

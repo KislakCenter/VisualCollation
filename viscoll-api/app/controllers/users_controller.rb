@@ -17,7 +17,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      raise VCError, "User update failed: #{current_user.errors.join "\n"}"
+      raise VCError, "User update failed: #{current_user.errors.full_messages.join "\n"}"
     end
 
   end
