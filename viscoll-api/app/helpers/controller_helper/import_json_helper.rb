@@ -75,9 +75,6 @@ module ControllerHelper
       allRectosIDsInOrder.each_with_index do |rectoID, order|
         recto = project.sides.find(rectoID)
         rectoParams = data["Rectos"][(order+1).to_s]["params"]
-        if rectoParams["page_number"].empty?
-          rectoParams["page_number"] = nil
-        end
         recto.update(rectoParams)
       end
 
@@ -85,9 +82,6 @@ module ControllerHelper
       allVersosIDsInOrder.each_with_index do |versoID, order|
         verso = project.sides.find(versoID)
         versoParams = data["Versos"][(order+1).to_s]["params"]
-        if versoParams["page_number"].empty?
-          versoParams["page_number"] = nil
-        end
         verso.update(versoParams)
       end
 
