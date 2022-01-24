@@ -20,9 +20,6 @@ module ControllerHelper
 
       # Create all Leafs
       data["Leafs"].each do |leafOrder, data|
-        if data["params"]["folio_number"].empty?
-          data["params"]["folio_number"] = nil
-        end
         data["params"]["project_id"] = project.id
         leaf = Leaf.create(data["params"])
         allLeafsIDsInOrder.push(leaf.id.to_s)
