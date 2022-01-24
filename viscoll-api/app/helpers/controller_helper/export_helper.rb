@@ -285,12 +285,14 @@ module ControllerHelper
                   pageNotation = nil
                   pageNotation = numbers.empty? ? nil : numbers.compact.join('; ')
 
-                  # folioNumber element
-                  folioNumberAttr             = {}
-                  folioNumberAttr[:certainty] = 1
-                  folioNumberAttr[:val]       = pageNotation
-                  xml.folioNumber folioNumberAttr do
-                    xml.text pageNotation
+                  unless pageNotation.empty?
+                    # folioNumber element
+                    folioNumberAttr             = {}
+                    folioNumberAttr[:certainty] = 1
+                    folioNumberAttr[:val]       = pageNotation
+                    xml.folioNumber folioNumberAttr do
+                      xml.text pageNotation
+                    end
                   end
 
                   mode = {}
