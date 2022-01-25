@@ -16,6 +16,7 @@ class Side
 
   # Callbacks
   before_destroy :unlink_terms, :unlink_image
+  before_save :handle_empty_page_number
 
   def parent_leaf
     Leaf.find(parentID)
@@ -59,5 +60,9 @@ class Side
         image.save
       end
     end
+  end
+
+  def handle_empty_page_number
+    self.page_number = nil if self.page_number.to_s.strip.empty?
   end
 end

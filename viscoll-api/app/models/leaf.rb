@@ -22,6 +22,7 @@ class Leaf
   # Callbacks
   before_create :edit_ID, :create_sides
   before_destroy :unlink_terms, :destroy_sides, :update_parent_group
+  before_save :handle_empty_folio_number
 
   def mapping?
     # if terms are attached to leaf, mappings exist
@@ -120,6 +121,10 @@ class Leaf
     group.tacketed.include?(self.id.to_s) ? group.tacketed.delete(self.id.to_s) : nil
     group.sewing.include?(self.id.to_s) ? group.sewing.delete(self.id.to_s) : nil
     group.save
+  end
+
+  def handle_empty_folio_number
+    self.folio_number = nil if self.folio_number.to_s.strip.empty?
   end
 end
 
