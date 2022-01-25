@@ -336,7 +336,7 @@ export function undoFolioNumbers(action, state) {
     };
     leaves.push(item);
   }
-  const historyActions = updateLeafs(leaves);
+  const historyActions = updateLeafs(leaves, state.project.id);
   return [historyActions];
 }
 
