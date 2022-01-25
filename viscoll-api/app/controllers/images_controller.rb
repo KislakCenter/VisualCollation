@@ -80,7 +80,6 @@ class ImagesController < ApplicationController
     images = []
     imageIDs.each do |imageID|
       image         = Image.find(imageID)
-      image.user_id = "test"
       authorize_image! image
       images.push(image)
     end
