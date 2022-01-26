@@ -18,6 +18,7 @@ export default class AddTerm extends React.Component {
       open: false,
       taxonomy: '',
       description: '',
+      uri: '',
       show: false,
       searchText: '',
       termID: null,
@@ -30,6 +31,7 @@ export default class AddTerm extends React.Component {
       open: true,
       taxonomy: '',
       description: '',
+      uri: '',
       show: false,
       searchText: '',
       termID: null,
@@ -84,6 +86,7 @@ export default class AddTerm extends React.Component {
           this.state.searchText,
           this.state.taxonomy,
           this.state.description,
+          this.state.uri,
           this.state.show
         );
       }
@@ -166,6 +169,15 @@ export default class AddTerm extends React.Component {
             fullWidth
             style={{ marginTop: -20 }}
           />
+          <TextField
+              floatingLabelText="URI"
+              name="uri"
+              value={this.state.uri}
+              onChange={(e, v) => this.onChange('uri', v)}
+              multiLine
+              fullWidth
+              style={{ marginTop: -20 }}
+          />
           <div className="label" style={{ paddingTop: 100 }}>
             Show in diagram (leaves & sides only):
           </div>
@@ -212,7 +224,7 @@ export default class AddTerm extends React.Component {
           listStyle={{ maxHeight: 300, overflow: 'auto' }}
           errorText={
             !this.termExists() && this.state.searchText.length > 0
-              ? "This term doesn't exist. To create and attach it, fill out its taxonomy and description."
+              ? "This term doesn't exist. To create and attach it, fill out its taxonomy, description, and URI."
               : ''
           }
           errorStyle={{ color: '#727272' }}
