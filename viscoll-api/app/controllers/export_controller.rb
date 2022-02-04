@@ -52,7 +52,7 @@ class ExportController < ApplicationController
           Zip::File.open(outfile) do |zip_file|
             zip_file.each do |entry|
               if File.extname(entry.name) === '.svg'
-                exportData << entry.get_input_stream.read
+                exportData << entry.get_input_stream.read.force_encoding("UTF-8")
               end
             end
           end
