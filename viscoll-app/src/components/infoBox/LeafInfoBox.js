@@ -642,6 +642,31 @@ export default class LeafInfoBox extends React.Component {
         </div>
       );
     });
+    let outsideFacingBtn = '';
+    let insideFacingBtn = '';
+    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null) {
+      outsideFacingBtn = (
+          <RaisedButton
+              primary
+              fullWidth
+              onClick={console.log("Show outside bifolia")}
+              // onClick={this.toggleImageModal(true)}
+              label="Show outside facing bifolia"
+              style={{ marginBottom: 10 }}
+              tabIndex={this.props.tabIndex}
+          />,
+      insideFacingBtn = (
+          <RaisedButton
+              primary
+              fullWidth
+              onClick={console.log("Show inside bifolia")}
+              label="Show inside facing bifolia"
+              style={{ marginBottom: 10 }}
+              tabIndex={this.props.tabIndex}
+          />
+      )
+      )
+    }
     let submitBtn = '';
     if (this.state.isBatch && this.hasActiveAttributes()) {
       submitBtn = (
@@ -804,6 +829,10 @@ export default class LeafInfoBox extends React.Component {
         {attributeDivs}
         <div style={{ clear: 'both', textAlign: 'center', paddingTop: 10 }}>
           {imageThumbnails}
+        </div>
+        <div style={{ clear: 'both', textAlign: 'center', paddingTop: 10 }}>
+          {insideFacingBtn}
+          {outsideFacingBtn}
         </div>
         {this.props.isReadOnly && terms.length === 0 ? (
           ''
