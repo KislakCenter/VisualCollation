@@ -791,21 +791,49 @@ export default class LeafInfoBox extends React.Component {
 
       const conjoinLeaf = this.props.Leafs[leaf.conjoined_to]
       if (conjoinLeaf !== undefined) {
+        // get bifolia side objects
         const insideBifoliaVerso = this.props.Versos[leaf.versoID]
         const insideBifoliaRecto = this.props.Rectos[conjoinLeaf.rectoID]
         const outsideBifoliaRecto = this.props.Rectos[leaf.rectoID]
         const outsideBifoliaVerso = this.props.Versos[conjoinLeaf.versoID]
 
+        //set URLs for bifolia images
+        const insideBifoliaVersoURL = insideBifoliaVerso.image ? insideBifoliaVerso.url : null;
+        const insideBifoliaRectoURL = insideBifoliaRecto.image ? insideBifoliaRecto.url : null;
+        const outsideBifoliaRectoURL = outsideBifoliaRecto.image ? outsideBifoliaRecto.url : null;
+        const outsideBifoliaVersoURL = outsideBifoliaVerso.image ? outsideBifoliaVerso.url : null;
+
+        //test if the images are DIY (user uploaded instead of from a manifest)
+        const isInsideBifoliaVersoDIY = insideBifoliaVerso.image.manifestID
+                                        ? insideBifoliaVerso.image.manifestID.includes('DIY')
+                                        : false;
+        const isInsideBifoliaRectoDIY = insideBifoliaRecto.image.manifestID
+                                        ? insideBifoliaRecto.image.manifestID.includes('DIY')
+                                        : false;
+        const isOutsideBifoliaRectoDIY = outsideBifoliaRecto.image.manifestID
+                                        ? outsideBifoliaRecto.image.manifestID.includes('DIY')
+                                        : false;
+        const isOutsideBifoliaVersoDIY = outsideBifoliaVerso.image.manifestID
+                                         ? outsideBifoliaVerso.image.manifestID.includes('DIY')
+                                         : false;
+
+        //set content for the modals
         insideBifoliaModalContent = (
             <ImageViewer
-                rectoURL={insideBifoliaVerso.image.url}
-                versoURL={insideBifoliaRecto.image.url}
+                //recto and verso are switched for a more realistic viewing experience
+                //this is hacky and ugly, but it works
+                isRectoDIY={isInsideBifoliaVersoDIY}
+                isVersoDIT={isInsideBifoliaRectoDIY}
+                rectoURL={insideBifoliaVersoURL}
+                versoURL={insideBifoliaRectoURL}
             />
         );
         outsideBifoliaModalContent = (
             <ImageViewer
-                rectoURL={outsideBifoliaVerso.image.url}
-                versoURL={outsideBifoliaRecto.image.url}
+                isRectoDIY={isOutsideBifoliaVersoDIY}
+                isVersoDIT={isOutsideBifoliaRectoDIY}
+                rectoURL={outsideBifoliaVersoURL}
+                versoURL={outsideBifoliaRectoURL}
             />
         );
       }
