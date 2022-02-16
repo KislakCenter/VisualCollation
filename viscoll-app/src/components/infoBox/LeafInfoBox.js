@@ -649,22 +649,23 @@ export default class LeafInfoBox extends React.Component {
           <RaisedButton
               primary
               fullWidth
-              onClick={console.log("Show outside bifolia")}
-              // onClick={this.toggleImageModal(true)}
+              onClick={() => console.log('Show outside bifolia')}
               label="Show outside facing bifolia"
-              style={{ marginBottom: 10 }}
-              tabIndex={this.props.tabIndex}
-          />,
-      insideFacingBtn = (
-          <RaisedButton
-              primary
-              fullWidth
-              onClick={console.log("Show inside bifolia")}
-              label="Show inside facing bifolia"
               style={{ marginBottom: 10 }}
               tabIndex={this.props.tabIndex}
           />
       )
+    }
+    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null) {
+      insideFacingBtn = (
+          <RaisedButton
+              primary
+              fullWidth
+              onClick={() => console.log('Show inside bifolia')}
+              label="Show inside facing bifolia"
+              style={{ marginBottom: 10 }}
+              tabIndex={this.props.tabIndex}
+          />
       )
     }
     let submitBtn = '';
