@@ -26,6 +26,8 @@ export default class LeafInfoBox extends React.Component {
 
     this.state = {
       imageModalOpen: false,
+      insideBifoliaModalOpen: false,
+      outsideBifoliaModalOpen: false,
       folioModalOpen: false,
       isBatch: this.props.selectedLeaves.length > 1,
       ...this.emptyAttributeState(),
@@ -231,6 +233,16 @@ export default class LeafInfoBox extends React.Component {
     this.setState({ imageModalOpen });
     this.props.togglePopUp(imageModalOpen);
   };
+
+  toggleInsideBifoliaModal = insideBifoliaModalOpen => {
+    this.setState({ insideBifoliaModalOpen });
+    this.props.togglePopUp(insideBifoliaModalOpen)
+  }
+
+  toggleOutsideBifoliaModal = outsideBifoliaModalOpen => {
+    this.setState({ outsideBifoliaModalOpen });
+    this.props.togglePopUp(outsideBifoliaModalOpen)
+  }
 
   toggleFolioModal = folioModalOpen => {
     this.setState({ folioModalOpen });
@@ -649,7 +661,7 @@ export default class LeafInfoBox extends React.Component {
           <RaisedButton
               primary
               fullWidth
-              onClick={() => console.log('Show outside bifolia')}
+              onClick={() => this.toggleOutsideBifoliaModal(true)}
               label="Show outside facing bifolia"
               style={{ marginBottom: 10 }}
               tabIndex={this.props.tabIndex}
@@ -661,7 +673,7 @@ export default class LeafInfoBox extends React.Component {
           <RaisedButton
               primary
               fullWidth
-              onClick={() => console.log('Show inside bifolia')}
+              onClick={() => this.toggleInsideBifoliaModal(true)}
               label="Show inside facing bifolia"
               style={{ marginBottom: 10 }}
               tabIndex={this.props.tabIndex}
@@ -749,6 +761,8 @@ export default class LeafInfoBox extends React.Component {
     }
 
     let imageModalContent;
+    let insideBifoliaModalContent;
+    let outsideBifoliaModalContent;
     let imageThumbnails = [];
     // Show the side image if available
     if (this.props.selectedLeaves.length === 1) {
@@ -774,6 +788,27 @@ export default class LeafInfoBox extends React.Component {
           versoURL={versoURL}
         />
       );
+
+      const conjoinLeaf = this.props.Leafs[leaf.conjoined_to]
+      if (conjoinLeaf !== undefined) {
+        const insideBifoliaVerso = this.props.Versos[leaf.versoID]
+        const insideBifoliaRecto = this.props.Rectos[conjoinLeaf.rectoID]
+        const outsideBifoliaRecto = this.props.Rectos[leaf.rectoID]
+        const outsideBifoliaVerso = this.props.Versos[conjoinLeaf.versoID]
+
+        insideBifoliaModalContent = (
+            <ImageViewer
+                rectoURL={insideBifoliaVerso.image.url}
+                versoURL={insideBifoliaRecto.image.url}
+            />
+        );
+        outsideBifoliaModalContent = (
+            <ImageViewer
+                rectoURL={outsideBifoliaVerso.image.url}
+                versoURL={outsideBifoliaRecto.image.url}
+            />
+        );
+      }
       if (rectoURL) {
         imageThumbnails.push(
           <button
@@ -888,6 +923,24 @@ export default class LeafInfoBox extends React.Component {
           bodyStyle={{ padding: 0 }}
         >
           {imageModalContent}
+        </Dialog>
+        <Dialog
+            modal={false}
+            open={this.state.insideBifoliaModalOpen}
+            onRequestClose={() => this.toggleInsideBifoliaModal(false)}
+            contentStyle={{background: 'none', boxShadow: 'inherit'}}
+            bodyStyle={{padding: 0}}
+        >
+          {insideBifoliaModalContent}
+        </Dialog>
+        <Dialog
+            modal={false}
+            open={this.state.outsideBifoliaModalOpen}
+            onRequestClose={() => this.toggleOutsideBifoliaModal(false)}
+            contentStyle={{background: 'none', boxShadow: 'inherit'}}
+            bodyStyle={{padding: 0}}
+        >
+          {outsideBifoliaModalContent}
         </Dialog>
         <FolioNumberDialog
           defaultStartNumber={
