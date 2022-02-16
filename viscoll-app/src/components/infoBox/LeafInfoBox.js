@@ -662,7 +662,7 @@ export default class LeafInfoBox extends React.Component {
               primary
               fullWidth
               onClick={() => this.toggleOutsideBifoliaModal(true)}
-              label="Outside Bifolia"
+              label="Outer Bifolia"
               style={{ marginBottom: 10}}
               tabIndex={this.props.tabIndex}
           />
@@ -674,7 +674,7 @@ export default class LeafInfoBox extends React.Component {
               primary
               fullWidth
               onClick={() => this.toggleInsideBifoliaModal(true)}
-              label="Inside Bifolia"
+              label="Inner Bifolia"
               style={{ marginBottom: 10}}
               tabIndex={this.props.tabIndex}
           />
