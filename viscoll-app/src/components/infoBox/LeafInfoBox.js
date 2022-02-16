@@ -798,10 +798,10 @@ export default class LeafInfoBox extends React.Component {
         const outsideBifoliaVerso = this.props.Versos[conjoinLeaf.versoID]
 
         //set URLs for bifolia images
-        const insideBifoliaVersoURL = insideBifoliaVerso.image ? insideBifoliaVerso.url : null;
-        const insideBifoliaRectoURL = insideBifoliaRecto.image ? insideBifoliaRecto.url : null;
-        const outsideBifoliaRectoURL = outsideBifoliaRecto.image ? outsideBifoliaRecto.url : null;
-        const outsideBifoliaVersoURL = outsideBifoliaVerso.image ? outsideBifoliaVerso.url : null;
+        const insideBifoliaVersoURL = insideBifoliaVerso.image ? insideBifoliaVerso.image.url : null;
+        const insideBifoliaRectoURL = insideBifoliaRecto.image ? insideBifoliaRecto.image.url : null;
+        const outsideBifoliaRectoURL = outsideBifoliaRecto.image ? outsideBifoliaRecto.image.url : null;
+        const outsideBifoliaVersoURL = outsideBifoliaVerso.image ? outsideBifoliaVerso.image.url : null;
 
         //test if the images are DIY (user uploaded instead of from a manifest)
         const isInsideBifoliaVersoDIY = insideBifoliaVerso.image.manifestID
