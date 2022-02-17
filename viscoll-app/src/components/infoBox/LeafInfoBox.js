@@ -654,31 +654,63 @@ export default class LeafInfoBox extends React.Component {
         </div>
       );
     });
+
+    const leaf = this.props.Leafs[this.props.selectedLeaves[0]];
+    let leafIndex = this.props.leafIDs.indexOf(leaf.id);
+    let conjoinIndex = this.props.leafIDs.indexOf(leaf.conjoined_to);
+    let firstInConjoin = leafIndex < conjoinIndex;
+
     let outsideFacingBtn = '';
     let insideFacingBtn = '';
     if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null) {
-      outsideFacingBtn = (
-          <RaisedButton
-              primary
-              fullWidth
-              onClick={() => this.toggleOutsideBifoliaModal(true)}
-              label="Outer Bifolia"
-              style={{ marginBottom: 10}}
-              tabIndex={this.props.tabIndex}
-          />
-      )
+      if (firstInConjoin === true) {
+        outsideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleOutsideBifoliaModal(true)}
+                label="Inner Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      } else if (firstInConjoin === false) {
+        outsideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleInsideBifoliaModal(true)}
+                label="Inner Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      }
     }
     if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null) {
-      insideFacingBtn = (
-          <RaisedButton
-              primary
-              fullWidth
-              onClick={() => this.toggleInsideBifoliaModal(true)}
-              label="Inner Bifolia"
-              style={{ marginBottom: 10}}
-              tabIndex={this.props.tabIndex}
-          />
-      )
+      if (firstInConjoin === true) {
+        insideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleInsideBifoliaModal(true)}
+                label="Outer Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      } else if (firstInConjoin === false) {
+        insideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleOutsideBifoliaModal(true)}
+                label="Outer Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      }
     }
     let submitBtn = '';
     if (this.state.isBatch && this.hasActiveAttributes()) {
@@ -790,9 +822,6 @@ export default class LeafInfoBox extends React.Component {
       );
 
       const conjoinLeaf = this.props.Leafs[leaf.conjoined_to];
-      let leafIndex = this.props.leafIDs.indexOf(leaf.id);
-      let conjoinIndex = this.props.leafIDs.indexOf(leaf.conjoined_to);
-      let firstInConjoin = leafIndex < conjoinIndex;
       if (conjoinLeaf !== undefined) {
         // get bifolia side objects
         const insideBifoliaVerso = this.props.Versos[leaf.versoID];
@@ -853,7 +882,6 @@ export default class LeafInfoBox extends React.Component {
             <img
               alt={recto.memberType}
               src={
-                // isRectoDIY ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
                 (isRecto3 || isRectoDIY) ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
               }
               style={{ cursor: 'pointer' }}
