@@ -789,13 +789,16 @@ export default class LeafInfoBox extends React.Component {
         />
       );
 
-      const conjoinLeaf = this.props.Leafs[leaf.conjoined_to]
+      const conjoinLeaf = this.props.Leafs[leaf.conjoined_to];
+      let leafIndex = this.props.leafIDs.indexOf(leaf.id);
+      let conjoinIndex = this.props.leafIDs.indexOf(leaf.conjoined_to);
+      let firstInConjoin = leafIndex < conjoinIndex;
       if (conjoinLeaf !== undefined) {
         // get bifolia side objects
-        const insideBifoliaVerso = this.props.Versos[leaf.versoID]
-        const insideBifoliaRecto = this.props.Rectos[conjoinLeaf.rectoID]
-        const outsideBifoliaRecto = this.props.Rectos[leaf.rectoID]
-        const outsideBifoliaVerso = this.props.Versos[conjoinLeaf.versoID]
+        const insideBifoliaVerso = this.props.Versos[leaf.versoID];
+        const insideBifoliaRecto = this.props.Rectos[conjoinLeaf.rectoID];
+        const outsideBifoliaRecto = this.props.Rectos[leaf.rectoID];
+        const outsideBifoliaVerso = this.props.Versos[conjoinLeaf.versoID];
 
         //set URLs for bifolia images
         const insideBifoliaVersoURL = insideBifoliaVerso.image ? insideBifoliaVerso.image.url : null;
