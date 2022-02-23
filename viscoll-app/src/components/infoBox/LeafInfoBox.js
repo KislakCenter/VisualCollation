@@ -660,6 +660,10 @@ export default class LeafInfoBox extends React.Component {
     let conjoinIndex = this.props.leafIDs.indexOf(leaf.conjoined_to);
     let firstInConjoin = leafIndex < conjoinIndex;
 
+    let rectoIsEmpty = Object.keys(this.props.Rectos[leaf.rectoID].image).length === 0
+    let versoIsEmpty = Object.keys(this.props.Versos[leaf.versoID].image).length === 0
+    console.log([rectoIsEmpty, versoIsEmpty])
+
     let outsideFacingBtn = '';
     let insideFacingBtn = '';
     if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null) {
