@@ -26,6 +26,8 @@ export default class LeafInfoBox extends React.Component {
 
     this.state = {
       imageModalOpen: false,
+      insideBifoliaModalOpen: false,
+      outsideBifoliaModalOpen: false,
       folioModalOpen: false,
       isBatch: this.props.selectedLeaves.length > 1,
       ...this.emptyAttributeState(),
@@ -231,6 +233,16 @@ export default class LeafInfoBox extends React.Component {
     this.setState({ imageModalOpen });
     this.props.togglePopUp(imageModalOpen);
   };
+
+  toggleInsideBifoliaModal = insideBifoliaModalOpen => {
+    this.setState({ insideBifoliaModalOpen });
+    this.props.togglePopUp(insideBifoliaModalOpen)
+  }
+
+  toggleOutsideBifoliaModal = outsideBifoliaModalOpen => {
+    this.setState({ outsideBifoliaModalOpen });
+    this.props.togglePopUp(outsideBifoliaModalOpen)
+  }
 
   toggleFolioModal = folioModalOpen => {
     this.setState({ folioModalOpen });
@@ -642,6 +654,68 @@ export default class LeafInfoBox extends React.Component {
         </div>
       );
     });
+
+    const leaf = this.props.Leafs[this.props.selectedLeaves[0]];
+    let leafIndex = this.props.leafIDs.indexOf(leaf.id);
+    let conjoinIndex = this.props.leafIDs.indexOf(leaf.conjoined_to);
+    let firstInConjoin = leafIndex < conjoinIndex;
+
+    let rectoIsPresent = Object.keys(this.props.Rectos[leaf.rectoID].image).length != 0
+    let versoIsPresent = Object.keys(this.props.Versos[leaf.versoID].image).length != 0
+    let leafImagePresent = [rectoIsPresent, versoIsPresent].every(v => v === true)
+
+    let outsideFacingBtn = '';
+    let insideFacingBtn = '';
+    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null && leafImagePresent === true) {
+      if (firstInConjoin === true) {
+        outsideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleOutsideBifoliaModal(true)}
+                label="Inner Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      } else if (firstInConjoin === false) {
+        outsideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleInsideBifoliaModal(true)}
+                label="Inner Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      }
+    }
+    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null && leafImagePresent === true) {
+      if (firstInConjoin === true) {
+        insideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleInsideBifoliaModal(true)}
+                label="Outer Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      } else if (firstInConjoin === false) {
+        insideFacingBtn = (
+            <RaisedButton
+                primary
+                fullWidth
+                onClick={() => this.toggleOutsideBifoliaModal(true)}
+                label="Outer Bifolia"
+                style={{ marginBottom: 10}}
+                tabIndex={this.props.tabIndex}
+            />
+        )
+      }
+    }
     let submitBtn = '';
     if (this.state.isBatch && this.hasActiveAttributes()) {
       submitBtn = (
@@ -723,6 +797,8 @@ export default class LeafInfoBox extends React.Component {
     }
 
     let imageModalContent;
+    let insideBifoliaModalContent;
+    let outsideBifoliaModalContent;
     let imageThumbnails = [];
     // Show the side image if available
     if (this.props.selectedLeaves.length === 1) {
@@ -748,6 +824,55 @@ export default class LeafInfoBox extends React.Component {
           versoURL={versoURL}
         />
       );
+
+      const conjoinLeaf = this.props.Leafs[leaf.conjoined_to];
+      if (conjoinLeaf !== undefined) {
+        // get bifolia side objects
+        const insideBifoliaVerso = this.props.Versos[leaf.versoID];
+        const insideBifoliaRecto = this.props.Rectos[conjoinLeaf.rectoID];
+        const outsideBifoliaRecto = this.props.Rectos[leaf.rectoID];
+        const outsideBifoliaVerso = this.props.Versos[conjoinLeaf.versoID];
+
+        //set URLs for bifolia images
+        const insideBifoliaVersoURL = insideBifoliaVerso.image ? insideBifoliaVerso.image.url : null;
+        const insideBifoliaRectoURL = insideBifoliaRecto.image ? insideBifoliaRecto.image.url : null;
+        const outsideBifoliaRectoURL = outsideBifoliaRecto.image ? outsideBifoliaRecto.image.url : null;
+        const outsideBifoliaVersoURL = outsideBifoliaVerso.image ? outsideBifoliaVerso.image.url : null;
+
+        //test if the images are DIY (user uploaded instead of from a manifest)
+        const isInsideBifoliaVersoDIY = insideBifoliaVerso.image.manifestID
+                                        ? insideBifoliaVerso.image.manifestID.includes('DIY')
+                                        : false;
+        const isInsideBifoliaRectoDIY = insideBifoliaRecto.image.manifestID
+                                        ? insideBifoliaRecto.image.manifestID.includes('DIY')
+                                        : false;
+        const isOutsideBifoliaRectoDIY = outsideBifoliaRecto.image.manifestID
+                                        ? outsideBifoliaRecto.image.manifestID.includes('DIY')
+                                        : false;
+        const isOutsideBifoliaVersoDIY = outsideBifoliaVerso.image.manifestID
+                                         ? outsideBifoliaVerso.image.manifestID.includes('DIY')
+                                         : false;
+
+        //set content for the modals
+        insideBifoliaModalContent = (
+            <ImageViewer
+                //recto and verso are switched for a more realistic viewing experience
+                //this is hacky and ugly, but it works
+                isRectoDIY={isInsideBifoliaVersoDIY}
+                isVersoDIY={isInsideBifoliaRectoDIY}
+                rectoURL={insideBifoliaVersoURL}
+                versoURL={insideBifoliaRectoURL}
+            />
+        );
+        outsideBifoliaModalContent = (
+            <ImageViewer
+                isRectoDIY={isOutsideBifoliaVersoDIY}
+                isVersoDIY={isOutsideBifoliaRectoDIY}
+                rectoURL={outsideBifoliaVersoURL}
+                versoURL={outsideBifoliaRectoURL}
+            />
+        );
+      }
       if (rectoURL) {
         imageThumbnails.push(
           <button
@@ -761,7 +886,6 @@ export default class LeafInfoBox extends React.Component {
             <img
               alt={recto.memberType}
               src={
-                // isRectoDIY ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
                 (isRecto3 || isRectoDIY) ? rectoURL : rectoURL + '/full/80,/0/default.jpg'
               }
               style={{ cursor: 'pointer' }}
@@ -785,7 +909,6 @@ export default class LeafInfoBox extends React.Component {
             <img
               alt={verso.memberType}
               src={
-                // isVersoDIY ? versoURL : versoURL + '/full/80,/0/default.jpg'
                 (isVerso3 || isVersoDIY) ? versoURL : versoURL + '/full/80,/0/default.jpg'
               }
               style={{ cursor: 'pointer' }}
@@ -804,6 +927,10 @@ export default class LeafInfoBox extends React.Component {
         {attributeDivs}
         <div style={{ clear: 'both', textAlign: 'center', paddingTop: 10 }}>
           {imageThumbnails}
+        </div>
+        <div style={{ clear: 'both', textAlign: 'center', paddingTop: 10 }}>
+          {insideFacingBtn}
+          {outsideFacingBtn}
         </div>
         {this.props.isReadOnly && terms.length === 0 ? (
           ''
@@ -858,6 +985,24 @@ export default class LeafInfoBox extends React.Component {
           bodyStyle={{ padding: 0 }}
         >
           {imageModalContent}
+        </Dialog>
+        <Dialog
+            modal={false}
+            open={this.state.insideBifoliaModalOpen}
+            onRequestClose={() => this.toggleInsideBifoliaModal(false)}
+            contentStyle={{background: 'none', boxShadow: 'inherit'}}
+            bodyStyle={{padding: 0}}
+        >
+          {insideBifoliaModalContent}
+        </Dialog>
+        <Dialog
+            modal={false}
+            open={this.state.outsideBifoliaModalOpen}
+            onRequestClose={() => this.toggleOutsideBifoliaModal(false)}
+            contentStyle={{background: 'none', boxShadow: 'inherit'}}
+            bodyStyle={{padding: 0}}
+        >
+          {outsideBifoliaModalContent}
         </Dialog>
         <FolioNumberDialog
           defaultStartNumber={
