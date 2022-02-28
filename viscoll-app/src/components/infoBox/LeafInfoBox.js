@@ -655,11 +655,7 @@ export default class LeafInfoBox extends React.Component {
       );
     });
 
-    const leaf = this.props.Leafs[this.props.selectedLeaves[0]];
-    let leafIndex = this.props.leafIDs.indexOf(leaf.id);
-    let conjoinIndex = this.props.leafIDs.indexOf(leaf.conjoined_to);
-    let firstInConjoin = leafIndex < conjoinIndex;
-
+    let leaf = this.props.Leafs[this.props.selectedLeaves[0]]
     let rectoIsPresent = Object.keys(this.props.Rectos[leaf.rectoID].image).length != 0
     let versoIsPresent = Object.keys(this.props.Versos[leaf.versoID].image).length != 0
     let leafImagePresent = [rectoIsPresent, versoIsPresent].every(v => v === true)
@@ -667,54 +663,26 @@ export default class LeafInfoBox extends React.Component {
     let outsideFacingBtn = '';
     let insideFacingBtn = '';
     if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null && leafImagePresent === true) {
-      if (firstInConjoin === true) {
-        outsideFacingBtn = (
-            <RaisedButton
-                primary
-                fullWidth
-                onClick={() => this.toggleOutsideBifoliaModal(true)}
-                label="Inner Bifolia"
-                style={{ marginBottom: 10}}
-                tabIndex={this.props.tabIndex}
-            />
-        )
-      } else if (firstInConjoin === false) {
-        outsideFacingBtn = (
-            <RaisedButton
-                primary
-                fullWidth
-                onClick={() => this.toggleInsideBifoliaModal(true)}
-                label="Inner Bifolia"
-                style={{ marginBottom: 10}}
-                tabIndex={this.props.tabIndex}
-            />
-        )
-      }
-    }
-    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null && leafImagePresent === true) {
-      if (firstInConjoin === true) {
-        insideFacingBtn = (
-            <RaisedButton
-                primary
-                fullWidth
-                onClick={() => this.toggleInsideBifoliaModal(true)}
-                label="Outer Bifolia"
-                style={{ marginBottom: 10}}
-                tabIndex={this.props.tabIndex}
-            />
-        )
-      } else if (firstInConjoin === false) {
-        insideFacingBtn = (
-            <RaisedButton
-                primary
-                fullWidth
-                onClick={() => this.toggleOutsideBifoliaModal(true)}
-                label="Outer Bifolia"
-                style={{ marginBottom: 10}}
-                tabIndex={this.props.tabIndex}
-            />
-        )
-      }
+      outsideFacingBtn = (
+          <RaisedButton
+              primary
+              fullWidth
+              onClick={() => this.toggleOutsideBifoliaModal(true)}
+              label="Outer Bifolia"
+              style={{ marginBottom: 10 }}
+              tabIndex={this.props.tabIndex}
+          />
+      )
+      insideFacingBtn = (
+          <RaisedButton
+              primary
+              fullWidth
+              onClick={() => this.toggleInsideBifoliaModal(true)}
+              label="Inner Bifolia"
+              style={{ marginBottom: 10 }}
+              tabIndex={this.props.tabIndex}
+          />
+      )
     }
     let submitBtn = '';
     if (this.state.isBatch && this.hasActiveAttributes()) {
@@ -828,48 +796,58 @@ export default class LeafInfoBox extends React.Component {
       const conjoinLeaf = this.props.Leafs[leaf.conjoined_to];
       if (conjoinLeaf !== undefined) {
         // get bifolia side objects
-        const insideBifoliaVerso = this.props.Versos[leaf.versoID];
-        const insideBifoliaRecto = this.props.Rectos[conjoinLeaf.rectoID];
-        const outsideBifoliaRecto = this.props.Rectos[leaf.rectoID];
-        const outsideBifoliaVerso = this.props.Versos[conjoinLeaf.versoID];
+        let leaf = this.props.Leafs[this.props.selectedLeaves[0]];
+        let conjoinLeaf = this.props.Leafs[leaf.conjoined_to]
+        let leafIndex = this.props.leafIDs.indexOf(leaf.id)
+        let conjoinIndex = this.props.leafIDs.indexOf(conjoinLeaf.id)
+
+        // test and assign leading and trailing leaves
+        let leadingLeaf;
+        let trailingLeaf;
+        if (leafIndex < conjoinIndex) {
+          leadingLeaf = leaf
+          trailingLeaf = conjoinLeaf
+        } else {
+          leadingLeaf = conjoinLeaf
+          trailingLeaf = leaf
+        }
+        console.log(leaf)
+
+        // assign leading/trailing recto/verso objects
+        let leadingRecto = this.props.Rectos[leadingLeaf.rectoID]
+        let leadingVerso= this.props.Versos[leadingLeaf.versoID]
+        let trailingRecto = this.props.Rectos[trailingLeaf.rectoID]
+        let trailingVerso = this.props.Versos[trailingLeaf.versoID]
 
         //set URLs for bifolia images
-        const insideBifoliaVersoURL = insideBifoliaVerso.image ? insideBifoliaVerso.image.url : null;
-        const insideBifoliaRectoURL = insideBifoliaRecto.image ? insideBifoliaRecto.image.url : null;
-        const outsideBifoliaRectoURL = outsideBifoliaRecto.image ? outsideBifoliaRecto.image.url : null;
-        const outsideBifoliaVersoURL = outsideBifoliaVerso.image ? outsideBifoliaVerso.image.url : null;
+        let leadingRectoURL = leadingRecto.image ? leadingRecto.image.url : null;
+        let leadingVersoURL = leadingVerso.image ? leadingVerso.image.url : null;
+        let trailingRectoURL = trailingRecto.image ? trailingRecto.image.url : null;
+        let trailingVersoURL = trailingVerso.image ? trailingVerso.image.url : null;
 
         //test if the images are DIY (user uploaded instead of from a manifest)
-        const isInsideBifoliaVersoDIY = insideBifoliaVerso.image.manifestID
-                                        ? insideBifoliaVerso.image.manifestID.includes('DIY')
-                                        : false;
-        const isInsideBifoliaRectoDIY = insideBifoliaRecto.image.manifestID
-                                        ? insideBifoliaRecto.image.manifestID.includes('DIY')
-                                        : false;
-        const isOutsideBifoliaRectoDIY = outsideBifoliaRecto.image.manifestID
-                                        ? outsideBifoliaRecto.image.manifestID.includes('DIY')
-                                        : false;
-        const isOutsideBifoliaVersoDIY = outsideBifoliaVerso.image.manifestID
-                                         ? outsideBifoliaVerso.image.manifestID.includes('DIY')
-                                         : false;
+        let isLeadingRectoDIY = leadingRecto.image.manifestID ? leadingRecto.image.manifestID.includes('DIY') : false;
+        let isLeadingVersoDIY = leadingVerso.image.manifestID ? leadingVerso.image.manifestID.includes('DIY') : false;
+        let isTrailingRectoDIY = trailingRecto.image.manifestID ? trailingRecto.image.manifestID.includes('DIY') : false;
+        let isTrailingVersoDIY = trailingVerso.image.manifestID ? trailingVerso.image.manifestID.includes('DIY') : false;
 
         //set content for the modals
         insideBifoliaModalContent = (
             <ImageViewer
                 //recto and verso are switched for a more realistic viewing experience
                 //this is hacky and ugly, but it works
-                isRectoDIY={isInsideBifoliaVersoDIY}
-                isVersoDIY={isInsideBifoliaRectoDIY}
-                rectoURL={insideBifoliaVersoURL}
-                versoURL={insideBifoliaRectoURL}
+                isRectoDIY={isLeadingVersoDIY}
+                isVersoDIY={isTrailingRectoDIY}
+                rectoURL={leadingVersoURL}
+                versoURL={trailingRectoURL}
             />
         );
         outsideBifoliaModalContent = (
             <ImageViewer
-                isRectoDIY={isOutsideBifoliaVersoDIY}
-                isVersoDIY={isOutsideBifoliaRectoDIY}
-                rectoURL={outsideBifoliaVersoURL}
-                versoURL={outsideBifoliaRectoURL}
+                isRectoDIY={isTrailingVersoDIY}
+                isVersoDIY={isLeadingRectoDIY}
+                rectoURL={trailingVersoURL}
+                versoURL={leadingRectoURL}
             />
         );
       }
