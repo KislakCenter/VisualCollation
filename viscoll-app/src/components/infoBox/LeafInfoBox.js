@@ -660,13 +660,13 @@ export default class LeafInfoBox extends React.Component {
     let conjoinIndex = this.props.leafIDs.indexOf(leaf.conjoined_to);
     let firstInConjoin = leafIndex < conjoinIndex;
 
-    let rectoIsEmpty = Object.keys(this.props.Rectos[leaf.rectoID].image).length === 0
-    let versoIsEmpty = Object.keys(this.props.Versos[leaf.versoID].image).length === 0
-    console.log([rectoIsEmpty, versoIsEmpty])
+    let rectoIsPresent = Object.keys(this.props.Rectos[leaf.rectoID].image).length != 0
+    let versoIsPresent = Object.keys(this.props.Versos[leaf.versoID].image).length != 0
+    let leafImagePresent = [rectoIsPresent, versoIsPresent].every(v => v === true)
 
     let outsideFacingBtn = '';
     let insideFacingBtn = '';
-    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null) {
+    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null && leafImagePresent === true) {
       if (firstInConjoin === true) {
         outsideFacingBtn = (
             <RaisedButton
@@ -691,7 +691,7 @@ export default class LeafInfoBox extends React.Component {
         )
       }
     }
-    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null) {
+    if (this.props.Leafs[this.props.selectedLeaves[0]].conjoined_to !== null && leafImagePresent === true) {
       if (firstInConjoin === true) {
         insideFacingBtn = (
             <RaisedButton
@@ -909,7 +909,6 @@ export default class LeafInfoBox extends React.Component {
             <img
               alt={verso.memberType}
               src={
-                // isVersoDIY ? versoURL : versoURL + '/full/80,/0/default.jpg'
                 (isVerso3 || isVersoDIY) ? versoURL : versoURL + '/full/80,/0/default.jpg'
               }
               style={{ cursor: 'pointer' }}
