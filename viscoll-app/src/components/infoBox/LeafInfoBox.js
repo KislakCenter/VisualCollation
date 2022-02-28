@@ -859,7 +859,7 @@ export default class LeafInfoBox extends React.Component {
                 //recto and verso are switched for a more realistic viewing experience
                 //this is hacky and ugly, but it works
                 isRectoDIY={isInsideBifoliaVersoDIY}
-                isVersoDIT={isInsideBifoliaRectoDIY}
+                isVersoDIY={isInsideBifoliaRectoDIY}
                 rectoURL={insideBifoliaVersoURL}
                 versoURL={insideBifoliaRectoURL}
             />
@@ -867,7 +867,7 @@ export default class LeafInfoBox extends React.Component {
         outsideBifoliaModalContent = (
             <ImageViewer
                 isRectoDIY={isOutsideBifoliaVersoDIY}
-                isVersoDIT={isOutsideBifoliaRectoDIY}
+                isVersoDIY={isOutsideBifoliaRectoDIY}
                 rectoURL={outsideBifoliaVersoURL}
                 versoURL={outsideBifoliaRectoURL}
             />
