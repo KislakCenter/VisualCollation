@@ -8,10 +8,10 @@
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+    xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:vc="http://viscoll.org/schema/collation/"
-    exclude-result-prefixes="ss xd vc svg" version="2.0">
+    xmlns:vc="http://viscoll.org/schema/collation/" exclude-result-prefixes="xs ss xd vc svg"
+    version="2.0">
 
     <xsl:output name="html5" method="html" encoding="UTF-8" version="5" indent="yes"/>
 
@@ -22,6 +22,8 @@
             <xd:p><xd:b>Modified on:</xd:b>April 29, 2016</xd:p>
             <xd:p><xd:b>Modified by:</xd:b> Dot Porter</xd:p>
             <xd:p><xd:b>Modified on:</xd:b> 2019-06-06</xd:p>
+            <xd:p><xd:b>Modified by:</xd:b> Alberto Campagnolo</xd:p>
+            <xd:p><xd:b>Modified on:</xd:b> 2022-01-26</xd:p>
             <xd:p><xd:b>Modified by:</xd:b> Alberto Campagnolo</xd:p>
             <xd:p>This document takes as its input the output from
                 viscoll_mod2_XML_to_processed-XML.xsl</xd:p>
@@ -56,7 +58,7 @@
 
     <!--Variable setting the URL to the Stub Visualization-->
     <xsl:variable name="stubVis">
-        <!-- Link to a stub visulization -->
+        <!-- Link to a stub visualization -->
         <xsl:text>STUB</xsl:text>
     </xsl:variable>
 
@@ -144,7 +146,8 @@
         <xsl:param name="shelfmark"/>
         <xsl:param name="tbName"/>
         <xsl:param name="tbURL"/>
-        <xsl:variable name="href" select="concat($idno, '-formulas.html')"/>
+        <xsl:variable name="filename-formulas" select="concat($idno, '-formulas.html')"/>
+        <xsl:variable name="href" select="$filename-formulas"/>
         <xsl:result-document href="{$href}" format="html5">
             <xsl:variable name="titleText">
                 <xsl:text>Gathering structure of </xsl:text>
@@ -370,7 +373,7 @@
                                 <xsl:call-template name="folFileName">
                                     <xsl:with-param name="fol" select="$rightFol"/>
                                     <xsl:with-param name="gatheringNo" select="$gatheringNo"/>
-                                    <xsl:with-param name="bi1" select="$bi1"/>
+                                    <xsl:with-param name="bi1" select="$bi2"/>
                                 </xsl:call-template>
                             </xsl:variable>
                             <xsl:call-template name="newGathering">
@@ -896,11 +899,25 @@
                                     <xsl:attribute name="value"><xsl:value-of
                                             select="concat($idno, '-', @n, '.html')"
                                         /></xsl:attribute> Gathering <xsl:value-of select="@n"/>
+                                    <xsl:choose>
+                                        <xsl:when test="@signature">
+                                            <xsl:text>: </xsl:text>
+                                            <xsl:value-of select="@signature"/>
+                                            <xsl:text> </xsl:text>
+                                        </xsl:when>
+                                    </xsl:choose>
                                         (<xsl:value-of select="@positions"/>) </xsl:element>
                             </xsl:for-each>
                         </select>
                     </div>
-                    <br/> Gathering <xsl:value-of select="$gatheringNo"/> (<xsl:value-of
+                    <br/> Gathering <xsl:value-of select="$gatheringNo"/>
+                    <xsl:choose>
+                        <xsl:when test="@signature">
+                            <xsl:text>: </xsl:text>
+                            <xsl:value-of select="@signature"/>
+                            <xsl:text> </xsl:text>
+                        </xsl:when>
+                    </xsl:choose> (<xsl:value-of
                         select="$positions"/>)<xsl:text> </xsl:text><xsl:text> </xsl:text>
                     <xsl:for-each select="units/unit">
                         <xsl:comment>
@@ -1128,14 +1145,7 @@
         <xsl:param name="fol"/>
         <xsl:param name="gatheringNo"/>
         <xsl:param name="bi1"/>
-        <xsl:choose>
-            <xsl:when test="$fol = $folNoX">
-                <xsl:value-of select="concat($folNoX, $gatheringNo, $bi1)"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$fol"/>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="concat('F',$fol, '_G',$gatheringNo, '-P',$bi1)"/>
     </xsl:template>
 
     <xd:doc>
@@ -1390,7 +1400,7 @@
             </span>
         </div>
     </xsl:template>
-    
+
     <xd:doc>
         <xd:desc>
             <xd:p>Record date and time of transformation</xd:p>
