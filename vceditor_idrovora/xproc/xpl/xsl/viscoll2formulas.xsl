@@ -166,14 +166,28 @@
                                         <xsl:when
                                             test="following-sibling::leaf[mode/@val eq 'missing']">
                                             <xsl:variable name="lastPresent">
-                                                <xsl:value-of
-                                                  select="preceding-sibling::leaf[mode/@val != 'missing'][1]/q/@position"
-                                                />
+                                                <xsl:choose>
+                                                    <xsl:when test="preceding-sibling::leaf[mode/@val != 'missing'][1]/q/@position">
+                                                        <xsl:value-of
+                                                            select="preceding-sibling::leaf[mode/@val != 'missing'][1]/q/@position"
+                                                        />
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <xsl:value-of select="0"/>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
                                             </xsl:variable>
                                             <xsl:variable name="lastMissing">
-                                                <xsl:value-of
-                                                  select="following-sibling::leaf[mode/@val eq 'missing'][last()]/q/@position"
-                                                />
+                                                <xsl:choose>
+                                                    <xsl:when test="following-sibling::leaf[mode/@val eq 'missing'][last()]/q/@position">
+                                                        <xsl:value-of
+                                                            select="following-sibling::leaf[mode/@val eq 'missing'][last()]/q/@position"
+                                                        />
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <xsl:value-of select="0"/>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
                                             </xsl:variable>
                                             <xsl:variable name="countMissing">
                                                 <xsl:value-of
