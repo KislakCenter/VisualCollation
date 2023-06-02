@@ -50,22 +50,22 @@ module ControllerHelper
             'type' => ['equals', 'not equals'],
             'material' => ['equals', 'not equals'],
             'conjoined_to' => ['equals', 'not equals'],
-            'conjoined_leaf_order' => ['equals', 'not equals'], # Legacy attribute
             'attached_above' => ['equals', 'not equals'],
             'attached_below' => ['equals', 'not equals'],
-            'stub' => ['equals', 'not equals']
+            'stub' => ['equals', 'not equals'],
+            'folio_number' => ['equals', 'not equals', 'contains', 'not contains']
           },
           'side' => {
-            'folio_number' => ['equals', 'not equals', 'contains', 'not contains'],
-            'page_number' => ['equals', 'not equals', 'contains', 'not contains'],
             'texture' => ['equals', 'not equals'],
             'script_direction' => ['equals', 'not equals'],
+            'page_number' => ['equals', 'not equals', 'contains', 'not contains'],
             'uri' => ['equals', 'not equals', 'contains', 'not contains'],
           },
           'term' => {
             'title' => ['equals', 'not equals', 'contains', 'not contains'],
-            'type' => ['equals', 'not equals'],
-            'description' => ['equals', 'not equals', 'contains', 'not contains']
+            'taxonomy' => ['equals', 'not equals', 'contains', 'not contains'],
+            'description' => ['equals', 'not equals', 'contains', 'not contains'],
+            'uri' => ['equals', 'not equals', 'contains', 'not contains']
           }
         },
         'conjunction' => ['OR']
