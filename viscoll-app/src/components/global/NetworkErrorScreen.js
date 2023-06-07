@@ -40,7 +40,7 @@ export default class NetworkErrorScreen extends React.Component {
         <div style={{textAlign:"center", paddingBottom:"1.5em"}}>
           {logo}
           <br />
-          Cannot connect to VisColl. Trying to re-connect..
+          Cannot connect to VCEditor. Trying to re-connect..
         </div>
       </Dialog>
     );

@@ -200,7 +200,7 @@ class Landing extends Component {
             <img src={imgCollation} alt="Collation illustration" />
           </div>
           <div className="panelLogin" role="main">
-            <img src={imgLogo} alt="VisColl logo" />
+            <img src={imgLogo} alt="VCEditor logo" />
             <hr />
             <br />
             {message}

@@ -4,7 +4,7 @@ class AccountApprovalMailer < ApplicationMailer
   def sendApprovalStatus(user)
     @user = User.find(user)
     mail(
-      subject: "VisColl Account Approval",
+      subject: "VCEditor Account Approval",
       to: @user.email,
       template_name: 'sendApprovalStatus'
     )
