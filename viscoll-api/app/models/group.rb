@@ -18,6 +18,7 @@ class Group
   # Callbacks
   before_create :edit_ID
   before_destroy :unlink_terms, :unlink_project, :unlink_group, :destroy_members
+  before_save :check_member_ids
 
   def mapping?
     # if any terms are attached to group, mappings exist
@@ -127,6 +128,13 @@ class Group
       end
     end
     @child_leafs
+  end
+
+  def check_member_ids
+    return if memberIDs.all?
+
+    Rails.logger.error("Group #{id} tried to save with nil values." + "\n" + self.to_json)
+    raise StandardError, "Group #{id} tried to save with nil values." + "\n" + self.to_json
   end
 
 end
