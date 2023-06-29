@@ -43,29 +43,29 @@ module ControllerHelper
       {
         'type' => {
           'group' => {
-            'type' => ['equals', 'not equals'],
-            'title' => ['equals', 'not equals', 'contains', 'not contains']
+            'type' => ['equals', 'does not equal'],
+            'title' => ['equals', 'does not equal', 'contains', 'does not contain']
           },
           'leaf' => {
-            'type' => ['equals', 'not equals'],
-            'material' => ['equals', 'not equals'],
-            'conjoined_to' => ['equals', 'not equals'],
-            'conjoined_leaf_order' => ['equals', 'not equals'], # Legacy attribute
-            'attached_above' => ['equals', 'not equals'],
-            'attached_below' => ['equals', 'not equals'],
-            'stub' => ['equals', 'not equals']
+            'type' => ['equals', 'does not equal'],
+            'material' => ['equals', 'does not equal'],
+            'conjoined_to' => ['equals', 'does not equal'],
+            'attached_above' => ['equals', 'does not equal'],
+            'attached_below' => ['equals', 'does not equal'],
+            'stub' => ['equals', 'does not equal'],
+            'folio_number' => ['equals', 'does not equal', 'contains', 'does not contain']
           },
           'side' => {
-            'folio_number' => ['equals', 'not equals', 'contains', 'not contains'],
-            'page_number' => ['equals', 'not equals', 'contains', 'not contains'],
-            'texture' => ['equals', 'not equals'],
-            'script_direction' => ['equals', 'not equals'],
-            'uri' => ['equals', 'not equals', 'contains', 'not contains'],
+            'texture' => ['equals', 'does not equal'],
+            'script_direction' => ['equals', 'does not equal'],
+            'page_number' => ['equals', 'does not equal', 'contains', 'does not contain'],
+            'uri' => ['equals', 'does not equal', 'contains', 'does not contain'],
           },
           'term' => {
-            'title' => ['equals', 'not equals', 'contains', 'not contains'],
-            'type' => ['equals', 'not equals'],
-            'description' => ['equals', 'not equals', 'contains', 'not contains']
+            'title' => ['equals', 'does not equal', 'contains', 'does not contain'],
+            'taxonomy' => ['equals', 'does not equal', 'contains', 'does not contain'],
+            'description' => ['equals', 'does not equal', 'contains', 'does not contain'],
+            'uri' => ['equals', 'does not equal', 'contains', 'does not contain']
           }
         },
         'conjunction' => ['OR']
