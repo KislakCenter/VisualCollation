@@ -31,9 +31,9 @@ services:
       - xproc
   xproc:
     container_name: viscoll_idrovora
-    image: "gitlab.library.upenn.edu/kislak-center/visualcollation/vceditor_idrovora:${IDROVORA_RELEASE_TAG}"
-#    build:
-#      context: ./vceditor_idrovora
+    image: gremid/idrovora:0.0.2020082920
+    build:
+      context: ./vceditor_idrovora
     volumes:
       - ./vceditor_idrovora/xproc/xpl:/xpl
       - ./vceditor_idrovora/xproc/docs:/docs

@@ -1,8 +1,8 @@
-# VisColl (Redux Front-End)
+# VCEditor (Redux Front-End)
 
 ## Introduction
 
-This is the the Redux-driven user interface for Viscoll.
+This is the the Redux-driven user interface for VCEditor.
 
 ## System Requirements
 
