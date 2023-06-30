@@ -144,7 +144,7 @@ class TopBar extends Component {
           tabIndex={this.props.tabIndex}
 
         >
-          <img src={imgLogo} alt="Viscoll logo" />
+          <img src={imgLogo} alt="VCEditor logo" />
         </button>
         <Toolbar style={{ background: '#ffffff' }}>
           <ToolbarGroup>{this.props.children}</ToolbarGroup>

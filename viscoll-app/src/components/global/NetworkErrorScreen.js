@@ -22,7 +22,7 @@ export default class NetworkErrorScreen extends React.Component {
           if (!that.state.isOffline) that.setState({isOffline:true});
         });
     }
-    setInterval(apiRequest, 5000);
+    setInterval(apiRequest, 20000);
   }
 
   render() {
@@ -40,7 +40,7 @@ export default class NetworkErrorScreen extends React.Component {
         <div style={{textAlign:"center", paddingBottom:"1.5em"}}>
           {logo}
           <br />
-          Cannot connect to VisColl. Trying to re-connect..
+          Cannot connect to VCEditor. Trying to re-connect..
         </div>
       </Dialog>
     );

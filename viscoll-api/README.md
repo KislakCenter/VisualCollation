@@ -1,8 +1,8 @@
-# VisColl (Rails API Back-End)
+# VCEditor (Rails API Back-End)
 
 ## Introduction
 
-This is the the Rails-driven back-end for Viscoll.
+This is the the Rails-driven back-end for VCEditor.
 
 ## System Requirements
 
