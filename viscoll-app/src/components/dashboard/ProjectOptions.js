@@ -10,7 +10,7 @@ import IconHelp from 'material-ui/svg-icons/action/help';
 /** New Project dialog - panel with additional options for project creation  */
 const ProjectOptions = props => {
 
-    let handleChange = (e, v) => {
+    let handleNumberChange = (e, v) => {
         // assigning values to null would not have to happen if generateFolioNumber
         // and generatePageNumber were combined into a single variable
         if (v === 'folio_number') {
@@ -32,7 +32,7 @@ const ProjectOptions = props => {
                 <RadioButtonGroup
                     name="folioOrPage"
                     defaultSelected="folio_number"
-                    onChange={(e, v) => handleChange(e, v)}
+                    onChange={(e, v) => handleNumberChange(e, v)}
                     style={{width: 240}}
                 >
                     <RadioButton
@@ -146,6 +146,40 @@ const ProjectOptions = props => {
                     value={'r-v'}
                     onChange={e => {
                         props.set('notationStyle', e);
+                        console.log(e);
+                    }}
+                    width={250}
+                />
+            </div>
+
+            <h2>
+                Select viewing direction
+                <IconButton
+                    iconStyle={{fontSize: 10, width: 15, height: 15}}
+                    tooltip="Direction of viewing"
+                >
+                    <IconHelp/>
+                </IconButton>
+            </h2>
+            <div
+                style={{
+                    width: '100%',
+                    margin: 'auto',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <SelectField
+                    id="selectSideStyle"
+                    label="Select side notation style"
+                    data={[
+                        {text: 'l-r', value: 'l-r'},
+                        {text: 'r-l', value: 'r-l'},
+                    ]}
+                    value={'l-r'}
+                    onChange={e => {
+                        props.set('viewingDirection', e);
                         console.log(e);
                     }}
                     width={250}
