@@ -10,6 +10,12 @@ export const initialState = {
       options: ['r-v', 'recto-verso', 'a-b'],
       isDropdown: true,
     },
+    viewingDirection: {
+      name: 'viewingDirection',
+      displayName: 'Viewing Direction',
+      options: ['l-r', 'r-l'],
+      isDropdown: true
+    },
     metadata: {
       date: '',
     },
