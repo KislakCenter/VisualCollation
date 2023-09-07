@@ -18,6 +18,7 @@ export default class NewProjectContainer extends React.Component {
       title: '',
       shelfmark: '',
       notationStyle: 'r-v',
+      viewingDirection: 'l-r',
       date: '',
       quireNo: 2,
       leafNo: 10,
@@ -50,6 +51,7 @@ export default class NewProjectContainer extends React.Component {
       title: '',
       shelfmark: '',
       notationStyle: '',
+      viewingDirection: '',
       date: '',
       quireNo: 1,
       leafNo: 10,
@@ -204,6 +206,7 @@ export default class NewProjectContainer extends React.Component {
         title: this.state.title,
         shelfmark: this.state.shelfmark,
         notationStyle: this.state.notationStyle,
+        viewingDirection: this.state.viewingDirection,
         metadata: {
           date: this.state.date,
         },
@@ -310,6 +313,7 @@ export default class NewProjectContainer extends React.Component {
             generatePageNumber={this.state.generatePageNumber}
             startingTexture={this.state.startingTexture}
             notationStyle={this.state.notationStyle}
+            viewingDirection={this.state.viewingDirection}
             previousStep={() => this.set('step', 3)}
             finish={this.finish}
             set={this.set}
