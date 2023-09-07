@@ -20,11 +20,15 @@ class EditProjectForm extends React.Component {
       editing: {
         title: false,
         shelfmark: false,
-        date: false,
+        notationStyle: false,
+        viewingDirection: false,
+        date: false
       },
       errors: {
         title: "",
         shelfmark: "",
+        notationStyle: "",
+        viewingDirection: "",
         date: "",
       },
     };
@@ -37,11 +41,15 @@ class EditProjectForm extends React.Component {
     if (nextProps.selectedProject) {
       let title = nextProps.selectedProject.title;
       let shelfmark = nextProps.selectedProject.shelfmark;
+      let notationStyle = nextProps.selectedProject.notationStyle;
+      let viewingDirection = nextProps.selectedProject.viewingDirection;
       let date = nextProps.selectedProject.metadata.date;
       if (this.props.selectedProject && this.props.selectedProject.id === nextProps.selectedProject.id) {
         // Do not update the fields if they are currently editing and did not submit
         if (this.state.title !== title && this.state.editing.title) title = this.state.title;
         if (this.state.shelfmark !== shelfmark && this.state.editing.shelfmark) shelfmark = this.state.shelfmark;
+        if (this.state.notationStyle !== notationStyle && this.state.editing.notationStyle) notationStyle = this.state.notationStyle;
+        if (this.state.viewingDirection !== viewingDirection && this.state.editing.viewingDirection) viewingDirection = this.state.viewingDirection;
         if (this.state.date !== date && this.state.editing.date) date = this.state.date;
       } else {
         // Switched project selection - reset editing states
@@ -49,17 +57,23 @@ class EditProjectForm extends React.Component {
           editing: {
             title: false,
             shelfmark: false,
-            date: false,
+            notationStyle: false,
+            viewingDirection: false,
+            date: false
           },
         });
       }
       this.setState({
         title: title,
         shelfmark: shelfmark,
+        notationStyle: notationStyle,
+        viewingDirection: viewingDirection,
         date: date,
         errors: {
           title: "",
           shelfmark: "",
+          notationStyle: "",
+          viewingDirection: "",
           date: "",
         },
         selectedProject: nextProps.selectedProject,
@@ -268,6 +282,34 @@ class EditProjectForm extends React.Component {
             tabIndex={this.props.tabIndex}
           /> 
           {this.submitButtons("date")}
+        </form>
+        <form onSubmit={(e)=>this.handleProjectUpdate(e, "notationStyle")}>
+          <TextField
+              floatingLabelText="Notation Style"
+              floatingLabelFixed
+              value={this.state.notationStyle}
+              errorText={this.state.errors.notationStyle}
+              aria-invalid={this.state.errors.date.notationStyle>0}
+              onChange={(event, newValue) => this.onInputChange(event, newValue, "notationStyle")}
+              floatingLabelStyle={{fontSize: 25, color: "#526C91"}}
+              fullWidth={true}
+              tabIndex={this.props.tabIndex}
+          />
+          {this.submitButtons("notationStyle")}
+        </form>
+        <form onSubmit={(e)=>this.handleProjectUpdate(e, "viewingDirection")}>
+          <TextField
+              floatingLabelText="Viewing Direction"
+              floatingLabelFixed
+              value={this.state.viewingDirection}
+              errorText={this.state.errors.viewingDirection}
+              aria-invalid={this.state.errors.date.viewingDirection>0}
+              onChange={(event, newValue) => this.onInputChange(event, newValue, "viewingDirection")}
+              floatingLabelStyle={{fontSize: 25, color: "#526C91"}}
+              fullWidth={true}
+              tabIndex={this.props.tabIndex}
+          />
+          {this.submitButtons("viewingDirection")}
         </form>
         <div className="info">
           <span>Created at:</span> {new Date(selectedProject.created_at).toLocaleString('en-US')}<br />
