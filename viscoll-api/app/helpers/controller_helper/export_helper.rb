@@ -19,13 +19,14 @@ module ControllerHelper
       @terms              = {}
 
       @projectInformation = {
-          "title":         @project.title,
-          "shelfmark":     @project.shelfmark,
-          "notationStyle": @project.notationStyle,
-          "metadata":      @project.metadata,
-          "preferences":   @project.preferences,
-          "manifests":     @project.manifests,
-          "taxonomies":    @project.taxonomies
+          "title":            @project.title,
+          "shelfmark":        @project.shelfmark,
+          "notationStyle":    @project.notationStyle,
+          "viewingDirection": @project.viewingDirection,
+          "metadata":         @project.metadata,
+          "preferences":      @project.preferences,
+          "manifests":        @project.manifests,
+          "taxonomies":       @project.taxonomies
       }
 
       rootMemberOrder = 1
@@ -225,7 +226,7 @@ module ControllerHelper
             xml.title project.title
             xml.shelfmark project.shelfmark
             xml.date project.metadata[:date]
-            xml.direction :val => "l-r"
+            xml.direction :val => project.viewingDirection
             idPrefix = project.shelfmark.parameterize.underscore
             xml.quires do
               @groupIDs.each_with_index do |groupID, index|
