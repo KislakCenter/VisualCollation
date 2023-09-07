@@ -127,14 +127,15 @@ module ControllerHelper
       @terms              = {}
 
       @projectInformation = {
-          "id":            @project.id.to_s,
-          "title":         @project.title,
-          "shelfmark":     @project.shelfmark,
-          "notationStyle": @project.notationStyle,
-          "metadata":      @project.metadata,
-          "preferences":   @project.preferences,
-          "manifests":     @project.manifests,
-          "taxonomies":    @project.taxonomies
+          "id":                @project.id.to_s,
+          "title":             @project.title,
+          "shelfmark":         @project.shelfmark,
+          "notationStyle":     @project.notationStyle,
+          "viewingDirection":  @project.viewingDirection,
+          "metadata":          @project.metadata,
+          "preferences":       @project.preferences,
+          "manifests":         @project.manifests,
+          "taxonomies":        @project.taxonomies
       }
       @project.manifests.each do |manifestID, manifest|
         manifestInformation = getManifestInformation(manifest[:url])
