@@ -1,20 +1,19 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "DELETE /groups/id", :type => :request do
+describe 'DELETE /groups/id', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
     @project = FactoryGirl.create(:project, {
-      user: @user,
-      taxonomies: ["Ink"],
-    })
+                                    user: @user,
+                                    taxonomies: ['Ink']
+                                  })
     @groupIDs = []
-    5.times do |n|
+    5.times do |_n|
       group = FactoryGirl.create(:quire, { project: @project })
       @groupIDs.push(group.id.to_s)
     end
@@ -23,16 +22,17 @@ describe "DELETE /groups/id", :type => :request do
     @parameters = {
       projectID: @project.id.to_s,
       group: {
-        type: "Booklet",
-        title: "Changed title"
-      },
+        type: 'Booklet',
+        title: 'Changed title'
+      }
     }
   end
-  
+
   context 'with valid authorization' do
     context 'and standard group specs' do
       before do
-        delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/groups/#{@group.id.to_str}", params: @parameters.to_json,
+                                              headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
       end
 
@@ -44,43 +44,46 @@ describe "DELETE /groups/id", :type => :request do
         expect(@project.groups).not_to include an_object_having_attributes(id: @group.id)
       end
     end
-    
+
     context 'and missing group' do
       before do
-        delete "/groups/#{@group.id.to_str}missing", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/groups/#{@group.id.to_str}missing", params: @parameters.to_json,
+                                                     headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'returns the right error message' do
-        expect(@body['error']).to eq "group not found"
+        expect(@body['error']).to eq 'group not found'
       end
     end
-    
+
     context 'and unauthorized group' do
       before do
         @project.user = FactoryGirl.create(:user)
         @project.save
-        delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/groups/#{@group.id.to_str}", params: @parameters.to_json,
+                                              headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @group.reload
       end
-      
+
       it 'returns 401' do
         expect(response).to have_http_status(:unauthorized)
       end
-      
+
       it 'retains the group' do
         expect(@project.groups).to include an_object_having_attributes(id: @group.id)
       end
     end
-    
+
     context 'and raised exception' do
       before do
         allow_any_instance_of(Group).to receive(:destroy).and_raise('MyException')
-        delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/groups/#{@group.id.to_str}", params: @parameters.to_json,
+                                              headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
@@ -93,10 +96,11 @@ describe "DELETE /groups/id", :type => :request do
       end
     end
   end
-  
+
   context 'with corrupted authorization' do
     before do
-      delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      delete "/groups/#{@group.id.to_str}", params: @parameters.to_json,
+                                            headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -111,7 +115,7 @@ describe "DELETE /groups/id", :type => :request do
 
   context 'with empty authorization' do
     before do
-      delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => ""}
+      delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -125,7 +129,7 @@ describe "DELETE /groups/id", :type => :request do
 
   context 'invalid authorization' do
     before do
-      delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do

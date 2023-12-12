@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FeedbackMailer < ApplicationMailer
   def sendFeedback(title, message, browserInformation, projectJSONExport, current_user)
     @title = title

@@ -1,5 +1,6 @@
-class SessionsController < RailsJwtAuth::SessionsController
+# frozen_string_literal: true
 
+class SessionsController < RailsJwtAuth::SessionsController
   def create
     user = RailsJwtAuth.model.where(RailsJwtAuth.auth_field_name =>
       session_create_params[RailsJwtAuth.auth_field_name].to_s.downcase).first
@@ -12,7 +13,7 @@ class SessionsController < RailsJwtAuth::SessionsController
       @userProjects = []
       begin
         @userProjects = user.projects
-      rescue
+      rescue StandardError
       end
       @userToken = get_jwt(user)
       @user = user
@@ -33,12 +34,11 @@ class SessionsController < RailsJwtAuth::SessionsController
   end
 end
 
-
-
 module Jwt
   class Request
     def initialize(request)
       return unless request.env['HTTP_AUTHORIZATION']
+
       @jwt = request.env['HTTP_AUTHORIZATION'].split.last
 
       begin

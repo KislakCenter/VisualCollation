@@ -1,18 +1,17 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "POST /feedback", :type => :request do
+describe 'POST /feedback', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
     @parameters = {
       feedback: {
-        title: "Something is weird",
-        message: "Hey can you look into this"
+        title: 'Something is weird',
+        message: 'Hey can you look into this'
       }
     }
   end
@@ -21,27 +20,31 @@ describe "POST /feedback", :type => :request do
     context 'and valid user ID' do
       it 'sends an email' do
         expect {
-          post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          post '/feedback', params: @parameters.to_json,
+                            headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         }.to change { ActionMailer::Base.deliveries.count }.by 1
       end
-      
+
       it 'requires a title' do
         @parameters[:feedback][:title] = ''
-        post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/feedback', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)['error']).to eq '[title] and [message] params required.'
       end
-      
+
       it 'requires a message' do
         @parameters[:feedback][:message] = ''
-        post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/feedback', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)['error']).to eq '[title] and [message] params required.'
       end
-      
+
       it 'handles exceptions' do
         expect(FeedbackMailer).to receive(:sendFeedback).and_raise('AnException')
-        post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/feedback', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)['error']).to eq 'AnException'
       end
@@ -50,7 +53,8 @@ describe "POST /feedback", :type => :request do
 
   context 'with corrupted authorization' do
     before do
-      post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      post '/feedback', params: @parameters.to_json,
+                        headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -65,7 +69,7 @@ describe "POST /feedback", :type => :request do
 
   context 'with empty authorization' do
     before do
-      post '/feedback', params: @parameters.to_json, headers: {'Authorization' => ""}
+      post '/feedback', params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -79,7 +83,7 @@ describe "POST /feedback", :type => :request do
 
   context 'invalid authorization' do
     before do
-      post '/feedback', params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      post '/feedback', params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require database cleaner at the top level
 require 'database_cleaner'
 
@@ -5,10 +7,10 @@ require 'database_cleaner'
 require 'spec_helper'
 
 ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
 
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
@@ -68,7 +70,7 @@ RSpec.configure do |config|
   config.include Mongoid::Matchers, type: :model
 
   # add 'WardenHelper'
-  config.include RailsJwtAuth::Spec::Helpers, :type => :request
+  config.include RailsJwtAuth::Spec::Helpers, type: :request
 
   # start by truncating all the tables but then use the faster transaction strategy the rest of the time.
   config.before(:suite) do
@@ -76,7 +78,7 @@ RSpec.configure do |config|
   end
 
   # start the transaction strategy as examples are run
-  config.around(:each) do |example|
+  config.around do |example|
     DatabaseCleaner.cleaning do
       example.run
     end

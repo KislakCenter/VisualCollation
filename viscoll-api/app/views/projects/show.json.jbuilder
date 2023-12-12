@@ -1,4 +1,6 @@
-json.set! "active" do
+# frozen_string_literal: true
+
+json.set! 'active' do
   json.id @data[:project][:id]
   json.title @data[:project][:title]
   json.notationStyle @data[:project][:notationStyle]
@@ -7,11 +9,11 @@ json.set! "active" do
   json.preferences @data[:project][:preferences]
   json.Taxonomies @data[:project][:taxonomies]
 
-  json.set! "manifests" do
-    json.set! "DIYImages" do
-      json.id "DIYImages"
+  json.set! 'manifests' do
+    json.set! 'DIYImages' do
+      json.id 'DIYImages'
       json.images @diyImages
-      json.name "Uploaded Images"
+      json.name 'Uploaded Images'
     end
     json.merge! @data[:project][:manifests]
   end
@@ -28,17 +30,17 @@ json.set! "active" do
   json.Terms @data[:terms]
 end
 
-json.set! "dashboard" do
-  json.set! "projects" do
-    json.array!(@projects.desc(:updated_at)) do | project |
+json.set! 'dashboard' do
+  json.set! 'projects' do
+    json.array!(@projects.desc(:updated_at)) do |project|
       json.extract! project, :id, :title, :shelfmark, :metadata, :created_at, :updated_at
     end
   end
 
-  json.set! "images" do
-    json.array!(@images) do | image |
+  json.set! 'images' do
+    json.array!(@images) do |image|
       json.extract! image, :id, :projectIDs, :sideIDs
-      json.url @base_api_url+"/images/"+image.id.to_s+"_"+image.filename
+      json.url "#{@base_api_url}/images/#{image.id}_#{image.filename}"
       json.label image.filename
     end
   end

@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require_relative 'boot'
 require_relative 'shrine'
 
-require "rails"
+require 'rails'
 # Pick the frameworks you want:
-require "active_model/railtie"
-require "active_job/railtie"
+require 'active_model/railtie'
+require 'active_job/railtie'
 # require "active_record/railtie"
-require "action_controller/railtie"
-require "action_mailer/railtie"
-require "action_view/railtie"
-require "action_cable/engine"
+require 'action_controller/railtie'
+require 'action_mailer/railtie'
+require 'action_view/railtie'
+require 'action_cable/engine'
 # require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
@@ -36,23 +38,23 @@ module ViscollApi
       allow do
         origins '*'
         resource '*',
-          :headers => :any,
-          :expose  => ['access-token', 'expiry', 'token-type', 'uid', 'client'],
-          :methods => [:get, :patch, :put, :delete, :post, :options]
+                 headers: :any,
+                 expose: %w[access-token expiry token-type uid client],
+                 methods: %i[get patch put delete post options]
       end
     end
 
     config.action_mailer.smtp_settings = {
-      :user_name            => ENV['MAILER_USR'],
-      :password             => ENV['MAILER_PWD'],
-      :from                 => ENV['MAILER_DEFAULT_FROM'],
-      :domain               => ENV['MAILER_DOMAIN'],
-      :address              => ENV['MAILER_HOST'],
-      :port                 => ENV['MAILER_PORT'] || 587,
-      :authentication       => :plain,
-      :enable_starttls_auto => true
+      user_name: ENV['MAILER_USR'],
+      password: ENV['MAILER_PWD'],
+      from: ENV['MAILER_DEFAULT_FROM'],
+      domain: ENV['MAILER_DOMAIN'],
+      address: ENV['MAILER_HOST'],
+      port: ENV['MAILER_PORT'] || 587,
+      authentication: :plain,
+      enable_starttls_auto: true
     }
-    config.action_mailer.default_url_options = { :host => ENV['APPLICATION_HOST'] }
+    config.action_mailer.default_url_options = { host: ENV['APPLICATION_HOST'] }
 
     # load configuration information for xproc service
     config.xproc = config_for :xproc

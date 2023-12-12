@@ -1,19 +1,18 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "POST /terms/taxonomy", :type => :request do
+describe 'POST /terms/taxonomy', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
-    @project = FactoryGirl.create(:project, {user: @user, taxonomies: ["Ink"]})
+    @project = FactoryGirl.create(:project, { user: @user, taxonomies: ['Ink'] })
     @parameters = {
       "taxonomy": {
         "project_id": @project.id.to_str,
-        "taxonomy": "Paper"
+        "taxonomy": 'Paper'
       }
     }
   end
@@ -21,80 +20,85 @@ describe "POST /terms/taxonomy", :type => :request do
   context 'with valid authorization' do
     context 'with valid parameters' do
       before do
-        post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/terms/taxonomy', params: @parameters.to_json,
+                                headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
       end
 
-      it 'should return 200' do
+      it 'returns 200' do
         expect(response).to have_http_status(:no_content)
       end
 
-      it 'should add the taxonomy to the project' do
-        expect(@project.taxonomies).to include "Ink"
-        expect(@project.taxonomies).to include "Paper"
+      it 'adds the taxonomy to the project' do
+        expect(@project.taxonomies).to include 'Ink'
+        expect(@project.taxonomies).to include 'Paper'
       end
     end
 
     context 'with missing project' do
       before do
         @parameters[:taxonomy][:project_id] += 'missing'
-        post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/terms/taxonomy', params: @parameters.to_json,
+                                headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
+      it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it 'should return the right error message' do
+      it 'returns the right error message' do
         expect(@body['project_id']).to eq "project not found with id #{@project.id}missing"
       end
     end
 
     context 'with duplicated taxonomy' do
       before do
-        @parameters[:taxonomy][:taxonomy] = "Ink"
-        post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        @parameters[:taxonomy][:taxonomy] = 'Ink'
+        post '/terms/taxonomy', params: @parameters.to_json,
+                                headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
+      it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it 'should return the right error message' do
-        expect(@body['taxonomy']).to eq "Ink taxonomy already exists in the project"
+      it 'returns the right error message' do
+        expect(@body['taxonomy']).to eq 'Ink taxonomy already exists in the project'
       end
 
-      it 'should leave the project alone' do
-        expect(@project.taxonomies).to eq ["Ink"]
+      it 'leaves the project alone' do
+        expect(@project.taxonomies).to eq ['Ink']
       end
     end
-    
+
     context 'with unauthorized project' do
       before do
         @user2 = FactoryGirl.create(:user)
-        @project2 = FactoryGirl.create(:project, {user: @user2, taxonomies: ["Ink"]})
+        @project2 = FactoryGirl.create(:project, { user: @user2, taxonomies: ['Ink'] })
         @parameters[:taxonomy][:project_id] = @project2.id.to_str
-        post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/terms/taxonomy', params: @parameters.to_json,
+                                headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project2.reload
       end
-      
-      it 'should return 403' do
+
+      it 'returns 403' do
         expect(response).to have_http_status(:unauthorized)
       end
-      
-      it 'should leave the taxonomies alone' do
-        expect(@project2.taxonomies).not_to include("Paper")
+
+      it 'leaves the taxonomies alone' do
+        expect(@project2.taxonomies).not_to include('Paper')
       end
     end
   end
 
   context 'with corrupted authorization' do
     before do
-      post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      post '/terms/taxonomy', params: @parameters.to_json,
+                              headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -109,7 +113,7 @@ describe "POST /terms/taxonomy", :type => :request do
 
   context 'with empty authorization' do
     before do
-      post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => ""}
+      post '/terms/taxonomy', params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -123,7 +127,7 @@ describe "POST /terms/taxonomy", :type => :request do
 
   context 'invalid authorization' do
     before do
-      post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      post '/terms/taxonomy', params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do

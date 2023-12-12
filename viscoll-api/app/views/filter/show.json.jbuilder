@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 json.Groups @groups
 json.Leafs @leafs
 json.Sides @sides

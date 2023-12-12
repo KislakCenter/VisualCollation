@@ -1,14 +1,13 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "DELETE /images", :type => :request do
+describe 'DELETE /images', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
     @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
     @image1 = FactoryGirl.create(:image, user: @user)
     @image2 = FactoryGirl.create(:image, user: @user)
@@ -20,7 +19,8 @@ describe "DELETE /images", :type => :request do
   context 'and valid authorization' do
     context 'and valid image' do
       before do
-        delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/images', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
@@ -33,29 +33,31 @@ describe "DELETE /images", :type => :request do
         expect(Image.where(id: @image2.id)).to exist
       end
     end
-    
+
     context 'and missing image' do
       before do
         @parameters[:imageIDs][0] += 'missing'
-        delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/images', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'returns the error message' do
         expect(@body['error']).to eq("image not found with id #{@image1.id.to_str}missing")
       end
     end
-    
+
     context 'and unauthorized image' do
       before do
         @image1.update(user: FactoryGirl.create(:user))
-        delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/images', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       end
-      
+
       it 'returns 401' do
         expect(response).to have_http_status(:unauthorized)
       end
@@ -63,8 +65,9 @@ describe "DELETE /images", :type => :request do
 
     context 'and uncaught exception' do
       before do
-        allow(Image).to receive(:find).and_raise("Exception")
-        delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        allow(Image).to receive(:find).and_raise('Exception')
+        delete '/images', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
@@ -72,16 +75,17 @@ describe "DELETE /images", :type => :request do
         expect(response).to have_http_status(:unprocessable_entity)
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns the error message' do
-        expect(@body['error']).to eq "Exception"
+        expect(@body['error']).to eq 'Exception'
       end
     end
   end
 
   context 'with corrupted authorization' do
     before do
-      delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      delete '/images', params: @parameters.to_json,
+                        headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -96,7 +100,7 @@ describe "DELETE /images", :type => :request do
 
   context 'with empty authorization' do
     before do
-      delete '/images', params: @parameters.to_json, headers: {'Authorization' => ""}
+      delete '/images', params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -110,7 +114,7 @@ describe "DELETE /images", :type => :request do
 
   context 'invalid authorization' do
     before do
-      delete '/images', params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      delete '/images', params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do

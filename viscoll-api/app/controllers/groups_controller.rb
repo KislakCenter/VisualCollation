@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class GroupsController < ApplicationController
   before_action :authenticate!
-  before_action :set_group, only: [:update, :destroy]
+  before_action :set_group, only: %i[update destroy]
 
   # POST /groups
   def create
@@ -16,20 +18,16 @@ class GroupsController < ApplicationController
     project_id       = group_params.to_h[:project_id]
     order            = additional_params.to_h[:order]
     # Validate group parameters
-    @additionalErrors   = validateAdditionalGroupParams(noOfGroups, parentGroupID, memberOrder, noOfLeafs, conjoin, oddMemberLeftOut)
+    @additionalErrors   = validateAdditionalGroupParams(noOfGroups, parentGroupID, memberOrder, noOfLeafs, conjoin,
+                                                        oddMemberLeftOut)
     hasAdditionalErrors = false
     @additionalErrors.each_value do |value|
-      if value.length > 0
-        hasAdditionalErrors = true
-      end
+      hasAdditionalErrors = true if value.length.positive?
     end
-    if (hasAdditionalErrors)
-      raise VCError, "Additional group errors: #{@additionalErrors}"
-    end
+    raise VCError, "Additional group errors: #{@additionalErrors}" if hasAdditionalErrors
+
     @groupErrors = { project_id: [] }
-    if (project_id == nil)
-      raise VCError, "Project ID is nil. Group has following errors: #{@groupErrors}"
-    end
+    raise VCError, "Project ID is nil. Group has following errors: #{@groupErrors}" if project_id.nil?
 
     @project = Project.find(project_id)
 
@@ -37,37 +35,32 @@ class GroupsController < ApplicationController
     new_group_ids = []
     groupIDIndex  = 0
     parent_group  = nil
-    if parentGroupID != nil
-      parent_group = @project.groups.find(parentGroupID)
-    end
+    parent_group = @project.groups.find(parentGroupID) unless parentGroupID.nil?
     # Create groups
     noOfGroups.times do |i|
       group = Group.new(group_params)
-      if groupIDs
-        group.id = groupIDs[i]
-      end
-      if parentGroupID != nil
+      group.id = groupIDs[i] if groupIDs
+      unless parentGroupID.nil?
         group.parentID  = parentGroupID
         group.nestLevel = parent_group.nestLevel + 1
       end
-      if group.save
-        new_groups.push(group)
-        new_group_ids.push(group.id.to_s)
-      else
+      unless group.save
         raise VCError, "Group (#{group.id}) was unable to save: #{group.errors.full_messages.join('\n')}"
       end
+
+      new_groups.push(group)
+      new_group_ids.push(group.id.to_s)
     end
     # Add new group(s) to parent
-    if parentGroupID != nil
-      parent_group.add_members(new_group_ids, memberOrder)
-    end
+    parent_group.add_members(new_group_ids, memberOrder) unless parentGroupID.nil?
     # Add group(s) to global list
     @project.add_groupIDs(new_group_ids, order.to_i - 1)
     # Add leaves inside each new group
     new_groups.each_with_index do |group, index|
       if noOfLeafs
-        if (leafIDs and sideIDs)
-          addLeavesInside(project_id, group, noOfLeafs, conjoin, oddMemberLeftOut, leafIDs[index * noOfLeafs..index * noOfLeafs + noOfLeafs - 1], sideIDs[index * 2 * noOfLeafs..index * 2 * noOfLeafs + noOfLeafs * 2 - 1])
+        if leafIDs && sideIDs
+          addLeavesInside(project_id, group, noOfLeafs, conjoin, oddMemberLeftOut,
+                          leafIDs[index * noOfLeafs..index * noOfLeafs + noOfLeafs - 1], sideIDs[index * 2 * noOfLeafs..index * 2 * noOfLeafs + noOfLeafs * 2 - 1])
         else
           addLeavesInside(project_id, group, noOfLeafs, conjoin, oddMemberLeftOut)
         end
@@ -77,9 +70,9 @@ class GroupsController < ApplicationController
 
   # PATCH/PUT /groups/1
   def update
-    unless @group.update(group_params)
-      raise VCError, "Some failed to update Group #{@group.id}"
-    end
+    return if @group.update(group_params)
+
+    raise VCError, "Some failed to update Group #{@group.id}"
   end
 
   # PATCH/PUT /groups
@@ -87,14 +80,13 @@ class GroupsController < ApplicationController
     allGroups = group_params_batch_update.to_h[:groups]
     # Run validations
     errors = validateGroupBatchUpdate(allGroups)
-    if not errors.empty?
-      raise VCError, "Batch update error: #{errors}"
-    end
+    raise VCError, "Batch update error: #{errors}" unless errors.empty?
+
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
       @project = Project.find(@group.project_id)
       authorize_project! @project
-      if !@group.update(group_params[:attributes])
+      unless @group.update(group_params[:attributes])
         raise VCError, "Group: #{@group} could not be updated. Errors: #{errors}"
       end
     end
@@ -129,19 +121,19 @@ class GroupsController < ApplicationController
   end
 
   def group_params
-    params.require(:group).permit(:project_id, :type, :title, :tacketed=>[], :sewing=>[])
+    params.require(:group).permit(:project_id, :type, :title, tacketed: [], sewing: [])
   end
 
   def additional_params
-    params.require(:additional).permit(:order, :noOfGroups, :memberOrder, :parentGroupID, :noOfLeafs, :conjoin, :oddMemberLeftOut, :groupIDs=>[], :leafIDs=>[], :sideIDs=>[])
+    params.require(:additional).permit(:order, :noOfGroups, :memberOrder, :parentGroupID, :noOfLeafs, :conjoin,
+                                       :oddMemberLeftOut, groupIDs: [], leafIDs: [], sideIDs: [])
   end
 
   def group_params_batch_update
-    params.permit(:groups => [:id, :attributes=>[:type, :title, :tacketed=>[], :sewing=>[]]])
+    params.permit(groups: [:id, { attributes: [:type, :title, { tacketed: [], sewing: [] }] }])
   end
 
   def group_params_batch_delete
-    params.permit(:projectID, :groups => [])
+    params.permit(:projectID, groups: [])
   end
-
 end

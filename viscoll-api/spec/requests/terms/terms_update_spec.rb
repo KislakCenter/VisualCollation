@@ -1,29 +1,28 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "PUT /terms/id", :type => :request do
+describe 'PUT /terms/id', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
     @project = FactoryGirl.create(:project, {
-        user: @user,
-        taxonomies: ["Ink"]
-    })
+                                    user: @user,
+                                    taxonomies: ['Ink']
+                                  })
     @term = FactoryGirl.create(:term, {
-        taxonomy: "Ink",
-      project: @project,
-      description: "vermilion"
-    })
+                                 taxonomy: 'Ink',
+                                 project: @project,
+                                 description: 'vermilion'
+                               })
     @parameters = {
-        term: {
+      term: {
         "project_id": @project.id.to_str,
-        "title": "some title for term",
-        "taxonomy": "Ink",
-        "description": "sepia"
+        "title": 'some title for term',
+        "taxonomy": 'Ink',
+        "description": 'sepia'
       }
     }
   end
@@ -31,7 +30,8 @@ describe "PUT /terms/id", :type => :request do
   context 'with valid authorization' do
     context 'and valid term ID' do
       before do
-        put '/terms/'+@term.id, params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}", params: @parameters.to_json,
+                                  headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @term.reload
       end
 
@@ -40,13 +40,14 @@ describe "PUT /terms/id", :type => :request do
       end
 
       it 'Updates the term' do
-        expect(@term.description).to eq "sepia"
+        expect(@term.description).to eq 'sepia'
       end
     end
 
     context 'and invalid term ID' do
       before do
-        put '/terms/'+@term.id+'invalid', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}invalid", params: @parameters.to_json,
+                                         headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       end
 
       it 'returns 404' do
@@ -57,7 +58,8 @@ describe "PUT /terms/id", :type => :request do
     context 'and failed update' do
       before do
         allow_any_instance_of(Term).to receive(:update).and_return(false)
-        put '/terms/'+@term.id, params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}", params: @parameters.to_json,
+                                  headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       end
 
       it 'returns 422' do
@@ -67,8 +69,9 @@ describe "PUT /terms/id", :type => :request do
 
     context 'and out-of-context term taxonomy' do
       before do
-        @parameters[:term][:taxonomy] = "waahoo"
-        put '/terms/'+@term.id, params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        @parameters[:term][:taxonomy] = 'waahoo'
+        put "/terms/#{@term.id}", params: @parameters.to_json,
+                                  headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @term.reload
         @body = JSON.parse(response.body)
       end
@@ -82,8 +85,8 @@ describe "PUT /terms/id", :type => :request do
       end
 
       it 'leaves the term alone' do
-        expect(@term.description).to eq "vermilion"
-        expect(@term.taxonomy).to eq "Ink"
+        expect(@term.description).to eq 'vermilion'
+        expect(@term.taxonomy).to eq 'Ink'
       end
     end
 
@@ -91,15 +94,16 @@ describe "PUT /terms/id", :type => :request do
       before do
         @user2 = FactoryGirl.create(:user)
         @project2 = FactoryGirl.create(:project, {
-            user: @user2,
-            taxonomies: ["Ink"]
-        })
+                                         user: @user2,
+                                         taxonomies: ['Ink']
+                                       })
         @term2 = FactoryGirl.create(:term, {
-          taxonomy: "Ink",
-          project: @project2,
-          description: "Prussian blue"
-        })
-        put '/terms/'+@term2.id, params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+                                      taxonomy: 'Ink',
+                                      project: @project2,
+                                      description: 'Prussian blue'
+                                    })
+        put "/terms/#{@term2.id}", params: @parameters.to_json,
+                                   headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @term2.reload
       end
 
@@ -108,14 +112,15 @@ describe "PUT /terms/id", :type => :request do
       end
 
       it 'leaves the term alone' do
-        expect(@term2.description).to eq "Prussian blue"
+        expect(@term2.description).to eq 'Prussian blue'
       end
     end
   end
 
   context 'with corrupted authorization' do
     before do
-      put '/terms/'+@term.id, params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      put "/terms/#{@term.id}", params: @parameters.to_json,
+                                headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -130,7 +135,7 @@ describe "PUT /terms/id", :type => :request do
 
   context 'with empty authorization' do
     before do
-      put '/terms/'+@term.id, params: @parameters.to_json, headers: {'Authorization' => ""}
+      put "/terms/#{@term.id}", params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -144,7 +149,7 @@ describe "PUT /terms/id", :type => :request do
 
   context 'invalid authorization' do
     before do
-      put '/terms/'+@term.id, params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      put "/terms/#{@term.id}", params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do
@@ -158,7 +163,7 @@ describe "PUT /terms/id", :type => :request do
 
   context 'without authorization' do
     before do
-      put '/terms/'+@term.id
+      put "/terms/#{@term.id}"
     end
 
     it 'returns an unauthorized action error' do

@@ -1,35 +1,32 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "DELETE /leafs/:id", :type => :request do
+describe 'DELETE /leafs/:id', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
     leaf_count = 4
     @project = FactoryGirl.create(:project, user: @user)
     @group = FactoryGirl.create(:group, project: @project)
     @project.add_groupIDs([@group.id.to_s], 0)
-    @leafs = leaf_count.times.collect { FactoryGirl.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s) }
+    @leafs = Array.new(leaf_count) do
+      FactoryGirl.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s)
+    end
     leaf_count.times.each do |i|
       params = {
-        conjoined_to: @leafs[-i-1].id.to_s
+        conjoined_to: @leafs[-i - 1].id.to_s
       }
-      unless i == 0
-        params[:attached_above] = @leafs[i-1].id.to_s
-      end
-      unless i == leaf_count-1
-        params[:attached_below] = @leafs[i+1].id.to_s
-      end
+      params[:attached_above] = @leafs[i - 1].id.to_s unless i == 0
+      params[:attached_below] = @leafs[i + 1].id.to_s unless i == leaf_count - 1
       @leafs[i].update(params)
     end
     @group.add_members(@leafs.collect { |leaf| leaf.id.to_s }, 0)
   end
-  
-  it 'should set up properly' do
+
+  it 'sets up properly' do
     expect(true).to be true
     expect(@leafs[0].conjoined_to).to eq @leafs[3].id.to_s
     expect(@leafs[1].conjoined_to).to eq @leafs[2].id.to_s
@@ -46,7 +43,9 @@ describe "DELETE /leafs/:id", :type => :request do
   context 'and valid authorization' do
     context 'and standard leaf' do
       before do
-        delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/leafs/#{@leafs[1].id}",
+               headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json',
+                          'ACCEPT' => 'application/json' }
         @project.reload
         @group.reload
         @leafs.each { |leaf| leaf.reload unless leaf.id == @leafs[1].id }
@@ -59,20 +58,22 @@ describe "DELETE /leafs/:id", :type => :request do
       it 'remove the leaf' do
         expect(Leaf.where(id: @leafs[1].id).exists?).to be false
       end
-      
+
       it 'frees the conjoined leaf' do
         expect(@leafs[2].conjoined_to).to be_blank
       end
-      
+
       it 'frees attached leafs' do
         expect(@leafs[0].attached_below).to eq 'None'
         expect(@leafs[2].attached_above).to eq 'None'
       end
     end
-    
+
     context 'and missing page' do
       before do
-        delete "/leafs/#{@leafs[1].id.to_s}waahoo", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/leafs/#{@leafs[1].id}waahoo",
+               headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json',
+                          'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
@@ -84,28 +85,32 @@ describe "DELETE /leafs/:id", :type => :request do
     context 'and raised exception' do
       before do
         allow_any_instance_of(Leaf).to receive(:destroy).and_raise('MyException')
-        delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/leafs/#{@leafs[1].id}",
+               headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json',
+                          'ACCEPT' => 'application/json' }
       end
 
       it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
-    
+
     context 'and an unauthorized page' do
       before do
         @user2 = FactoryGirl.create(:user)
         @project.update(user: @user2)
-        delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete "/leafs/#{@leafs[1].id}",
+               headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json',
+                          'ACCEPT' => 'application/json' }
         @project.reload
         @group.reload
       end
-      
+
       it 'returns 401' do
         expect(response).to have_http_status(:unauthorized)
       end
-      
-      it 'should not remove any' do
+
+      it 'does not remove any' do
         expect(@project.leafs.count).to eq 4
       end
     end
@@ -113,7 +118,9 @@ describe "DELETE /leafs/:id", :type => :request do
 
   context 'with corrupted authorization' do
     before do
-      delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      delete "/leafs/#{@leafs[1].id}",
+             headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json',
+                        'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -128,7 +135,7 @@ describe "DELETE /leafs/:id", :type => :request do
 
   context 'with empty authorization' do
     before do
-      delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => ""}
+      delete "/leafs/#{@leafs[1].id}", headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -142,7 +149,7 @@ describe "DELETE /leafs/:id", :type => :request do
 
   context 'invalid authorization' do
     before do
-      delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => "123456789"}
+      delete "/leafs/#{@leafs[1].id}", headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do
@@ -156,7 +163,7 @@ describe "DELETE /leafs/:id", :type => :request do
 
   context 'without authorization' do
     before do
-      delete "/leafs/#{@leafs[1].id.to_s}"
+      delete "/leafs/#{@leafs[1].id}"
     end
 
     it 'returns an unauthorized action error' do

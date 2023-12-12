@@ -1,33 +1,35 @@
+# frozen_string_literal: true
+
 require 'net/http'
 module ControllerHelper
   module ProjectsHelper
     include ControllerHelper::LeafsHelper
 
-    def authorize_project! project
+    def authorize_project!(project)
       return if current_user.id == project.user_id
-      raise ApplicationController::VCError, "Project (#{project.id}) is not authorized for current user (#{current_user.id}); expected: '#{project.user_id}'."
+
+      raise ApplicationController::VCError,
+            "Project (#{project.id}) is not authorized for current user (#{current_user.id}); expected: '#{project.user_id}'."
     end
 
     def addGroupsLeafsConjoin(project, allGroups, folioNumber, pageNumber, startingTexture)
       groupIDs = []
       allGroups.each do |groupInfo|
-        group = Group.new({ project_id: project, title: "Default", type: "Quire" })
+        group = Group.new({ project_id: project, title: 'Default', type: 'Quire' })
 
         # Create leaves
         newlyAddedLeafs   = []
         newlyAddedLeafIDs = []
-        groupInfo["leaves"].times do |i|
-          leaf = Leaf.new({ project_id: project, parentID: "Group_" + group.id.to_s })
-          leaf.save()
+        groupInfo['leaves'].times do |_i|
+          leaf = Leaf.new({ project_id: project, parentID: "Group_#{group.id}" })
+          leaf.save
           newlyAddedLeafs.push(leaf)
           newlyAddedLeafIDs.push(leaf.id.to_s)
         end
         # Add newly created leaves to this group
         group = group.add_members(newlyAddedLeafIDs, 1, false)
         # Auto-Conjoin newly added leaves in this group
-        if groupInfo["conjoin"]
-          autoConjoinLeaves(newlyAddedLeafs, groupInfo["oddLeaf"])
-        end
+        autoConjoinLeaves(newlyAddedLeafs, groupInfo['oddLeaf']) if groupInfo['conjoin']
         group.save
         groupIDs.push(group.id.to_s)
         # Add folio numbers
@@ -54,45 +56,46 @@ module ControllerHelper
     end
 
     def getManifestInformation(url)
-      begin
-        images       = []
-        response     = JSON.parse(Net::HTTP.get(URI(url)))
-        iiif_version = response["@context"]
-        if iiif_version.include? "2"
-          response["sequences"][0]["canvases"].each do |canvas|
-            images.push({ label: canvas["label"],
-                          url:   canvas["images"][0]["resource"]["service"]["@id"] })
-          end
-          return { name:   response["label"][0..150],
-                   images: images } unless response["label"].empty?
-          return { name: "Unnamed manifest", images: images }
-        elsif iiif_version.include? "3"
-          response["items"].each do |item|
-            images.push({ label: item["label"].values.first[0],
-                          url:   item["items"][0]["items"][0]["body"]["id"] })
-          end
-          unless response["label"].values.first[0].empty?
-            return { name: response["label"].values.first[0][0..150], images: images }
-          end
-          return { name: "Unnamed manifest", images: images }
-        else
-          raise "IIIF Version: #{iiif_version}"
+      images       = []
+      response     = JSON.parse(Net::HTTP.get(URI(url)))
+      iiif_version = response['@context']
+      if iiif_version.include? '2'
+        response['sequences'][0]['canvases'].each do |canvas|
+          images.push({ label: canvas['label'],
+                        url: canvas['images'][0]['resource']['service']['@id'] })
         end
-      rescue Exception => e
-        Honeybadger.notify e
-        return { name: "Unparseable manifest URL", images: images }
+        unless response['label'].empty?
+          return { name: response['label'][0..150],
+                   images: images }
+        end
+        { name: 'Unnamed manifest', images: images }
+      elsif iiif_version.include? '3'
+        response['items'].each do |item|
+          images.push({ label: item['label'].values.first[0],
+                        url: item['items'][0]['items'][0]['body']['id'] })
+        end
+        unless response['label'].values.first[0].empty?
+          return { name: response['label'].values.first[0][0..150], images: images }
+        end
+
+        { name: 'Unnamed manifest', images: images }
+      else
+        raise "IIIF Version: #{iiif_version}"
       end
+    rescue Exception => e
+      Honeybadger.notify e
+      { name: 'Unparseable manifest URL', images: images }
     end
 
     def assignTexture(leaves, startingTexture)
       # Create pattern of hair and flesh depending on starting texture value
       textures       = [startingTexture]
       textureOptions = []
-      if startingTexture == "Hair"
-        textureOptions += ["Flesh", "Hair"]
-      else
-        textureOptions += ["Hair", "Flesh"]
-      end
+      textureOptions += if startingTexture == 'Hair'
+                          %w[Flesh Hair]
+                        else
+                          %w[Hair Flesh]
+                        end
       leaves.count.times do |i|
         textures += [textureOptions[i % 2], textureOptions[i % 2]]
       end
@@ -101,19 +104,19 @@ module ControllerHelper
       leaves.each do |leaf|
         recto = Side.find(leaf.rectoID)
         verso = Side.find(leaf.versoID)
-        if leaf.conjoined_to != nil
+        if !leaf.conjoined_to.nil?
           recto.update_attribute(:texture, textures[i])
           i += 1
           verso.update_attribute(:texture, textures[i])
           i += 1
         else
-          recto.update_attribute(:texture, "Hair")
-          verso.update_attribute(:texture, "Flesh")
+          recto.update_attribute(:texture, 'Hair')
+          verso.update_attribute(:texture, 'Flesh')
         end
       end
     end
 
-    def generateResponse()
+    def generateResponse
       @project.reload
       @projectInformation = {}
       @groupIDs           = @project.groupIDs
@@ -127,34 +130,34 @@ module ControllerHelper
       @terms              = {}
 
       @projectInformation = {
-          "id":            @project.id.to_s,
-          "title":         @project.title,
-          "shelfmark":     @project.shelfmark,
-          "notationStyle": @project.notationStyle,
-          "metadata":      @project.metadata,
-          "preferences":   @project.preferences,
-          "manifests":     @project.manifests,
-          "taxonomies":    @project.taxonomies
+        "id": @project.id.to_s,
+        "title": @project.title,
+        "shelfmark": @project.shelfmark,
+        "notationStyle": @project.notationStyle,
+        "metadata": @project.metadata,
+        "preferences": @project.preferences,
+        "manifests": @project.manifests,
+        "taxonomies": @project.taxonomies
       }
       @project.manifests.each do |manifestID, manifest|
         manifestInformation = getManifestInformation(manifest[:url])
-        manifestName        = manifest[:name] ? manifest[:name] : manifestInformation[:name]
-        if manifestName.length > 50
-          manifestName = manifestName[0, 47] + "..."
+        manifestName        = manifest[:name] || manifestInformation[:name]
+        manifestName = "#{manifestName[0, 47]}..." if manifestName.length > 50
+        @projectInformation[:manifests][manifestID][:images] = manifestInformation[:images].map do |image|
+          image.merge({ manifestID: manifestID })
         end
-        @projectInformation[:manifests][manifestID][:images] = manifestInformation[:images].map { |image| image.merge({ manifestID: manifestID }) }
-        @projectInformation[:manifests][manifestID][:name]   = manifestName
+        @projectInformation[:manifests][manifestID][:name] = manifestName
       end
       # Generate all DIY images for this Project
       @diyImages = []
       User.find(@project.user_id).images.all.each do |image|
-        if image.projectIDs.include? @project.id.to_s
-          @diyImages.push({
-                              label:      image.filename,
-                              url:        @base_api_url + "/images/" + image.id.to_s + "_" + image.filename,
-                              manifestID: "DIYImages"
-                          })
-        end
+        next unless image.projectIDs.include? @project.id.to_s
+
+        @diyImages.push({
+                          label: image.filename,
+                          url: "#{@base_api_url}/images/#{image.id}_#{image.filename}",
+                          manifestID: 'DIYImages'
+                        })
       end
       # @projectInformation[:manifests][:DIYImages] = {
       #   id: "DIYImages",
@@ -162,62 +165,59 @@ module ControllerHelper
       #   name: "Uploaded Images"
       # }
 
-      @groupIDs.each_with_index do |groupID, index|
+      @groupIDs.each_with_index do |groupID, _index|
         group = @project.groups.find(groupID)
         # group = Group.find(groupID)
         @groups[group.id.to_s] = {
-            "id":         group.id.to_s,
-            "type":       group.type,
-            "title":      group.title,
-            "tacketed":   group.tacketed,
-            "sewing":     group.sewing,
-            "nestLevel":  group.nestLevel,
-            "parentID":   group.parentID,
-            "terms":      [],
-            "memberIDs":  group.memberIDs,
-            "memberType": "Group",
+          "id": group.id.to_s,
+          "type": group.type,
+          "title": group.title,
+          "tacketed": group.tacketed,
+          "sewing": group.sewing,
+          "nestLevel": group.nestLevel,
+          "parentID": group.parentID,
+          "terms": [],
+          "memberIDs": group.memberIDs,
+          "memberType": 'Group'
         }
       end
-      @groups.each do |groupID, group|
-        if group[:nestLevel] == 1
-          getLeafMembers(group[:memberIDs])
-        end
+      @groups.each do |_groupID, group|
+        getLeafMembers(group[:memberIDs]) if group[:nestLevel] == 1
       end
       @project.leafs.each do |leaf|
         @leafs[leaf.id.to_s] = {
-            "id":             leaf.id.to_s,
-            "folio_number":   leaf.folio_number,
-            "material":       leaf.material,
-            "type":           leaf.type,
-            "conjoined_to":   leaf.conjoined_to,
-            "attached_above": leaf.attached_above,
-            "attached_below": leaf.attached_below,
-            "stub":           leaf.stub,
-            "nestLevel":      leaf.nestLevel,
-            "parentID":       leaf.parentID,
-            "rectoID":        leaf.rectoID,
-            "versoID":        leaf.versoID,
-            "terms":          [],
-            "memberType":     "Leaf",
+          "id": leaf.id.to_s,
+          "folio_number": leaf.folio_number,
+          "material": leaf.material,
+          "type": leaf.type,
+          "conjoined_to": leaf.conjoined_to,
+          "attached_above": leaf.attached_above,
+          "attached_below": leaf.attached_below,
+          "stub": leaf.stub,
+          "nestLevel": leaf.nestLevel,
+          "parentID": leaf.parentID,
+          "rectoID": leaf.rectoID,
+          "versoID": leaf.versoID,
+          "terms": [],
+          "memberType": 'Leaf'
         }
       end
-
 
       @project.sides.each do |side|
         parentOrder = @leafIDs.index(side.parentID) + 1
         obj         = {
-            "id":               side.id.to_s,
-            "parentID":         side.parentID,
-            "page_number":      side.page_number,
-            "texture":          side.texture,
-            "image":            side.image,
-            "script_direction": side.script_direction,
-            "terms":            [],
-            "memberType":       side.id[0] == "R" ? "Recto" : "Verso"
+          "id": side.id.to_s,
+          "parentID": side.parentID,
+          "page_number": side.page_number,
+          "texture": side.texture,
+          "image": side.image,
+          "script_direction": side.script_direction,
+          "terms": [],
+          "memberType": side.id[0] == 'R' ? 'Recto' : 'Verso'
         }
-        if side.id[0] == "R"
+        if side.id[0] == 'R'
           @rectos[side.id.to_s] = obj
-        elsif side.id[0] == "V"
+        elsif side.id[0] == 'V'
           @versos[side.id.to_s] = obj
         end
       end
@@ -231,48 +231,48 @@ module ControllerHelper
 
       @project.terms.each do |term|
         @terms[term.id.to_s] = {
-            "id":          term.id.to_s,
-            "title":       term.title,
-            "taxonomy":    term.taxonomy,
-            "description": term.description,
-            "uri":         term.uri,
-            "show":        term.show,
-            "objects":     term.objects,
+          "id": term.id.to_s,
+          "title": term.title,
+          "taxonomy": term.taxonomy,
+          "description": term.description,
+          "uri": term.uri,
+          "show": term.show,
+          "objects": term.objects
         }
-        term.objects["Group"].each do |id|
+        term.objects['Group'].each do |id|
           @groups[id][:terms].append(term.id.to_s) unless @groups[id].nil?
         end
-        term.objects["Leaf"].each do |id|
+        term.objects['Leaf'].each do |id|
           @leafs[id][:terms].append(term.id.to_s) unless @leafs[id].nil?
         end
-        term.objects["Recto"].each do |id|
+        term.objects['Recto'].each do |id|
           @rectos[id][:terms].append(term.id.to_s) unless @rectos[id].nil?
         end
-        term.objects["Verso"].each do |id|
+        term.objects['Verso'].each do |id|
           @versos[id][:terms].append(term.id.to_s) unless @versos[id].nil?
         end
       end
 
-      return {
-          "project":  @projectInformation,
-          "groupIDs": @groupIDs,
-          "leafIDs":  @leafIDs,
-          "rectoIDs": @rectoIDs,
-          "versoIDs": @versoIDs,
-          "groups":   @groups,
-          "leafs":    @leafs,
-          "rectos":   @rectos,
-          "versos":   @versos,
-          "terms":    @terms,
+      {
+        "project": @projectInformation,
+        "groupIDs": @groupIDs,
+        "leafIDs": @leafIDs,
+        "rectoIDs": @rectoIDs,
+        "versoIDs": @versoIDs,
+        "groups": @groups,
+        "leafs": @leafs,
+        "rectos": @rectos,
+        "versos": @versos,
+        "terms": @terms
       }
     end
 
     # Populate @leafIDs recursively
     def getLeafMembers(memberIDs)
-      memberIDs.each_with_index do |memberID, index|
-        if memberID[0] == "G"
+      memberIDs.each_with_index do |memberID, _index|
+        if memberID[0] == 'G'
           getLeafMembers(@groups[memberID][:memberIDs])
-        elsif memberID[0] == "L"
+        elsif memberID[0] == 'L'
           @leafIDs.push(memberID)
         end
       end

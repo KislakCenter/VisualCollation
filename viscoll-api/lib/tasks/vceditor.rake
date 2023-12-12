@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 namespace :vce do
-  desc "Update Leaf#stubType to Yes|No values"
-  task :update_stubs => :environment do
+  desc 'Update Leaf#stubType to Yes|No values'
+  task update_stubs: :environment do
     Leaf.all.each do |leaf|
-      next if %w{No Yes}.include? leaf.stubType
+      next if %w[No Yes].include? leaf.stubType
+
       case leaf.stubType
       when 'None'
         leaf.stubType = 'No'

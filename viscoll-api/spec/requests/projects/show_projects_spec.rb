@@ -1,20 +1,22 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "GET /projects/id", :type => :request do
+describe 'GET /projects/id', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    @user2 = FactoryGirl.create(:user, {:password => "user2"})
-    @project1 = FactoryGirl.create(:project, {:user => @user})
-    @project2 = FactoryGirl.create(:project, {:user => @user2})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    @user2 = FactoryGirl.create(:user, { password: 'user2' })
+    @project1 = FactoryGirl.create(:project, { user: @user })
+    @project2 = FactoryGirl.create(:project, { user: @user2 })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   context 'with correct authorization' do
     context 'and standard params' do
       before do
-        get '/projects/'+@project1.id, params: '', headers: {'Authorization' => @authToken}
+        get "/projects/#{@project1.id}", params: '', headers: { 'Authorization' => @authToken }
         @body = JSON.parse(response.body)
       end
 
@@ -29,7 +31,7 @@ describe "GET /projects/id", :type => :request do
 
     context 'and inexistent params' do
       before do
-        get '/projects/ULTRAWAAHOO', params: '', headers: {'Authorization' => @authToken}
+        get '/projects/ULTRAWAAHOO', params: '', headers: { 'Authorization' => @authToken }
       end
 
       it 'returns 404' do
@@ -39,9 +41,9 @@ describe "GET /projects/id", :type => :request do
 
     context 'and unauthorized params' do
       before do
-        get '/projects/'+@project2._id, params: '', headers: {'Authorization' => @authToken}
+        get "/projects/#{@project2._id}", params: '', headers: { 'Authorization' => @authToken }
       end
-    
+
       it 'returns 401' do
         expect(response).to have_http_status(:unauthorized)
       end
@@ -50,7 +52,7 @@ describe "GET /projects/id", :type => :request do
 
   context 'with corrupted authorization' do
     before do
-      get '/projects/'+@project1.id, params: '', headers: {'Authorization' => @authToken+"invalid"}
+      get "/projects/#{@project1.id}", params: '', headers: { 'Authorization' => "#{@authToken}invalid" }
       @body = JSON.parse(response.body)
     end
 
@@ -65,7 +67,7 @@ describe "GET /projects/id", :type => :request do
 
   context 'with empty authorization' do
     before do
-      get '/projects/'+@project1.id, params: '', headers: {'Authorization' => ""}
+      get "/projects/#{@project1.id}", params: '', headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -79,7 +81,7 @@ describe "GET /projects/id", :type => :request do
 
   context 'invalid authorization' do
     before do
-      get '/projects/'+@project1.id, params: '', headers: {'Authorization' => "123456789"}
+      get "/projects/#{@project1.id}", params: '', headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do
@@ -93,7 +95,7 @@ describe "GET /projects/id", :type => :request do
 
   context 'without authorization' do
     before do
-      get '/projects/'+@project1.id
+      get "/projects/#{@project1.id}"
     end
 
     it 'returns an unauthorized action error' do

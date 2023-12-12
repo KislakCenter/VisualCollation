@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class AccountApprovalMailer < ApplicationMailer
   default from: RailsJwtAuth.mailer_sender
-  
+
   def sendApprovalStatus(user)
     @user = User.find(user)
     mail(
-      subject: "VCEditor Account Approval",
+      subject: 'VCEditor Account Approval',
       to: @user.email,
       template_name: 'sendApprovalStatus'
     )

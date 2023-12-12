@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 include ActionDispatch::TestProcess
 FactoryGirl.define do
   factory :leaf do
-    material "Paper"
-    type "Original"
-    
+    material { 'Paper' }
+    type { 'Original' }
+
     factory :parchment do
-      material "Parchment"
+      material { 'Parchment' }
     end
   end
 end

@@ -1,6 +1,14 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Group, type: :model do
+  before do
+    @project = FactoryGirl.create(:project)
+    @group = FactoryGirl.create(:group, project: @project)
+    @project.add_groupIDs([@group.id], 0)
+  end
+
   it { is_expected.to be_mongoid_document }
 
   it { is_expected.to have_field(:title).of_type(String) }
@@ -14,63 +22,58 @@ RSpec.describe Group, type: :model do
   it { is_expected.to belong_to(:project) }
   it { is_expected.to have_and_belong_to_many(:terms) }
 
-  before(:each) do
-    @project = FactoryGirl.create(:project)
-    @group = FactoryGirl.create(:group, project: @project)
-    @project.add_groupIDs([@group.id], 0)
-  end
-
-  describe "Initialization" do
-    it "should prefix its ID" do
-      expect(@group.id.to_s[0..5]).to eq "Group_"
+  describe 'Initialization' do
+    it 'prefixes its ID' do
+      expect(@group.id.to_s[0..5]).to eq 'Group_'
     end
   end
 
-  describe "Member handling" do
-    it "should add member IDs" do
-      @group.add_members(['abcd', 'efgh'], 0)
-      expect(@group.memberIDs).to eq ['abcd', 'efgh']
+  describe 'Member handling' do
+    it 'adds member IDs' do
+      @group.add_members(%w[abcd efgh], 0)
+      expect(@group.memberIDs).to eq %w[abcd efgh]
     end
 
-    it "should add additional member IDs" do
-      @group.add_members(['abcd', 'efgh', 'ijkl'], 0)
-      expect(@group.memberIDs).to eq ['abcd', 'efgh', 'ijkl']
-      @group.add_members(['1234', '5678'], 3)
-      expect(@group.memberIDs).to eq ['abcd', 'efgh', '1234', '5678', 'ijkl']
+    it 'adds additional member IDs' do
+      @group.add_members(%w[abcd efgh ijkl], 0)
+      expect(@group.memberIDs).to eq %w[abcd efgh ijkl]
+      @group.add_members(%w[1234 5678], 3)
+      expect(@group.memberIDs).to eq %w[abcd efgh 1234 5678 ijkl]
     end
 
-    it "should respect the save flag" do
-      @group.add_members(['abcd', 'efgh', 'ijkl'], 0)
-      expect(@group.memberIDs).to eq ['abcd', 'efgh', 'ijkl']
-      @group.add_members(['1234', '5678'], 3, false)
-      expect(@group.memberIDs).to eq ['abcd', 'efgh', '1234', '5678', 'ijkl']
+    it 'respects the save flag' do
+      @group.add_members(%w[abcd efgh ijkl], 0)
+      expect(@group.memberIDs).to eq %w[abcd efgh ijkl]
+      @group.add_members(%w[1234 5678], 3, false)
+      expect(@group.memberIDs).to eq %w[abcd efgh 1234 5678 ijkl]
       @group.reload
-      expect(@group.memberIDs).to eq ['abcd', 'efgh', 'ijkl']
+      expect(@group.memberIDs).to eq %w[abcd efgh ijkl]
     end
 
-    it "should remove member IDs" do
-      @group.add_members(['abcd', 'efgh', 'ijkl'], 0)
-      expect(@group.memberIDs).to eq ['abcd', 'efgh', 'ijkl']
-      @group.remove_members(['abcd', 'ijkl'])
+    it 'removes member IDs' do
+      @group.add_members(%w[abcd efgh ijkl], 0)
+      expect(@group.memberIDs).to eq %w[abcd efgh ijkl]
+      @group.remove_members(%w[abcd ijkl])
       expect(@group.memberIDs).to eq ['efgh']
     end
   end
 
-  describe "On-destroy hooks" do
-    it "should remove itself from an associated term" do
-      term = FactoryGirl.create(:term, project: @project, objects: {Group: [@group.id], Leaf: [], Recto: [], Verso: []})
+  describe 'On-destroy hooks' do
+    it 'removes itself from an associated term' do
+      term = FactoryGirl.create(:term, project: @project,
+                                       objects: { Group: [@group.id], Leaf: [], Recto: [], Verso: [] })
       @group.terms << term
       @group.save
       @group.destroy
       expect(term.objects[:Group]).to be_empty
     end
 
-    it "should remove itself from an associated project" do
+    it 'removes itself from an associated project' do
       @group.destroy
       expect(@project.groupIDs).to be_empty
     end
 
-    it "should remove itself from a parent group" do
+    it 'removes itself from a parent group' do
       parent_group = FactoryGirl.create(:group, project: @project)
       @project.add_groupIDs([parent_group.id.to_s], 0)
       @group.parentID = parent_group.id
@@ -82,7 +85,7 @@ RSpec.describe Group, type: :model do
       expect(parent_group.memberIDs).to be_empty
     end
 
-    it "should remove its members" do
+    it 'removes its members' do
       subgroup = FactoryGirl.create(:group, project: @project)
       subgroup_id = subgroup.id
       @project.add_groupIDs([subgroup.id.to_s], 0)
@@ -99,7 +102,7 @@ RSpec.describe Group, type: :model do
       expect(@group.memberIDs).to include(subleaf.id.to_s)
 
       @group.destroy
-      expect(Group.where(id: subgroup_id).exists?).to be false
+      expect(described_class.where(id: subgroup_id).exists?).to be false
       expect(Leaf.where(id: subleaf_id).exists?).to be false
     end
   end

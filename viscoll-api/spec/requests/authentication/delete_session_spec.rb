@@ -1,33 +1,35 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "DELETE /session", :type => :request do
+describe 'DELETE /session', type: :request do
   context 'without token in header' do
     before do
-      @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
+      @user = User.create(name: 'user', email: 'user@mail.com', password: 'user')
       @user.confirmation_token = nil
-      @user.confirmed_at = "2017-07-12T16:08:25.278Z"
+      @user.confirmed_at = '2017-07-12T16:08:25.278Z'
       @user.save
       delete '/session'
     end
-    
+
     it 'returns an unauthorized action error' do
       expect(response).to have_http_status(:unauthorized)
     end
   end
 
-  context 'with token in header' do 
+  context 'with token in header' do
     before do
-      @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
+      @user = User.create(name: 'user', email: 'user@mail.com', password: 'user')
       @user.confirmation_token = nil
-      @user.confirmed_at = "2017-07-12T16:08:25.278Z"
+      @user.confirmed_at = '2017-07-12T16:08:25.278Z'
       @user.save
     end
 
     context 'and token is invalid' do
       before do
-        post '/session', params: {:session => { :email=> "user@mail.com", :password => "user" }}
-        authToken = JSON.parse(response.body)['session']['jwt']+"someInvalidStuff"
-        delete '/session', params: '', headers: {'Authorization' => authToken}
+        post '/session', params: { session: { email: 'user@mail.com', password: 'user' } }
+        authToken = "#{JSON.parse(response.body)['session']['jwt']}someInvalidStuff"
+        delete '/session', params: '', headers: { 'Authorization' => authToken }
       end
 
       it 'returns an unprocessable_entity status' do
@@ -41,8 +43,8 @@ describe "DELETE /session", :type => :request do
 
     context 'and token format is wrong' do
       before do
-        post '/session', params: {:session => { :email=> "user@mail.com", :password => "user" }}
-        delete '/session', params: '', headers: {'Authorization' => "invalidTokenFormat"}
+        post '/session', params: { session: { email: 'user@mail.com', password: 'user' } }
+        delete '/session', params: '', headers: { 'Authorization' => 'invalidTokenFormat' }
       end
 
       it 'returns an unprocessable_entity status' do
@@ -56,9 +58,9 @@ describe "DELETE /session", :type => :request do
 
     context 'and token is valid' do
       before do
-        post '/session', params: {:session => { :email=> "user@mail.com", :password => "user" }}
+        post '/session', params: { session: { email: 'user@mail.com', password: 'user' } }
         authToken = JSON.parse(response.body)['session']['jwt']
-        delete '/session', params: '', headers: {'Authorization' => authToken}
+        delete '/session', params: '', headers: { 'Authorization' => authToken }
       end
 
       it 'returns 204 no content response' do

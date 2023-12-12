@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -31,7 +33,7 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.default_url_options = { :host => "localhost", :port => 3000 }
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
   # config.action_mailer.smtp_settings = {
   #   :address => 'smtp.ethereal.email',
   #   :port => 587,
@@ -39,14 +41,13 @@ Rails.application.configure do
   #   :password => '2DzDyRf6Q22n21FV2q'
   # }
   config.action_mailer.smtp_settings = {
-    :address => ENV['MAILER_HOST'],
-    :port => ENV['MAILER_PORT'],
-    :user_name => ENV['MAILER_USR'],
-    :password => ENV['MAILER_PWD']
+    address: ENV['MAILER_HOST'],
+    port: ENV['MAILER_PORT'],
+    user_name: ENV['MAILER_USR'],
+    password: ENV['MAILER_PWD']
   }
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
-
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
@@ -58,11 +59,11 @@ Rails.application.configure do
   config.middleware.insert_before 0, Rack::Cors do
     allow do
       origins '*'
-      resource '*', :headers => :any, :methods => [:get, :post, :put, :patch, :options, :delete]
+      resource '*', headers: :any, methods: %i[get post put patch options delete]
     end
   end
 
-  logger           = ActiveSupport::Logger.new(STDOUT)
+  logger           = ActiveSupport::Logger.new($stdout)
   logger.formatter = config.log_formatter
   config.logger = ActiveSupport::TaggedLogging.new(logger)
   config.log_level = :debug

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class LeafsController < ApplicationController
   before_action :authenticate!
-  before_action :set_leaf, only: [:update, :destroy]
+  before_action :set_leaf, only: %i[update destroy]
 
   # POST /leafs
   def create
@@ -15,21 +17,18 @@ class LeafsController < ApplicationController
 
     # Validation error for leaf_params
     @leafErrors = validateLeafParams(project_id, parentID)
-    if @leafErrors[:project_id].length > 0 || @leafErrors[:parentID].length > 0
+    if @leafErrors[:project_id].length.positive? || @leafErrors[:parentID].length.positive?
       raise VCError, "Leaf validation failed: #{@leafErrors.join "\n"}"
     end
 
     # Validation errors checking for additional parameters
-    @additionalErrors   = validateAdditionalLeafParams(project_id, parentID, memberOrder, noOfLeafs, conjoin, oddMemberLeftOut)
+    @additionalErrors   = validateAdditionalLeafParams(project_id, parentID, memberOrder, noOfLeafs, conjoin,
+                                                       oddMemberLeftOut)
     hasAdditionalErrors = false
     @additionalErrors.each_value do |value|
-      if value.length > 0
-        hasAdditionalErrors = true
-      end
+      hasAdditionalErrors = true if value.length.positive?
     end
-    if hasAdditionalErrors
-      raise VCError, "Validation failed: #{@additionalErrors}"
-    end
+    raise VCError, "Validation failed: #{@additionalErrors}" if hasAdditionalErrors
 
     # Attempt to validate ownership
     @project = Project.find(project_id)
@@ -37,43 +36,38 @@ class LeafsController < ApplicationController
 
     # Skip all callbacks for side creation if leafIDs and SideIDs were give in the request
     begin
-      if (leafIDs and sideIDs)
-        Leaf.skip_callback(:create, :before, :create_sides)
-      end
+      Leaf.skip_callback(:create, :before, :create_sides) if leafIDs && sideIDs
       newlyAddedLeafIDs = []
       newlyAddedLeafs   = []
       sideIDIndex       = 0
       noOfLeafs.times do |leafIDIndex|
         @leaf = Leaf.new(leaf_params)
-        if leafIDs
-          @leaf.id = leafIDs[leafIDIndex]
-        end
+        @leaf.id = leafIDs[leafIDIndex] if leafIDs
         @leaf.nestLevel = @group.nestLevel
-        if @leaf.save
-          newlyAddedLeafs.push(@leaf)
-          newlyAddedLeafIDs.push(@leaf.id.to_s)
-          # Create new sides for this leaf with given SideIDs
-          if (leafIDs and sideIDs)
-            recto    = Side.new({ parentID: @leaf.id.to_s, project: @leaf.project, texture: "Hair", id: sideIDs[sideIDIndex] })
-            verso    = Side.new({ parentID: @leaf.id.to_s, project: @leaf.project, texture: "Flesh", id: sideIDs[sideIDIndex + 1] })
-            recto.id = "Recto_" + recto.id.to_s
-            verso.id = "Verso_" + verso.id.to_s
-            recto.save
-            verso.save
-            @leaf.rectoID = recto.id
-            @leaf.versoID = verso.id
-            @leaf.save
-          end
-        else
-          raise VCError, @leaf.errors.full_messages.join("\n")
+        raise VCError, @leaf.errors.full_messages.join("\n") unless @leaf.save
+
+        newlyAddedLeafs.push(@leaf)
+        newlyAddedLeafIDs.push(@leaf.id.to_s)
+        # Create new sides for this leaf with given SideIDs
+        if leafIDs && sideIDs
+          recto    = Side.new({ parentID: @leaf.id.to_s, project: @leaf.project, texture: 'Hair',
+                                id: sideIDs[sideIDIndex] })
+          verso    = Side.new({ parentID: @leaf.id.to_s, project: @leaf.project, texture: 'Flesh',
+                                id: sideIDs[sideIDIndex + 1] })
+          recto.id = "Recto_#{recto.id}"
+          verso.id = "Verso_#{verso.id}"
+          recto.save
+          verso.save
+          @leaf.rectoID = recto.id
+          @leaf.versoID = verso.id
+          @leaf.save
         end
+
         sideIDIndex += 2
       end
-    rescue
+    rescue StandardError
     ensure
-      if (leafIDs and sideIDs)
-        Leaf.set_callback(:create, :before, :create_sides)
-      end
+      Leaf.set_callback(:create, :before, :create_sides) if leafIDs && sideIDs
     end
 
     # Time to Auto-Conjoin
@@ -81,7 +75,6 @@ class LeafsController < ApplicationController
 
     # Add leaves to parent group
     @group.add_members(newlyAddedLeafIDs, memberOrder)
-
   end
 
   # PUT /leafs/generateFolio
@@ -92,26 +85,22 @@ class LeafsController < ApplicationController
       leaf = Leaf.find(leafID)
       leaf.update_attribute(:folio_number, folioNumberCount.to_s)
       folioNumberCount += 1
-      if index == 0
-        @project = Project.find(leaf.project_id)
-      end
+      @project = Project.find(leaf.project_id) if index.zero?
     end
   end
 
   # PATCH/PUT /leafs/1
   def update
-    if (leaf_params.to_h.key?(:conjoined_to))
+    if leaf_params.to_h.key?(:conjoined_to)
       # HANDLE SPECIAL CASE FOR conjoined_to
       update_conjoined_partner(leaf_params.to_h[:conjoined_to])
     end
-    if @leaf.update(leaf_params)
-      if (leaf_params.to_h.key?(:attached_below) || leaf_params.to_h.key?(:attached_above))
-        update_attached_to()
-      elsif leaf_params.to_h.key?(:material) and leaf_params.to_h[:material] == "Paper"
-        handle_paper_update(@leaf)
-      end
-    else
-      raise VCError, "Leaf failed to update: #{@leaf.errors.full_messages.join "\n"}"
+    raise VCError, "Leaf failed to update: #{@leaf.errors.full_messages.join "\n"}" unless @leaf.update(leaf_params)
+
+    if leaf_params.to_h.key?(:attached_below) || leaf_params.to_h.key?(:attached_above)
+      update_attached_to
+    elsif leaf_params.to_h.key?(:material) && (leaf_params.to_h[:material] == 'Paper')
+      handle_paper_update(@leaf)
     end
   end
 
@@ -119,15 +108,16 @@ class LeafsController < ApplicationController
   def updateMultiple
     allLeafs = leaf_params_batch_update.to_h[:leafs]
     @project = Project.find(leaf_params_batch_update.to_h[:project_id])
-    allLeafs.each do |leaf_params, index|
+    allLeafs.each do |leaf_params, _index|
       @leaf = Leaf.find(leaf_params[:id])
       authorize_project! @project
-      if !@leaf.update(leaf_params[:attributes])
+      unless @leaf.update(leaf_params[:attributes])
         raise VCError, "Leaf could not be updated: #{leaf.errors.full_messages.join "\n"}"
       end
-      if (leaf_params[:attributes].key?(:attached_below) || leaf_params[:attributes].key?(:attached_above))
-        update_attached_to()
-      elsif leaf_params[:attributes].key?(:material) and leaf_params[:attributes][:material] == "Paper"
+
+      if leaf_params[:attributes].key?(:attached_below) || leaf_params[:attributes].key?(:attached_above)
+        update_attached_to
+      elsif leaf_params[:attributes].key?(:material) && (leaf_params[:attributes][:material] == 'Paper')
         handle_paper_update(@leaf)
       end
     end
@@ -138,20 +128,18 @@ class LeafsController < ApplicationController
     parent      = @project.groups.find(@leaf.parentID)
     memberOrder = parent.memberIDs.index(@leaf.id.to_s)
     # Detach its conjoined leaf
-    if @leaf.conjoined_to
-      @project.leafs.find(@leaf.conjoined_to).update(conjoined_to: nil)
-    end
-    if @leaf.attached_above != "None"
+    @project.leafs.find(@leaf.conjoined_to).update(conjoined_to: nil) if @leaf.conjoined_to
+    if @leaf.attached_above != 'None'
       # Detach its above attached leaf
       aboveLeaf = @project.leafs.find(parent.memberIDs[memberOrder - 1])
-      aboveLeaf.update(attached_below: "None")
+      aboveLeaf.update(attached_below: 'None')
     end
-    if @leaf.attached_below != "None"
+    if @leaf.attached_below != 'None'
       # Detach its below attached leaf
       belowLeaf = @project.leafs.find(parent.memberIDs[memberOrder + 1])
-      belowLeaf.update(attached_above: "None")
+      belowLeaf.update(attached_above: 'None')
     end
-    @leaf.remove_from_group()
+    @leaf.remove_from_group
     @leaf.destroy
   end
 
@@ -163,33 +151,30 @@ class LeafsController < ApplicationController
 
     parentAndChildren = {}
 
-    allLeafs.each_with_index do |leafID|
+    allLeafs.each do |leafID|
       leaf = Leaf.find(leafID)
-      if !@parent || @parent.id.to_s != leaf.parentID
-        @parent = @project.groups.find(leaf.parentID)
-      end
+      @parent = @project.groups.find(leaf.parentID) if !@parent || @parent.id.to_s != leaf.parentID
       memberOrder = @parent.memberIDs.index(leaf.id.to_s)
       if leaf.project.user_id != current_user.id
-        raise VCError, "Leaf belongs to user (#{leaf.project.user_id}) which does not match the current user's ID (#{current_user.id})"
+        raise VCError,
+              "Leaf belongs to user (#{leaf.project.user_id}) which does not match the current user's ID (#{current_user.id})"
       end
 
       # Detach its conjoined leaf if any
-      if leaf.conjoined_to
-        @project.leafs.find(leaf.conjoined_to).update(conjoined_to: nil)
-      end
-      if leaf.attached_above != "None"
+      @project.leafs.find(leaf.conjoined_to).update(conjoined_to: nil) if leaf.conjoined_to
+      if leaf.attached_above != 'None'
         # Detach its above attached leaf
         aboveLeaf = @project.leafs.find(@parent.memberIDs[memberOrder - 1])
-        aboveLeaf.update(attached_below: "None")
+        aboveLeaf.update(attached_below: 'None')
       end
-      if leaf.attached_below != "None"
+      if leaf.attached_below != 'None'
         # Detach its below attached leaf
         belowLeaf = @project.leafs.find(@parent.memberIDs[memberOrder + 1])
-        belowLeaf.update(attached_above: "None")
+        belowLeaf.update(attached_above: 'None')
       end
       leaf.destroy
       # Add leaf to list of leaves to detach from parent
-      if parentAndChildren[leaf.parentID] == nil
+      if parentAndChildren[leaf.parentID].nil?
         parentAndChildren[leaf.parentID] = [leaf.id.to_s]
       else
         parentAndChildren[leaf.parentID].push(leaf.id.to_s)
@@ -209,26 +194,22 @@ class LeafsController < ApplicationController
     # VALIDATION ERRORS
     @errors             = []
     haveErrors          = false
-    allowed_project_ids = current_user.projects.pluck(:id).collect { |pid| pid.to_s }
+    allowed_project_ids = current_user.projects.pluck(:id).collect(&:to_s)
     leafIDs.each do |leafID|
-      begin
-        leaf = Leaf.find(leafID)
-        if not allowed_project_ids.include?(leaf.project_id.to_s)
-          raise VCError, "Conjoin not allowed."
-        end
-        leaves.push(leaf)
-      rescue Exception => e
-        @errors.push("leaf not found with id " + leafID)
-        haveErrors = true
-      end
-    end
-    if leafIDs.size < 2
-      @errors.push("Minimum of 2 leaves required to conjoin")
+      leaf = Leaf.find(leafID)
+      raise VCError, 'Conjoin not allowed.' unless allowed_project_ids.include?(leaf.project_id.to_s)
+
+      leaves.push(leaf)
+    rescue Exception => e
+      @errors.push("leaf not found with id #{leafID}")
       haveErrors = true
     end
-    if haveErrors
-      raise VCError, "Error with conjoin: #{@errors.join "\n"}"
+    if leafIDs.size < 2
+      @errors.push('Minimum of 2 leaves required to conjoin')
+      haveErrors = true
     end
+    raise VCError, "Error with conjoin: #{@errors.join "\n"}" if haveErrors
+
     @project = Project.find(leaves[0].project_id)
     autoConjoinLeaves(leaves, (leaves.length + 1) / 2)
   end
@@ -244,27 +225,31 @@ class LeafsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def leaf_params
-    params.require(:leaf).permit(:folio_number, :id, :project_id, :parentID, :material, :type, :conjoined_to, :stub, :attached_above, :attached_below)
+    params.require(:leaf).permit(:folio_number, :id, :project_id, :parentID, :material, :type, :conjoined_to, :stub,
+                                 :attached_above, :attached_below)
   end
 
   def additional_params
-    params.require(:additional).permit(:memberOrder, :noOfLeafs, :conjoin, :oddMemberLeftOut, :leafIDs => [], :sideIDs => [])
+    params.require(:additional).permit(:memberOrder, :noOfLeafs, :conjoin, :oddMemberLeftOut, leafIDs: [],
+                                                                                              sideIDs: [])
   end
 
   def leaf_params_batch_update
-    params.permit(:project_id, :leafs => [:id, :attributes => [:folio_number, :conjoined_to, :type, :material, :stub, :attached_above, :attached_below]])
+    params.permit(:project_id,
+                  leafs: [:id,
+                          { attributes: %i[folio_number conjoined_to type material stub attached_above
+                                           attached_below] }])
   end
 
   def leaf_params_batch_delete
-    params.permit(:leafs => [])
+    params.permit(leafs: [])
   end
 
   def leaf_params_conjoin
-    params.permit(:leafs => [])
+    params.permit(leafs: [])
   end
 
   def leaf_params_generate
-    params.permit(:startNumber, :leafIDs => [])
+    params.permit(:startNumber, leafIDs: [])
   end
-
 end

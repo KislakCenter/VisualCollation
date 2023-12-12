@@ -1,32 +1,32 @@
+# frozen_string_literal: true
+
 class TermsController < ApplicationController
   before_action :authenticate!
-  before_action :set_term, only: [:update, :link, :unlink, :destroy]
-  before_action :set_attached_project, only: [:createTaxonomy, :deleteTaxonomy, :updateTaxonomy]
+  before_action :set_term, only: %i[update link unlink destroy]
+  before_action :set_attached_project, only: %i[createTaxonomy deleteTaxonomy updateTaxonomy]
 
   # POST /terms
   def create
     @term    = Term.new(term_create_params)
     @project = Project.find(@term.project_id)
     authorize_project! @project
-    if @term.save
-      if not Project.find(@term.project_id).taxonomies.include?(@term.taxonomy)
-        @term.delete
-        raise VCError, "Taxonomy (#{@term.taxonomy}) does not belong to project (#{@project.id})."
-      end
-    else
-      raise VCError, "Something went wrong with saving terms: #{@term.errors.full_messages.join("\n")}"
-    end
+    raise VCError, "Something went wrong with saving terms: #{@term.errors.full_messages.join("\n")}" unless @term.save
+
+    return if Project.find(@term.project_id).taxonomies.include?(@term.taxonomy)
+
+    @term.delete
+    raise VCError, "Taxonomy (#{@term.taxonomy}) does not belong to project (#{@project.id})."
   end
 
   # PATCH/PUT /terms/1
   def update
     taxonomy = term_update_params.to_h[:taxonomy]
-    if not Project.find(@term.project_id).taxonomies.include?(taxonomy)
+    unless Project.find(@term.project_id).taxonomies.include?(taxonomy)
       raise VCError, "Taxonomy (#{@term.taxonomy}) does not belong to project (#{@project.id})."
     end
-    if !@term.update(term_update_params)
-      raise VCError, "Term (#{@term.id}) could not update: #{@term.errors.full_messages.join "\n"}"
-    end
+    return if @term.update(term_update_params)
+
+    raise VCError, "Term (#{@term.id}) could not update: #{@term.errors.full_messages.join "\n"}"
   end
 
   # DELETE /terms/1
@@ -41,26 +41,23 @@ class TermsController < ApplicationController
       type = object[:type]
       id   = object[:id]
       case type
-      when "Group"
+      when 'Group'
         @object    = Group.find(id)
         authorized = @object.project.user_id == current_user.id
-      when "Leaf"
+      when 'Leaf'
         @object    = Leaf.find(id)
         authorized = @object.project.user_id == current_user.id
-      when "Recto", "Verso"
+      when 'Recto', 'Verso'
         @object    = Side.find(id)
         authorized = @object.project.user_id == current_user.id
       else
         raise VCError, "Object not found with type: #{type}"
       end
-      unless authorized
-        raise VCError, "Action not authorized."
-      end
+      raise VCError, 'Action not authorized.' unless authorized
+
       @object.terms.push(@term)
       @object.save
-      if (not @term.objects[type].include?(id))
-        @term.objects[type].push(id)
-      end
+      @term.objects[type].push(id) unless @term.objects[type].include?(id)
       @term.save
     end
   end
@@ -72,21 +69,20 @@ class TermsController < ApplicationController
       type = object[:type]
       id   = object[:id]
       case type
-      when "Group"
+      when 'Group'
         @object    = Group.find(id)
         authorized = @object.project.user_id == current_user.id
-      when "Leaf"
+      when 'Leaf'
         @object    = Leaf.find(id)
         authorized = @object.project.user_id == current_user.id
-      when "Recto", "Verso"
+      when 'Recto', 'Verso'
         @object    = Side.find(id)
         authorized = @object.project.user_id == current_user.id
       else
         raise VCError, "Object not found with type: #{type}"
       end
-      unless authorized
-        raise VCError, "Action not authorized."
-      end
+      raise VCError, 'Action not authorized.' unless authorized
+
       @object.terms.delete(@term)
       @object.save
       @term.objects[type].delete(id)
@@ -99,24 +95,24 @@ class TermsController < ApplicationController
     taxonomy = taxonomy_params.to_h[:taxonomy]
     if @project.taxonomies.include?(taxonomy)
       raise VCError, "Taxonomy (#{taxonomy}) already exists in the project (#{@project.id})"
-    else
-      @project.taxonomies.push(taxonomy)
-      @project.save
     end
+
+    @project.taxonomies.push(taxonomy)
+    @project.save
   end
 
   # DELETE /terms/taxonomy
   def deleteTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
-    if not @project.taxonomies.include?(taxonomy)
+    unless @project.taxonomies.include?(taxonomy)
       raise VCError, "Taxonomy (#{taxonomy}) does not exist in the project (#{@project.id})"
-    else
-      @project.taxonomies.delete(taxonomy)
-      @project.save
-      @project.terms.where(taxonomy: taxonomy).each do |term|
-        term.update(taxonomy: "Unknown")
-        term.save
-      end
+    end
+
+    @project.taxonomies.delete(taxonomy)
+    @project.save
+    @project.terms.where(taxonomy: taxonomy).each do |term|
+      term.update(taxonomy: 'Unknown')
+      term.save
     end
   end
 
@@ -124,7 +120,7 @@ class TermsController < ApplicationController
   def updateTaxonomy
     old_taxonomy = taxonomy_params.to_h[:old_taxonomy]
     taxonomy     = taxonomy_params.to_h[:taxonomy]
-    if not @project.taxonomies.include?(old_taxonomy)
+    if !@project.taxonomies.include?(old_taxonomy)
       raise VCError, "Taxonomy (#{taxonomy}) does not exist in the project (#{@project.id})"
     elsif @project.taxonomies.include?(taxonomy)
       raise VCError, "Taxonomy (#{taxonomy}) already exists in the project (#{@project.id})"
@@ -149,7 +145,7 @@ class TermsController < ApplicationController
     term_id  = if params[:id].include? 'Term_'
                  params[:id]
                else
-                 'Term_' + params[:id]
+                 "Term_#{params[:id]}"
                end
     @term    = Term.find(term_id)
     @project = Project.find(@term.project_id)
@@ -172,11 +168,10 @@ class TermsController < ApplicationController
   end
 
   def term_object_link_params
-    params.permit(:objects => [:id, :type])
+    params.permit(objects: %i[id type])
   end
 
   def taxonomy_params
     params.require(:taxonomy).permit(:taxonomy, :project_id, :old_taxonomy)
   end
-
 end

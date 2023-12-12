@@ -1,28 +1,27 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "PUT /terms/id/link", :type => :request do
+describe 'PUT /terms/id/link', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
-    @project = FactoryGirl.create(:project, {user: @user, taxonomies: ["Ink"]})
+    @project = FactoryGirl.create(:project, { user: @user, taxonomies: ['Ink'] })
     @defaultGroup = FactoryGirl.create(:quire, project: @project)
     @project.add_groupIDs([@defaultGroup.id.to_s], 0)
     @term = FactoryGirl.create(:term, {
-      project: @project,
-      title: "some title for term",
-      taxonomy: "Ink",
-      description: "blue ink"
-    })
+                                 project: @project,
+                                 title: 'some title for term',
+                                 taxonomy: 'Ink',
+                                 description: 'blue ink'
+                               })
     @parameters = {
       objects: [
         {
-          id: "something",
-          type: "Group"
+          id: 'something',
+          type: 'Group'
         }
       ]
     }
@@ -37,23 +36,25 @@ describe "PUT /terms/id/link", :type => :request do
           objects: [
             {
               id: @group.id.to_str,
-              type: "Group"
+              type: 'Group'
             }
           ]
         }
-        put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}/link", params: @parameters.to_json,
+                                       headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @group.reload
       end
 
-      it 'should return 200' do
+      it 'returns 200' do
         expect(response).to have_http_status(:no_content)
       end
 
-      it 'should add the term to the target' do
+      it 'adds the term to the target' do
         expect(@group.terms.length).to eq 1
         expect(@group.terms[0].id).to eq @term.id
       end
     end
+
     context 'and correct leaf target' do
       before do
         @leaf = FactoryGirl.create(:leaf, { project: @project, parentID: @defaultGroup.id.to_s })
@@ -62,23 +63,25 @@ describe "PUT /terms/id/link", :type => :request do
           objects: [
             {
               id: @leaf.id.to_str,
-              type: "Leaf"
+              type: 'Leaf'
             }
           ]
         }
-        put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}/link", params: @parameters.to_json,
+                                       headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @leaf.reload
       end
 
-      it 'should return 200' do
+      it 'returns 200' do
         expect(response).to have_http_status(:no_content)
       end
 
-      it 'should add the term to the target' do
+      it 'adds the term to the target' do
         expect(@leaf.terms.length).to eq 1
         expect(@leaf.terms[0].id).to eq @term.id
       end
     end
+
     context 'and correct side target' do
       before do
         @leaf = FactoryGirl.create(:leaf, { project: @project })
@@ -88,28 +91,31 @@ describe "PUT /terms/id/link", :type => :request do
           objects: [
             {
               id: @side.id.to_str,
-              type: "Recto"
+              type: 'Recto'
             }
           ]
         }
-        put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}/link", params: @parameters.to_json,
+                                       headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @side.reload
       end
 
-      it 'should return 200' do
+      it 'returns 200' do
         expect(response).to have_http_status(:no_content)
       end
 
-      it 'should add the term to the target' do
+      it 'adds the term to the target' do
         expect(@side.terms.length).to eq 1
         expect(@side.terms[0].id).to eq @term.id
       end
     end
+
     context 'and a project belonging to another user' do
-      before :each do
+      before do
         @user2 = FactoryGirl.create(:user)
-        @project2 = FactoryGirl.create(:project, {user: @user2, taxonomies: ["Ink"] })
+        @project2 = FactoryGirl.create(:project, { user: @user2, taxonomies: ['Ink'] })
       end
+
       context 'and group target' do
         before do
           @group2 = FactoryGirl.create(:group, { project: @project2 })
@@ -117,22 +123,24 @@ describe "PUT /terms/id/link", :type => :request do
             objects: [
               {
                 id: @group2.id.to_str,
-                type: "Group"
+                type: 'Group'
               }
             ]
           }
-          put '/terms/'+@term.id+'/link', params: @parameters2.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          put "/terms/#{@term.id}/link", params: @parameters2.to_json,
+                                         headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
           @group2.reload
         end
 
-        it 'should return 401' do
+        it 'returns 401' do
           expect(response).to have_http_status(:unauthorized)
         end
 
-        it 'should leave the group alone' do
+        it 'leaves the group alone' do
           expect(@group2.terms).to be_empty
         end
       end
+
       context 'and a leaf target' do
         before do
           @leaf2 = FactoryGirl.create(:leaf, { project: @project2 })
@@ -141,22 +149,24 @@ describe "PUT /terms/id/link", :type => :request do
             objects: [
               {
                 id: @leaf2.id.to_str,
-                type: "Leaf"
+                type: 'Leaf'
               }
             ]
           }
-          put '/terms/'+@term.id+'/link', params: @parameters2.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          put "/terms/#{@term.id}/link", params: @parameters2.to_json,
+                                         headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
           @leaf2.reload
         end
 
-        it 'should return 401' do
+        it 'returns 401' do
           expect(response).to have_http_status(:unauthorized)
         end
 
-        it 'should leave the leaf alone' do
+        it 'leaves the leaf alone' do
           expect(@leaf2.terms).to be_empty
         end
       end
+
       context 'and a side target' do
         before do
           @leaf2 = FactoryGirl.create(:leaf, { project: @project2 })
@@ -166,90 +176,99 @@ describe "PUT /terms/id/link", :type => :request do
             objects: [
               {
                 id: @side2.id.to_str,
-                type: "Recto"
+                type: 'Recto'
               }
             ]
           }
-          put '/terms/'+@term.id+'/link', params: @parameters2.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          put "/terms/#{@term.id}/link", params: @parameters2.to_json,
+                                         headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
           @side2.reload
         end
 
-        it 'should return 401' do
+        it 'returns 401' do
           expect(response).to have_http_status(:unauthorized)
         end
 
-        it 'should leave the side alone' do
+        it 'leaves the side alone' do
           expect(@side2.terms).to be_empty
         end
       end
     end
+
     context 'and unknown target type' do
       before do
-        @parameters[:objects][0][:type] = "unknown"
-        put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        @parameters[:objects][0][:type] = 'unknown'
+        put "/terms/#{@term.id}/link", params: @parameters.to_json,
+                                       headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
+      it 'returns 422' do
         expect(response).to have_http_status :unprocessable_entity
       end
 
-      it 'should give the right error message' do
-        expect(@body['type']).to eq "object not found with type unknown"
+      it 'gives the right error message' do
+        expect(@body['type']).to eq 'object not found with type unknown'
       end
     end
+
     context 'and missing term' do
       before do
-        put '/terms/'+@term.id+'missing/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}missing/link", params: @parameters.to_json,
+                                              headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 404' do
+      it 'returns 404' do
         expect(response).to have_http_status :not_found
       end
     end
+
     context 'and missing target' do
       before do
         @group = FactoryGirl.create(:group, { project: @project })
         @parameters = {
           objects: [
             {
-              id: @group.id.to_str+"weird",
-              type: "Group"
+              id: "#{@group.id.to_str}weird",
+              type: 'Group'
             }
           ]
         }
-        put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}/link", params: @parameters.to_json,
+                                       headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @group.reload
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
+      it 'returns 422' do
         expect(response).to have_http_status :unprocessable_entity
       end
 
-      it 'should give the right error message' do
+      it 'gives the right error message' do
         expect(@body['id']).to eq "Group object not found with id #{@group.id.to_str}weird"
       end
     end
+
     context 'and uncaught exception' do
       before do
-        allow_any_instance_of(Term).to receive(:save).and_raise("Exception!")
+        allow_any_instance_of(Term).to receive(:save).and_raise('Exception!')
         @group = FactoryGirl.create(:group, { project: @project })
         @parameters = {
           objects: [
             {
               id: @group.id.to_str,
-              type: "Group"
+              type: 'Group'
             }
           ]
         }
-        put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        put "/terms/#{@term.id}/link", params: @parameters.to_json,
+                                       headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @group.reload
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
+      it 'returns 422' do
         expect(response).to have_http_status :unprocessable_entity
       end
     end
@@ -257,7 +276,8 @@ describe "PUT /terms/id/link", :type => :request do
 
   context 'with corrupted authorization' do
     before do
-      put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      put "/terms/#{@term.id}/link", params: @parameters.to_json,
+                                     headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -272,7 +292,7 @@ describe "PUT /terms/id/link", :type => :request do
 
   context 'with empty authorization' do
     before do
-      put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => ""}
+      put "/terms/#{@term.id}/link", params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -286,7 +306,7 @@ describe "PUT /terms/id/link", :type => :request do
 
   context 'invalid authorization' do
     before do
-      put '/terms/'+@term.id+'/link', params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      put "/terms/#{@term.id}/link", params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do
@@ -300,7 +320,7 @@ describe "PUT /terms/id/link", :type => :request do
 
   context 'without authorization' do
     before do
-      put '/terms/'+@term.id+'/link'
+      put "/terms/#{@term.id}/link"
     end
 
     it 'returns an unauthorized action error' do

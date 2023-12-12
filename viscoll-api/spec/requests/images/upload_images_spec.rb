@@ -1,40 +1,38 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "POST /images", :type => :request do
+describe 'POST /images', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
     @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
     @parameters = {
       "projectID": @project.id.to_s,
       "images": [
-      	{
-      		"filename": "green",
-      		"content": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-      	},
-      	{
-      		"filename": "blue",
-      		"content": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
-         }
-  	  ]
+        {
+          "filename": 'green',
+          "content": 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+        },
+        {
+          "filename": 'blue',
+          "content": 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+        }
+      ]
     }
   end
 
   after do
-    Image.where(:projectIDs => @project.id.to_s).each do | image |
-      image.destroy
-    end
+    Image.where(projectIDs: @project.id.to_s).each(&:destroy)
   end
 
   context 'and valid authorization' do
     context 'and standard group' do
       before do
-        post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/images', params: @parameters.to_json,
+                        headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
@@ -49,18 +47,19 @@ describe "POST /images", :type => :request do
         expect(Image.find_by(filename: 'blue.png').projectIDs).to include @project.id.to_s
       end
     end
-    
+
     context 'and duplicated image' do
       before do
         @parameters[:images][1][:filename] = 'green'
-        post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/images', params: @parameters.to_json,
+                        headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 200' do
         expect(response).to have_http_status(:ok)
       end
-      
+
       it 'creates two new images, the second with the _copy(n) suffix' do
         expect(Image.where(filename: 'green.png')).to exist
         expect(Image.where(filename: 'green_copy(1).png')).to exist
@@ -68,29 +67,31 @@ describe "POST /images", :type => :request do
         expect(Image.find_by(filename: 'green_copy(1).png').projectIDs).to include @project.id.to_s
       end
     end
-    
+
     context 'and missing project' do
       before do
         @parameters[:projectID] += 'missing'
-        post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/images', params: @parameters.to_json,
+                        headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'returns the error message' do
         expect(@body['error']).to eq("project not found with id #{@project.id.to_str}missing")
       end
     end
-    
+
     context 'and unauthorized project' do
       before do
         @project.update(user: FactoryGirl.create(:user))
-        post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/images', params: @parameters.to_json,
+                        headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       end
-      
+
       it 'returns 401' do
         expect(response).to have_http_status(:unauthorized)
       end
@@ -99,7 +100,8 @@ describe "POST /images", :type => :request do
     context 'and failing image' do
       before do
         allow_any_instance_of(Image).to receive(:valid?).and_return(false)
-        post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        post '/images', params: @parameters.to_json,
+                        headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       end
 
       it 'returns 422' do
@@ -109,8 +111,9 @@ describe "POST /images", :type => :request do
 
     context 'and uncaught exception' do
       before do
-        allow(Project).to receive(:find).and_raise("Exception")
-        post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        allow(Project).to receive(:find).and_raise('Exception')
+        post '/images', params: @parameters.to_json,
+                        headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @body = JSON.parse(response.body)
       end
 
@@ -118,16 +121,17 @@ describe "POST /images", :type => :request do
         expect(response).to have_http_status(:unprocessable_entity)
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns the error message' do
-        expect(@body['error']).to eq "Exception"
+        expect(@body['error']).to eq 'Exception'
       end
     end
   end
 
   context 'with corrupted authorization' do
     before do
-      post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      post '/images', params: @parameters.to_json,
+                      headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -142,7 +146,7 @@ describe "POST /images", :type => :request do
 
   context 'with empty authorization' do
     before do
-      post '/images', params: @parameters.to_json, headers: {'Authorization' => ""}
+      post '/images', params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -156,7 +160,7 @@ describe "POST /images", :type => :request do
 
   context 'invalid authorization' do
     before do
-      post '/images', params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      post '/images', params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do

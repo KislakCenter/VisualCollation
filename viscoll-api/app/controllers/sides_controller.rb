@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class SidesController < ApplicationController
   before_action :authenticate!
   before_action :set_side, only: [:update]
 
   # PATCH/PUT /sides/1
   def update
-    if !@side.update(side_params)
-      raise VCError, "Side (#{@side.id} could not be updated: #{@side.errors.full_messages.join "\n"})"
-    end
+    return if @side.update(side_params)
+
+    raise VCError, "Side (#{@side.id} could not be updated: #{@side.errors.full_messages.join "\n"})"
   end
 
   # PATCH/PUT /sides
@@ -17,53 +19,52 @@ class SidesController < ApplicationController
     haveErrors = false
     sides      = []
     allSides.each do |sideID|
-      begin
-        side = Side.find(sideID)
-        sides.push(side)
-      rescue Exception => e
-        @errors.push("side not found with id " + sideID)
-        haveErrors = true
-      end
+      side = Side.find(sideID)
+      sides.push(side)
+    rescue Exception => e
+      @errors.push("side not found with id #{sideID}")
+      haveErrors = true
     end
     @project = Project.find(sides[0].project_id)
     authorize_project! @project
-    if haveErrors
-      raise VCError, "Errors occurred when updating: #{@errors.join "\n"}"
-    end
+    raise VCError, "Errors occurred when updating: #{@errors.join "\n"}" if haveErrors
+
     allSides.each_with_index do |side_params, index|
       side              = sides[index]
       previousSideImage = side.image.clone
-      if !side.update(side_params[:attributes])
+      unless side.update(side_params[:attributes])
         raise VCError, "Errors occurred when updating sides: #{side.errors.full_messages.join "\n"}"
-      else
-        # SPEICAL CASE FOR DIY IMAGE MAPPING
-        if side_params[:attributes]["image"]
-          newSideImage = side_params[:attributes]["image"].clone
-          # If an image was linked, check if it was a DIY and link this Side to that Image
-          if newSideImage and !(newSideImage.empty?) and newSideImage["manifestID"] == "DIYImages"
-            imageID     = newSideImage["url"].split("/")[-1].split("_", 2)[0]
-            imageLinked = Image.find(imageID)
-            !(imageLinked.sideIDs.include?(side.id.to_s)) ? imageLinked.sideIDs.push(side.id.to_s) : nil
-            imageLinked.save
-          end
-          # If an image was linked, check if this side was previously linked to a DIY Image and unlink this Side to that Image
-          if newSideImage and !newSideImage.empty? and !previousSideImage.empty? and previousSideImage["manifestID"] == "DIYImages"
-            imageID       = previousSideImage["url"].split("/")[-1].split("_", 2)[0]
-            imageUnlinked = Image.find(imageID)
-            if !imageLinked or imageLinked.id.to_s != imageUnlinked.id.to_s
-              imageUnlinked.sideIDs.include?(side.id.to_s) ? imageUnlinked.sideIDs.delete(side.id.to_s) : nil
-              imageUnlinked.save
-            end
-          end
-          # If an Image was unlinked, check if it was a DIY and unlink this Side from the Image
-          if newSideImage and newSideImage.empty? and !previousSideImage.empty? and previousSideImage["manifestID"] == "DIYImages"
-            imageID = previousSideImage["url"].split("/")[-1].split("_", 2)[0]
-            image   = Image.find(imageID)
-            image.sideIDs.include?(side.id.to_s) ? image.sideIDs.delete(side.id.to_s) : nil
-            image.save
-          end
+      end
+
+      # SPEICAL CASE FOR DIY IMAGE MAPPING
+      next unless side_params[:attributes]['image']
+
+      newSideImage = side_params[:attributes]['image'].clone
+      # If an image was linked, check if it was a DIY and link this Side to that Image
+      if newSideImage.present? && (newSideImage['manifestID'] == 'DIYImages')
+        imageID     = newSideImage['url'].split('/')[-1].split('_', 2)[0]
+        imageLinked = Image.find(imageID)
+        !imageLinked.sideIDs.include?(side.id.to_s) ? imageLinked.sideIDs.push(side.id.to_s) : nil
+        imageLinked.save
+      end
+      # If an image was linked, check if this side was previously linked to a DIY Image and unlink this Side to that Image
+      if newSideImage.present? && !previousSideImage.empty? && (previousSideImage['manifestID'] == 'DIYImages')
+        imageID       = previousSideImage['url'].split('/')[-1].split('_', 2)[0]
+        imageUnlinked = Image.find(imageID)
+        if !imageLinked || (imageLinked.id.to_s != imageUnlinked.id.to_s)
+          imageUnlinked.sideIDs.include?(side.id.to_s) ? imageUnlinked.sideIDs.delete(side.id.to_s) : nil
+          imageUnlinked.save
         end
       end
+      # If an Image was unlinked, check if it was a DIY and unlink this Side from the Image
+      unless newSideImage && newSideImage.empty? && !previousSideImage.empty? && (previousSideImage['manifestID'] == 'DIYImages')
+        next
+      end
+
+      imageID = previousSideImage['url'].split('/')[-1].split('_', 2)[0]
+      image   = Image.find(imageID)
+      image.sideIDs.include?(side.id.to_s) ? image.sideIDs.delete(side.id.to_s) : nil
+      image.save
     end
   end
 
@@ -79,9 +80,7 @@ class SidesController < ApplicationController
       pageNumberCount += 1
       verso.update_attribute(:page_number, pageNumberCount.to_s)
       pageNumberCount += 1
-      if index == 0
-        @project = Project.find(recto.project_id)
-      end
+      @project = Project.find(recto.project_id) if index.zero?
     end
   end
 
@@ -96,15 +95,16 @@ class SidesController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def side_params
-    params.require(:side).permit(:page_number, :texture, :script_direction, :image => [:manifestID, :label, :url])
+    params.require(:side).permit(:page_number, :texture, :script_direction, image: %i[manifestID label url])
   end
 
   def side_params_batch_update
-    params.permit(:sides => [:id, :attributes => [:page_number, :texture, :script_direction, :image => [:manifestID, :label, :url]]])
+    params.permit(sides: [:id,
+                          { attributes: [:page_number, :texture, :script_direction,
+                                         { image: %i[manifestID label url] }] }])
   end
 
   def side_params_generate
-    params.permit(:startNumber, :rectoIDs => [], :versoIDs => [])
+    params.permit(:startNumber, rectoIDs: [], versoIDs: [])
   end
-
 end

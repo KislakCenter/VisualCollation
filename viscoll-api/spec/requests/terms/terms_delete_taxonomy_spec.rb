@@ -1,30 +1,29 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "DELETE /terms/taxonomy", :type => :request do
+describe 'DELETE /terms/taxonomy', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
-    @project = FactoryGirl.create(:project, {user: @user, taxonomies: ["Ink", "Paper"]})
+    @project = FactoryGirl.create(:project, { user: @user, taxonomies: %w[Ink Paper] })
     @project.terms << FactoryGirl.create(:term, {
-      project_id: @project.id,
-      taxonomy: "Ink",
-      description: "Sepia"
-    })
+                                           project_id: @project.id,
+                                           taxonomy: 'Ink',
+                                           description: 'Sepia'
+                                         })
     @project.terms << FactoryGirl.create(:term, {
-      project_id: @project.id,
-      taxonomy: "Paper",
-      description: "Parchment"
-    })
+                                           project_id: @project.id,
+                                           taxonomy: 'Paper',
+                                           description: 'Parchment'
+                                         })
     @project.save
     @parameters = {
       "taxonomy": {
         "project_id": @project.id.to_str,
-        "taxonomy": "Ink"
+        "taxonomy": 'Ink'
       }
     }
   end
@@ -32,60 +31,63 @@ describe "DELETE /terms/taxonomy", :type => :request do
   context 'with valid authorization' do
     context 'with valid parameters' do
       before do
-        delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/terms/taxonomy', params: @parameters.to_json,
+                                  headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
       end
 
-      it 'should return 200' do
+      it 'returns 200' do
         expect(response).to have_http_status(:no_content)
       end
 
-      it 'should remove the taxonomy from the project' do
-        expect(@project.taxonomies).not_to include "Ink"
-        expect(@project.taxonomies).to include "Paper"
+      it 'removes the taxonomy from the project' do
+        expect(@project.taxonomies).not_to include 'Ink'
+        expect(@project.taxonomies).to include 'Paper'
       end
 
-      it 'should change taxonomy of the term to Unknown' do
-        expect(@project.terms).to include an_object_having_attributes(taxonomy: "Unknown")
-        expect(@project.terms).to include an_object_having_attributes(taxonomy: "Paper")
+      it 'changes taxonomy of the term to Unknown' do
+        expect(@project.terms).to include an_object_having_attributes(taxonomy: 'Unknown')
+        expect(@project.terms).to include an_object_having_attributes(taxonomy: 'Paper')
       end
     end
 
     context 'with missing project' do
       before do
         @parameters[:taxonomy][:project_id] += 'missing'
-        delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/terms/taxonomy', params: @parameters.to_json,
+                                  headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
+      it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it 'should return the right error message' do
+      it 'returns the right error message' do
         expect(@body['project_id']).to eq "project not found with id #{@project.id}missing"
       end
     end
 
     context 'with out-of-context taxonomy' do
       before do
-        @parameters[:taxonomy][:taxonomy] = "Waahoo"
-        delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        @parameters[:taxonomy][:taxonomy] = 'Waahoo'
+        delete '/terms/taxonomy', params: @parameters.to_json,
+                                  headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
+      it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it 'should return the right error message' do
+      it 'returns the right error message' do
         expect(@body['taxonomy']).to eq "Waahoo taxonomy doesn't exist in the project"
       end
 
-      it 'should leave the project alone' do
-        expect(@project.taxonomies).to eq ["Ink", "Paper"]
+      it 'leaves the project alone' do
+        expect(@project.taxonomies).to eq %w[Ink Paper]
       end
     end
 
@@ -94,23 +96,25 @@ describe "DELETE /terms/taxonomy", :type => :request do
         @user2 = FactoryGirl.create(:user)
         @project.user = @user2
         @project.save
-        delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/terms/taxonomy', params: @parameters.to_json,
+                                  headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
       end
 
-      it 'should return 403' do
+      it 'returns 403' do
         expect(response).to have_http_status(:unauthorized)
       end
 
-      it 'should leave the taxonomies alone' do
-        expect(@project.taxonomies).to eq ["Ink", "Paper"]
+      it 'leaves the taxonomies alone' do
+        expect(@project.taxonomies).to eq %w[Ink Paper]
       end
     end
   end
 
   context 'with corrupted authorization' do
     before do
-      delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      delete '/terms/taxonomy', params: @parameters.to_json,
+                                headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       @body = JSON.parse(response.body)
     end
 
@@ -125,7 +129,7 @@ describe "DELETE /terms/taxonomy", :type => :request do
 
   context 'with empty authorization' do
     before do
-      delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => ""}
+      delete '/terms/taxonomy', params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -139,7 +143,7 @@ describe "DELETE /terms/taxonomy", :type => :request do
 
   context 'invalid authorization' do
     before do
-      delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      delete '/terms/taxonomy', params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do

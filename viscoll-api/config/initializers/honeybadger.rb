@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Adding Honeybadger configuration.
 
 if Rails.env.production? && ENV['HONEYBADGER_API_KEY']

@@ -1,21 +1,23 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "DELETE /users/userID", :type => :request do
+describe 'DELETE /users/userID', type: :request do
   before do
-    @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email=> "user@mail.com", :password => "user" }}
+    @user = User.create(name: 'user', email: 'user@mail.com', password: 'user')
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: 'user@mail.com', password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   context 'with correct authorization' do
     context 'and valid params' do
       before do
-        @user2 = User.create(:name => "user2", :email => "user2@mail.com", :password => "user2")
-        @project1 = Project.create(:title => "first project", :user_id => @user.id)
-        @project2 = Project.create(:title => "second project", :user_id => @user.id)
-        @project3 = Project.create(:title => "some other user project", :user_id => @user2.id)
-        delete '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => @authToken}
+        @user2 = User.create(name: 'user2', email: 'user2@mail.com', password: 'user2')
+        @project1 = Project.create(title: 'first project', user_id: @user.id)
+        @project2 = Project.create(title: 'second project', user_id: @user.id)
+        @project3 = Project.create(title: 'some other user project', user_id: @user2.id)
+        delete "/users/#{@user.id}", params: '', headers: { 'Authorization' => @authToken }
       end
 
       it 'returns a successful no_content response' do
@@ -35,11 +37,11 @@ describe "DELETE /users/userID", :type => :request do
 
     context 'and another user' do
       before do
-        @user2 = User.create(:name => "user2", :email => "user2@mail.com", :password => "user2")
-        @project1 = Project.create(:title => "first project", :user_id => @user.id)
-        @project2 = Project.create(:title => "second project", :user_id => @user.id)
-        @project3 = Project.create(:title => "some other user project", :user_id => @user2.id)
-        delete '/users/'+@user2.id.to_s, params: '', headers: {'Authorization' => @authToken}
+        @user2 = User.create(name: 'user2', email: 'user2@mail.com', password: 'user2')
+        @project1 = Project.create(title: 'first project', user_id: @user.id)
+        @project2 = Project.create(title: 'second project', user_id: @user.id)
+        @project3 = Project.create(title: 'some other user project', user_id: @user2.id)
+        delete "/users/#{@user2.id}", params: '', headers: { 'Authorization' => @authToken }
       end
 
       it 'returns unauthorized' do
@@ -53,7 +55,7 @@ describe "DELETE /users/userID", :type => :request do
 
     context 'and invalid params' do
       before do
-        delete '/users/invalidID', params: '', headers: {'Authorization' => @authToken}
+        delete '/users/invalidID', params: '', headers: { 'Authorization' => @authToken }
       end
 
       it 'returns 404 no content found error' do
@@ -68,7 +70,7 @@ describe "DELETE /users/userID", :type => :request do
 
   context 'with corrupted authorization' do
     before do
-      delete '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => @authToken+"invalidify"}
+      delete "/users/#{@user.id}", params: '', headers: { 'Authorization' => "#{@authToken}invalidify" }
     end
 
     it 'returns an bad request error' do
@@ -82,7 +84,7 @@ describe "DELETE /users/userID", :type => :request do
 
   context 'with empty authorization' do
     before do
-      delete '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => ""}
+      delete "/users/#{@user.id}", params: '', headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -96,7 +98,7 @@ describe "DELETE /users/userID", :type => :request do
 
   context 'invalid authorization' do
     before do
-      delete '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => "123456789"}
+      delete "/users/#{@user.id}", params: '', headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do
@@ -110,7 +112,7 @@ describe "DELETE /users/userID", :type => :request do
 
   context 'without authorization' do
     before do
-      delete '/users/'+@user.id.to_s
+      delete "/users/#{@user.id}"
     end
 
     it 'returns an unauthorized action error' do

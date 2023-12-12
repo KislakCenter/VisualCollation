@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ImportController < ApplicationController
   before_action :authenticate!
 
@@ -7,24 +9,23 @@ class ImportController < ApplicationController
     importFormat = imported_data.to_h[:importFormat]
     imageData    = imported_data.to_h[:imageData]
     case importFormat
-    when "json"
+    when 'json'
       handleJSONImport(JSON.parse(importData))
-    when "xml"
+    when 'xml'
       xml     = Nokogiri::XML(importData)
-      schema  = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel2.rng"))
-      schema2 = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel2.0.rng"))
+      schema  = Nokogiri::XML::RelaxNG(File.open('public/viscoll-datamodel2.rng'))
+      schema2 = Nokogiri::XML::RelaxNG(File.open('public/viscoll-datamodel2.0.rng'))
       errors  = schema.validate(xml)
       errors2 = schema2.validate(xml)
-      if errors.empty? || errors2.empty?
-        handleXMLImport(xml)
-      else
-        raise VCError, "XML import failed: #{(errors + errors2).join "\n"}"
-      end
+      raise VCError, "XML import failed: #{(errors + errors2).join "\n"}" unless errors.empty? || errors2.empty?
+
+      handleXMLImport(xml)
+
     end
-    newProject = current_user.projects.order_by(:updated_at => 'desc').first
+    newProject = current_user.projects.order_by(updated_at: 'desc').first
     handleMappingImport(newProject, imageData, current_user)
     current_user.reload
-    @projects = current_user.projects.order_by(:updated_at => 'desc')
+    @projects = current_user.projects.order_by(updated_at: 'desc')
     @images   = current_user.images
     render :'projects/index', status: :ok and return
   end
@@ -35,5 +36,4 @@ class ImportController < ApplicationController
   def imported_data
     params.permit(:importData, :importFormat, :imageData)
   end
-
 end

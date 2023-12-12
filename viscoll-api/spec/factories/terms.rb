@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   sequence :term_title do |n|
     "Term #{n}"
@@ -8,16 +10,17 @@ FactoryGirl.define do
 
   factory :term do
     transient do
-      attachments []
+      attachments { [] }
     end
-    before(:build) do |term, evaluator|
-      myobjects = {Group: [], Leaf: [], Recto: [], Verso: []}
+    before(:build) do |_term, evaluator|
+      myobjects = { Group: [], Leaf: [], Recto: [], Verso: [] }
       evaluator.attachments.each do |attachment|
-        if attachment.is_a? Group
+        case attachment
+        when Group
           myobjects[:Group] << attachment
-        elsif attachment.is_a? Leaf
+        when Leaf
           myobjects[:Leaf] << attachment
-        elsif attachment.is_a? Side
+        when Side
           if attachment.id.to_s[0..5] == 'Verso_'
             myobjects[:Verso] << attachment
           else
@@ -28,7 +31,8 @@ FactoryGirl.define do
         end
       end
     end
+
     title { generate(:term_title) }
-    taxonomy "Unknown"
+    taxonomy { 'Unknown' }
   end
 end

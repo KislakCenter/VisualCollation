@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 json.set! 'Export' do
   json.project @data[:project]
   json.Groups @data[:groups]
@@ -8,9 +10,5 @@ json.set! 'Export' do
 end
 
 json.set! 'Images' do
-  if @zipFilePath
-    json.exportedImages @zipFilePath
-  else
-    json.exportedImages ""
-  end
+  json.exportedImages @zipFilePath || ''
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TestMailer < ApplicationMailer
   default from: 'emeryr@upenn.edu'
 

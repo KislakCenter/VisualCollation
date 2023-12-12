@@ -1,20 +1,22 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "GET /users/userID", :type => :request do
+describe 'GET /users/userID', type: :request do
   before do
-    @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email=> "user@mail.com", :password => "user" }}
+    @user = User.create(name: 'user', email: 'user@mail.com', password: 'user')
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: 'user@mail.com', password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   context 'with correct authorization' do
     context 'and valid params' do
       before do
-        @project1 = Project.create(:title => "first project", :user_id => @user.id)
-        @project2 = Project.create(:title => "second project", :user_id => @user.id)
-        @project3 = Project.create(:title => "some other user project", :user_id => "")
-        get '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => @authToken}
+        @project1 = Project.create(title: 'first project', user_id: @user.id)
+        @project2 = Project.create(title: 'second project', user_id: @user.id)
+        @project3 = Project.create(title: 'some other user project', user_id: '')
+        get "/users/#{@user.id}", params: '', headers: { 'Authorization' => @authToken }
       end
 
       it 'returns a successful ok response' do
@@ -23,20 +25,20 @@ describe "GET /users/userID", :type => :request do
 
       it 'returns the user object in the response' do
         expect(JSON.parse(response.body)['id']).to eq(@user.id.to_s)
-        expect(JSON.parse(response.body)['email']).to eq("user@mail.com")
-        expect(JSON.parse(response.body)['name']).to eq("user")
+        expect(JSON.parse(response.body)['email']).to eq('user@mail.com')
+        expect(JSON.parse(response.body)['name']).to eq('user')
       end
 
       it 'returns all the projects with manuscripts of this user' do
         expect(JSON.parse(response.body)['projects'].size).to eq(2)
-        expect(JSON.parse(response.body)['projects'][0]["title"]).to eq("first project")
-        expect(JSON.parse(response.body)['projects'][1]["title"]).to eq("second project")
+        expect(JSON.parse(response.body)['projects'][0]['title']).to eq('first project')
+        expect(JSON.parse(response.body)['projects'][1]['title']).to eq('second project')
       end
     end
 
     context 'and invalid params' do
       before do
-        get '/users/invalidID', params: '', headers: {'Authorization' => @authToken}
+        get '/users/invalidID', params: '', headers: { 'Authorization' => @authToken }
       end
 
       it 'returns 404 no content found error' do
@@ -51,7 +53,7 @@ describe "GET /users/userID", :type => :request do
 
   context 'with corrupted authorization' do
     before do
-      get '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => @authToken+"invalidify"}
+      get "/users/#{@user.id}", params: '', headers: { 'Authorization' => "#{@authToken}invalidify" }
     end
 
     it 'returns an bad request error' do
@@ -65,7 +67,7 @@ describe "GET /users/userID", :type => :request do
 
   context 'with empty authorization' do
     before do
-      get '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => ""}
+      get "/users/#{@user.id}", params: '', headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -79,7 +81,7 @@ describe "GET /users/userID", :type => :request do
 
   context 'invalid authorization' do
     before do
-      get '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => "123456789"}
+      get "/users/#{@user.id}", params: '', headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do
@@ -93,7 +95,7 @@ describe "GET /users/userID", :type => :request do
 
   context 'without authorization' do
     before do
-      get '/users/'+@user.id.to_s
+      get "/users/#{@user.id}"
     end
 
     it 'returns an unauthorized action error' do

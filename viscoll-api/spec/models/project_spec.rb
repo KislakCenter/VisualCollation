@@ -1,6 +1,13 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Project, type: :model do
+  before do
+    @user = FactoryGirl.create(:user)
+    @project = FactoryGirl.create(:project, user: @user)
+  end
+
   it { is_expected.to be_mongoid_document }
 
   it { is_expected.to have_field(:title).of_type(String) }
@@ -18,24 +25,19 @@ RSpec.describe Project, type: :model do
   it { is_expected.to have_many(:sides) }
   it { is_expected.to have_many(:terms) }
 
-  before(:each) do
-    @user = FactoryGirl.create(:user)
-    @project = FactoryGirl.create(:project, user: @user)
-  end
-
-  describe "Validations" do
-    it "should require a title" do
+  describe 'Validations' do
+    it 'requires a title' do
       @project.title = ''
       expect(@project).not_to be_valid
     end
 
-    it "should be unique to the same user" do
+    it 'is unique to the same user' do
       @duplicated_project = FactoryGirl.create(:project, user: @user)
       @project.title = @duplicated_project.title
       expect(@project).not_to be_valid
     end
 
-    it "can be duplicated for different users" do
+    it 'can be duplicated for different users' do
       @user2 = FactoryGirl.create(:user)
       @duplicated_project = FactoryGirl.create(:project, user: @user2)
       @project.title = @duplicated_project.title
@@ -43,33 +45,34 @@ RSpec.describe Project, type: :model do
     end
   end
 
-  describe "Group IDs" do
-    it "should add group IDs properly" do
-      @project.add_groupIDs(['abcd', 'efgh'], 0)
-      expect(@project.groupIDs).to eq ['abcd', 'efgh']
+  describe 'Group IDs' do
+    it 'adds group IDs properly' do
+      @project.add_groupIDs(%w[abcd efgh], 0)
+      expect(@project.groupIDs).to eq %w[abcd efgh]
     end
 
-    it "should insert group IDs properly" do
-      @project.add_groupIDs(['abcd', 'efgh', 'ijkl'], 0)
-      @project.add_groupIDs(['1234', '5678'], 1)
-      expect(@project.groupIDs).to eq ['abcd', '1234', '5678', 'efgh', 'ijkl']
+    it 'inserts group IDs properly' do
+      @project.add_groupIDs(%w[abcd efgh ijkl], 0)
+      @project.add_groupIDs(%w[1234 5678], 1)
+      expect(@project.groupIDs).to eq %w[abcd 1234 5678 efgh ijkl]
     end
 
-    it "should remove group IDs properly" do
-      @project.add_groupIDs(['abcd', 'efgh', 'ijkl'], 0)
+    it 'removes group IDs properly' do
+      @project.add_groupIDs(%w[abcd efgh ijkl], 0)
       @project.remove_groupID('efgh')
-      expect(@project.groupIDs).to eq ['abcd', 'ijkl']
+      expect(@project.groupIDs).to eq %w[abcd ijkl]
     end
   end
 
-  describe "Image unlinking hook" do
+  describe 'Image unlinking hook' do
     before do
-      @project1 = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1,2]])
-      @project2 = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1,2]])
-      @image = FactoryGirl.create(:pixel, user: @user, projectIDs: [@project1.id.to_s, @project2.id.to_s], sideIDs: [@project1.sides[0].id.to_s, @project2.sides[0].id.to_s])
+      @project1 = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
+      @project2 = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
+      @image = FactoryGirl.create(:pixel, user: @user, projectIDs: [@project1.id.to_s, @project2.id.to_s],
+                                          sideIDs: [@project1.sides[0].id.to_s, @project2.sides[0].id.to_s])
     end
 
-    it 'should unhook from deleted project and sides' do
+    it 'unhooks from deleted project and sides' do
       @project2.destroy!
       @image.reload
       expect(@image.projectIDs).to eq [@project1.id.to_s]

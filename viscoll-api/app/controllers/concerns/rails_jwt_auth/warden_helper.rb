@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailsJwtAuth
   module WardenHelper
     def signed_in?
@@ -13,12 +15,10 @@ module RailsJwtAuth
     end
 
     def authenticate!
-      begin
-        warden.authenticate!(store: false)
-      rescue Exception => e
-        render json: {error: "Authorization Token: "+e.message}, status: :bad_request
-        return false
-      end
+      warden.authenticate!(store: false)
+    rescue Exception => e
+      render json: { error: "Authorization Token: #{e.message}" }, status: :bad_request
+      false
     end
 
     def authenticateDestroy!
@@ -29,7 +29,7 @@ module RailsJwtAuth
       return unless Rails.env.test? && base.name == 'ApplicationController'
 
       base.send(:rescue_from, RailsJwtAuth::Spec::NotAuthorized) do
-        render json: {}, status: 401
+        render json: {}, status: :unauthorized
       end
     end
   end

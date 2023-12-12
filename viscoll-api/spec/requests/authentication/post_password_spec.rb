@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "POST /password", :type => :request do
+describe 'POST /password', type: :request do
   context 'with valid params' do
     before do
-      @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
+      @user = User.create(name: 'user', email: 'user@mail.com', password: 'user')
       @user.confirmation_token = nil
-      @user.confirmed_at = "2017-07-12T16:08:25.278Z"
+      @user.confirmed_at = '2017-07-12T16:08:25.278Z'
       @user.save
-      post '/password', params: {:password => {:email => "user@mail.com"}}
+      post '/password', params: { password: { email: 'user@mail.com' } }
     end
 
     it 'returns a successful no_content response' do
@@ -21,10 +23,10 @@ describe "POST /password", :type => :request do
   end
 
   context 'with invalid params' do
-    context 'and unconfirmed user' do 
+    context 'and unconfirmed user' do
       before do
-        @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
-        post '/password', params: {:password => {:email => "user@mail.com"}}
+        @user = User.create(name: 'user', email: 'user@mail.com', password: 'user')
+        post '/password', params: { password: { email: 'user@mail.com' } }
       end
 
       it 'returns an unprocessable_entity status' do
@@ -43,7 +45,7 @@ describe "POST /password", :type => :request do
 
     context 'and no valid user' do
       before do
-        post '/password', params: {:password => {:email => "user@mail.com"}}
+        post '/password', params: { password: { email: 'user@mail.com' } }
       end
 
       it 'returns an unprocessable_entity status' do

@@ -1,24 +1,23 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "DELETE /groups", :type => :request do
+describe 'DELETE /groups', type: :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
-    post '/session', params: {:session => { :email => @user.email, :password => "user" }}
+    @user = FactoryGirl.create(:user, { password: 'user' })
+    put '/confirmation', params: { confirmation_token: @user.confirmation_token }
+    post '/session', params: { session: { email: @user.email, password: 'user' } }
     @authToken = JSON.parse(response.body)['session']['jwt']
-  end
-
-  before :each do
     @project = FactoryGirl.create(:project, {
-      user: @user,
-      taxonomies: ["Ink"],
-    })
+                                    user: @user,
+                                    taxonomies: ['Ink']
+                                  })
     groupIDs = []
     5.times do |n|
-      group = (FactoryGirl.create(:quire, { 
-        project: @project, 
-        title: "QUIRE #{n+1}"
-      }))
+      group = FactoryGirl.create(:quire, {
+                                   project: @project,
+                                   title: "QUIRE #{n + 1}"
+                                 })
       groupIDs.push(group.id.to_s)
     end
     @project.add_groupIDs(groupIDs, 0)
@@ -26,16 +25,17 @@ describe "DELETE /groups", :type => :request do
     @parameters = {
       projectID: @project.id.to_s,
       groups: [
-          @project.groups[1].id.to_str,
-          @project.groups[2].id.to_str,
-      ],
+        @project.groups[1].id.to_str,
+        @project.groups[2].id.to_str
+      ]
     }
   end
-  
+
   context 'with valid authorization' do
     context 'and standard group specs' do
       before do
-        delete '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/groups', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
       end
 
@@ -44,59 +44,62 @@ describe "DELETE /groups", :type => :request do
       end
 
       it 'deletes only the specified groups' do
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 1")
-        expect(@project.groups).not_to include an_object_having_attributes(title: "QUIRE 2")
-        expect(@project.groups).not_to include an_object_having_attributes(title: "QUIRE 3")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 4")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 5")
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 1')
+        expect(@project.groups).not_to include an_object_having_attributes(title: 'QUIRE 2')
+        expect(@project.groups).not_to include an_object_having_attributes(title: 'QUIRE 3')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 4')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 5')
       end
     end
-    
+
     context 'and missing group' do
       before do
         @parameters[:groups][0] += 'missing'
         @parameters[:groups][1] += 'missing'
-        delete "/groups", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/groups', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       end
-      
+
       it 'returns 204' do
         expect(response).to have_http_status(:no_content)
       end
-      
+
       it 'leaves the groups alone' do
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 1")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 2")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 3")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 4")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 5")
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 1')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 2')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 3')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 4')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 5')
       end
     end
-    
+
     context 'and unauthorized group' do
       before do
         @project.user = FactoryGirl.create(:user)
         @project.save
-        delete '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        delete '/groups', params: @parameters.to_json,
+                          headers: { 'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         @project.reload
       end
-      
+
       it 'returns 401' do
         expect(response).to have_http_status(:unauthorized)
       end
-      
+
       it 'leaves the groups alone' do
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 1")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 2")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 3")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 4")
-        expect(@project.groups).to include an_object_having_attributes(title: "QUIRE 5")
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 1')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 2')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 3')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 4')
+        expect(@project.groups).to include an_object_having_attributes(title: 'QUIRE 5')
       end
     end
   end
-  
+
   context 'with corrupted authorization' do
     before do
-      delete '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+      delete '/groups', params: @parameters.to_json,
+                        headers: { 'Authorization' => "#{@authToken}asdf", 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
     end
 
     it 'returns an bad request error' do
@@ -110,7 +113,7 @@ describe "DELETE /groups", :type => :request do
 
   context 'with empty authorization' do
     before do
-      delete '/groups', params: @parameters.to_json, headers: {'Authorization' => ""}
+      delete '/groups', params: @parameters.to_json, headers: { 'Authorization' => '' }
     end
 
     it 'returns an bad request error' do
@@ -124,7 +127,7 @@ describe "DELETE /groups", :type => :request do
 
   context 'invalid authorization' do
     before do
-      delete '/groups', params: @parameters.to_json, headers: {'Authorization' => "123456789"}
+      delete '/groups', params: @parameters.to_json, headers: { 'Authorization' => '123456789' }
     end
 
     it 'returns an bad request error' do
