@@ -190,6 +190,9 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
+          # TODO: 2024-11-05: This fails because spec is out of sync with the code
+          #     The response body is: "{\"errors\":\"User update failed: Current password blank\"}"
+          #     This problem appears to occur throughout the Specs
           expect(JSON.parse(response.body)['current_password']).to eq(['blank'])
         end
       end
