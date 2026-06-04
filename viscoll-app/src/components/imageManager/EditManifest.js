@@ -13,13 +13,14 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import IconFilter from 'material-ui/svg-icons/content/filter-list';
+import {getPrimaryManifestName, getTrimmedPrimaryManifestName, isManifestNameUpdateValid} from './manifestName';
 
 /** Dialog to edit manifest name */
 export default class EditManifest extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.manifest? props.manifest.name:"",
+      name: props.manifest? getPrimaryManifestName(props.manifest.name):"",
       nameError: "",
       confirmationOpen: "",
       activeImg: "",
@@ -30,7 +31,7 @@ export default class EditManifest extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.manifest) {
-      this.setState({name: nextProps.manifest.name})
+      this.setState({name: getPrimaryManifestName(nextProps.manifest.name)})
     }
   }
 
@@ -44,7 +45,7 @@ export default class EditManifest extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    const manifest = {id: this.props.manifest.id, name: this.state.name.trim()}
+    const manifest = {id: this.props.manifest.id, name: getTrimmedPrimaryManifestName(this.state.name)}
     this.setState({name: ""}, ()=>{
       this.props.action.updateManifest({manifest});
       this.props.handleClose();
@@ -58,10 +59,10 @@ export default class EditManifest extends Component {
   runValidation = () => {
     for (const manifestID in this.props.manifests){
       const manifest = this.props.manifests[manifestID];
-      if (manifestID!==this.props.manifest.id && manifest.name===this.state.name.trim()){
-        this.setState({nameError: `Manifest with name: ${manifest.name} already exists.`});
+      if (manifestID!==this.props.manifest.id && getTrimmedPrimaryManifestName(manifest.name)===getTrimmedPrimaryManifestName(this.state.name)){
+        this.setState({nameError: `Manifest with name: ${getPrimaryManifestName(manifest.name)} already exists.`});
         return;
-      } else if (this.state.name.length>51) {
+      } else if (getPrimaryManifestName(this.state.name).length>51) {
         this.setState({nameError: `Manifest name must be under 50 characters.`});
         return;
       }
@@ -71,7 +72,7 @@ export default class EditManifest extends Component {
   }
 
   isValid = () => {
-    return (this.state.nameError==="" && this.state.name!=="" && this.props.manifest.name!==this.state.name.trim())
+    return isManifestNameUpdateValid(this.state.nameError, this.state.name, this.props.manifest.name)
   }
 
   handleFilterClick = (e) => {
