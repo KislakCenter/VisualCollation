@@ -1,0 +1,10 @@
+{:deps {babashka/fs                 {:mvn/version "0.5.26"}
+        com.taoensso/telemere       {:mvn/version "1.2.1"}
+        com.taoensso/telemere-slf4j {:mvn/version "1.2.1"}
+        com.xmlcalabash/xmlcalabash {:mvn/version "3.0.47"
+                                     :exclusions  [ch.qos.logback/logback-classic]}
+        jarohen/chime               {:mvn/version "0.3.3"}
+        metosin/reitit              {:mvn/version "0.10.1"}
+        ring/ring-defaults          {:mvn/version "0.7.0"}
+        ring/ring-jetty-adapter     {:mvn/version "1.15.4"}
+        tick/tick                   {:mvn/version "1.0"}}}

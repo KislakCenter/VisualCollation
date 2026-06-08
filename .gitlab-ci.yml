@@ -22,13 +22,13 @@ workflow:
 stages:
   - sast:project
   - build:web
-  - build:idrovora
+  - build:xproc
   - sast:web
-  - sast:idrovora
+  - sast:xproc
   - push:web
-  - push:idrovora
+  - push:xproc
   - remove:web
-  - remove:idrovora
+  - remove:xproc
 
 shiftleft_project_scanning:
   stage: sast:project
@@ -49,16 +49,16 @@ build_web_image:
   tags:
     - build
 
-build_idrovora_image:
-  stage: build:idrovora
+build_xproc_image:
+  stage: build:xproc
   extends:
     - .build_docker_image
   needs:
     - shiftleft_project_scanning
   variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
-    DOCKER_BUILD_CONTEXT: "vceditor_idrovora/"
-    DOCKERFILE_PATH: "vceditor_idrovora/"
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
+    DOCKER_BUILD_CONTEXT: "viscoll-xproc/"
+    DOCKERFILE_PATH: "viscoll-xproc/"
   tags:
     - build
 
@@ -74,14 +74,14 @@ trivy_web_container_scanning:
     - build
   allow_failure: true
 
-trivy_idrovora_container_scanning:
-  stage: sast:idrovora
+trivy_xproc_container_scanning:
+  stage: sast:xproc
   extends:
     - .trivy_container_scanning
   needs:
-    - build_idrovora_image
+    - build_xproc_image
   variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
   tags:
     - build
   allow_failure: true
@@ -98,15 +98,15 @@ push_web_image_to_registry:
   tags:
     - build
 
-push_idrovora_image_to_registry:
-  stage: push:idrovora
+push_xproc_image_to_registry:
+  stage: push:xproc
   extends:
     - .push_docker_image
   needs:
-    - trivy_idrovora_container_scanning
+    - trivy_xproc_container_scanning
   variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
-    DOCKER_IMAGE_NAME: "vceditor_idrovora"
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
+    DOCKER_IMAGE_NAME: "vceditor_xproc"
   tags:
     - build
 
@@ -123,14 +123,14 @@ remove_web_image:
   tags:
     - build
 
-remove_idrovora_image:
-  stage: remove:idrovora
+remove_xproc_image:
+  stage: remove:xproc
   extends:
     - .remove_docker_image
   needs:
-    - push_idrovora_image_to_registry
+    - push_xproc_image_to_registry
   variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-idrovora"
+    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
   rules:
     - when: always
   tags:

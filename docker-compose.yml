@@ -40,8 +40,7 @@ services:
       - internal
 
   xproc:
-    image: "quay.io/upennlibraries/vceditor_idrovora:${RELEASE_TAG}"
-    command: --http 2000 --http-context-path /xproc --http-doc-root /docs /xpl
+    image: "quay.io/upennlibraries/vceditor_xproc:${RELEASE_TAG}"
     deploy:
       labels:
         - "traefik.enable=true"
@@ -52,7 +51,7 @@ services:
       - internal
       - traefik
     volumes:
-      - xproc:/docs
+      - xproc:/app/htdocs
 
 networks:
   internal:
