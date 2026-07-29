@@ -2,12 +2,11 @@ version: "3.7"
 
 services:
   app:
-    image: "quay.io/upennlibraries/vceditor_web:${RELEASE_TAG}"
+    image: "gitlab.library.upenn.edu/chc/viscoll/visualcollation/vceditor_web:${RELEASE_TAG}"
     command: server -b 0.0.0.0
     environment:
       - ADMIN_EMAIL
       - APPLICATION_HOST
-      - HONEYBADGER_API_KEY
       - MAILER_DEFAULT_FROM
       - MAILER_DOMAIN
       - MAILER_HOST
@@ -20,6 +19,7 @@ services:
       - RELEASE_TAG
       - SECRET_KEY_BASE
       - XPROC_URL
+      - HONEYBADGER_API_KEY
     deploy:
       labels:
         - "traefik.enable=true"
@@ -40,7 +40,7 @@ services:
       - internal
 
   xproc:
-    image: "quay.io/upennlibraries/vceditor_idrovora:${RELEASE_TAG}"
+    image: "gitlab.library.upenn.edu/chc/viscoll/visualcollation/vceditor_idrovora:${RELEASE_TAG}"
     command: --http 2000 --http-context-path /xproc --http-doc-root /docs /xpl
     deploy:
       labels:
@@ -66,3 +66,4 @@ volumes:
     name: ${INSTANCE}-xproc
   images:
     name: ${INSTANCE}-images
+
