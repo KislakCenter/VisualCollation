@@ -1,14 +1,32 @@
-# require database cleaner at the top level
-require 'database_cleaner'
-
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 
-ENV['RAILS_ENV'] ||= 'test'
+ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../../config/environment', __FILE__)
 
-# Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+module TestDatabaseSafety
+  EXPECTED_DATABASE_NAME = 'viscoll_test'.freeze
+
+  def self.client
+    raise "RSpec must run in the test environment" unless Rails.env.test?
+
+    client = Mongoid.default_client
+    database_name = client.database.name
+    return client if database_name == EXPECTED_DATABASE_NAME
+
+    raise "RSpec must use #{EXPECTED_DATABASE_NAME}, not #{database_name}"
+  end
+
+  def self.clean!
+    client.collections.each do |collection|
+      next if collection.name.start_with?('system.')
+
+      collection.find.delete_many
+    end
+  end
+end
+
+TestDatabaseSafety.client
 
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
@@ -70,15 +88,18 @@ RSpec.configure do |config|
   # add 'WardenHelper'
   config.include RailsJwtAuth::Spec::Helpers, :type => :request
 
-  # start by truncating all the tables but then use the faster transaction strategy the rest of the time.
+  # Start each suite with an empty test database.
   config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation)
+    TestDatabaseSafety.clean!
   end
 
-  # start the transaction strategy as examples are run
+  # MongoDB transactions are not available with the current standalone server,
+  # so clear the verified test database after every example.
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
+    begin
       example.run
+    ensure
+      TestDatabaseSafety.clean!
     end
   end
 end
