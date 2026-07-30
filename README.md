@@ -36,8 +36,8 @@ To create and approve a development user:
 - Enter a name, email and password. It does not have to be a real email address; e.g., `test@test.com` is fine.
 - From the docker log copy the link from the confirmation email body It will look like this: 
   - https://localhost/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
-- Paste the link into a browser and add port `3000` to the domain:
-  - https://localhost:3000/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
+- Paste the link into a browser, change the protcol to `http`, and add port `3000` to the domain:
+  - http://localhost:3000/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
 - Hit enter and the account will be approved
 
 #### Testing
