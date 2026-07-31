@@ -5,7 +5,7 @@ class SidesController < ApplicationController
   # PATCH/PUT /sides/1
   def update
     if !@side.update(side_params)
-      raise VCError, "Side (#{@side.id} could not be updated: #{@side.errors.full_messages.join "\n"})"
+      render_error("Side (#{@side.id} could not be updated: #{@side.errors.full_messages.join "\n"})", status: :unprocessable_entity) and return
     end
   end
 
@@ -26,15 +26,15 @@ class SidesController < ApplicationController
       end
     end
     @project = Project.find(sides[0].project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
     if haveErrors
-      raise VCError, "Errors occurred when updating: #{@errors.join "\n"}"
+      render_error("Errors occurred when updating: #{@errors.join "\n"}", status: :unprocessable_entity) and return
     end
     allSides.each_with_index do |side_params, index|
       side              = sides[index]
       previousSideImage = side.image.clone
       if !side.update(side_params[:attributes])
-        raise VCError, "Errors occurred when updating sides: #{side.errors.full_messages.join "\n"}"
+        render_error("Errors occurred when updating sides: #{side.errors.full_messages.join "\n"}", status: :unprocessable_entity) and return
       else
         # SPEICAL CASE FOR DIY IMAGE MAPPING
         if side_params[:attributes]["image"]
@@ -91,7 +91,7 @@ class SidesController < ApplicationController
   def set_side
     @side    = Side.find(params[:id])
     @project = Project.find(@side.project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

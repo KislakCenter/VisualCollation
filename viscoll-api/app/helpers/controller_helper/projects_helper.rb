@@ -3,9 +3,11 @@ module ControllerHelper
   module ProjectsHelper
     include ControllerHelper::LeafsHelper
 
-    def authorize_project! project
-      return if current_user.id == project.user_id
-      raise ApplicationController::VCError, "Project (#{project.id}) is not authorized for current user (#{current_user.id}); expected: '#{project.user_id}'."
+    def authorize_project! project, status: :unauthorized
+      return true if current_user.id == project.user_id
+
+      render_error("Project (#{project.id}) is not authorized for current user (#{current_user.id}); expected: '#{project.user_id}'.", status: status)
+      false
     end
 
     def addGroupsLeafsConjoin(project, allGroups, folioNumber, pageNumber, startingTexture)

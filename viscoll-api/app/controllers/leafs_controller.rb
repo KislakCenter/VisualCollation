@@ -16,7 +16,7 @@ class LeafsController < ApplicationController
     # Validation error for leaf_params
     @leafErrors = validateLeafParams(project_id, parentID)
     if @leafErrors[:project_id].length > 0 || @leafErrors[:parentID].length > 0
-      raise VCError, "Leaf validation failed: #{@leafErrors.join "\n"}"
+      render_error("Leaf validation failed", status: :unprocessable_entity, json: { leaf: @leafErrors }) and return
     end
 
     # Validation errors checking for additional parameters
@@ -28,12 +28,12 @@ class LeafsController < ApplicationController
       end
     end
     if hasAdditionalErrors
-      raise VCError, "Validation failed: #{@additionalErrors}"
+      render_error("Additional leaf validation failed", status: :unprocessable_entity, json: { additional: @additionalErrors }) and return
     end
 
     # Attempt to validate ownership
     @project = Project.find(project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
 
     # Skip all callbacks for side creation if leafIDs and SideIDs were give in the request
     begin
@@ -65,7 +65,7 @@ class LeafsController < ApplicationController
             @leaf.save
           end
         else
-          raise VCError, @leaf.errors.full_messages.join("\n")
+          render_error("Leaf could not be saved", status: :unprocessable_entity, json: { leaf: @leaf.errors }) and return
         end
         sideIDIndex += 2
       end
@@ -111,19 +111,28 @@ class LeafsController < ApplicationController
         handle_paper_update(@leaf)
       end
     else
-      raise VCError, "Leaf failed to update: #{@leaf.errors.full_messages.join "\n"}"
+      render_error("Leaf could not be updated", status: :unprocessable_entity, json: { leaf: @leaf.errors }) and return
     end
   end
 
   # PATCH/PUT /leafs
   def updateMultiple
     allLeafs = leaf_params_batch_update.to_h[:leafs]
-    @project = Project.find(leaf_params_batch_update.to_h[:project_id])
+    project_id = leaf_params_batch_update.to_h[:project_id]
+    begin
+      @project = Project.find(project_id)
+    rescue Mongoid::Errors::DocumentNotFound => error
+      render_error(error, status: :unprocessable_entity, json: { error: "project not found with id #{project_id}" }) and return
+    end
     allLeafs.each do |leaf_params, index|
-      @leaf = Leaf.find(leaf_params[:id])
-      authorize_project! @project
+      begin
+        @leaf = Leaf.find(leaf_params[:id])
+      rescue Mongoid::Errors::DocumentNotFound => error
+        render_error(error, status: :unprocessable_entity, json: { leafs: ["leaf not found with id #{leaf_params[:id]}"] }) and return
+      end
+      return unless authorize_project! @project
       if !@leaf.update(leaf_params[:attributes])
-        raise VCError, "Leaf could not be updated: #{leaf.errors.full_messages.join "\n"}"
+        render_error("Leaf could not be updated", status: :unprocessable_entity, json: { leafs: { attributes: { index: @leaf.errors } } }) and return
       end
       if (leaf_params[:attributes].key?(:attached_below) || leaf_params[:attributes].key?(:attached_above))
         update_attached_to()
@@ -170,7 +179,7 @@ class LeafsController < ApplicationController
       end
       memberOrder = @parent.memberIDs.index(leaf.id.to_s)
       if leaf.project.user_id != current_user.id
-        raise VCError, "Leaf belongs to user (#{leaf.project.user_id}) which does not match the current user's ID (#{current_user.id})"
+        render_error("Leaf belongs to user (#{leaf.project.user_id}) which does not match the current user's ID (#{current_user.id})", status: :unauthorized) and return
       end
 
       # Detach its conjoined leaf if any
@@ -200,6 +209,8 @@ class LeafsController < ApplicationController
     parentAndChildren.each do |parentID, leafIDs|
       @project.groups.find(parentID).remove_members(leafIDs)
     end
+  rescue Mongoid::Errors::DocumentNotFound => error
+    render_error(error, status: :unprocessable_entity)
   end
 
   # CONJOIN /leafs.json
@@ -214,7 +225,7 @@ class LeafsController < ApplicationController
       begin
         leaf = Leaf.find(leafID)
         if not allowed_project_ids.include?(leaf.project_id.to_s)
-          raise VCError, "Conjoin not allowed."
+          render_error("Conjoin not allowed.", status: :unauthorized) and return
         end
         leaves.push(leaf)
       rescue Exception => e
@@ -227,7 +238,7 @@ class LeafsController < ApplicationController
       haveErrors = true
     end
     if haveErrors
-      raise VCError, "Error with conjoin: #{@errors.join "\n"}"
+      render_error("Leaf conjoin failed", status: :unprocessable_entity, json: { leafs: @errors }) and return
     end
     @project = Project.find(leaves[0].project_id)
     autoConjoinLeaves(leaves, (leaves.length + 1) / 2)
@@ -239,7 +250,7 @@ class LeafsController < ApplicationController
   def set_leaf
     @leaf    = Leaf.find(params[:id])
     @project = Project.find(@leaf.project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

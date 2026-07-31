@@ -2,16 +2,23 @@ class ImagesController < ApplicationController
   before_action :authenticate!, except: [:show, :getZipImages]
 
   def authorize_image! image
-    return if current_user.id == image.user_id
-    raise ApplicationController::VCError, "Image (#{image.id}) is not authorized for current user (#{current_user.id}); expected: '#{image.user_id}'."
+    return true if current_user.id == image.user_id
+
+    render_error("Image (#{image.id}) is not authorized for current user (#{current_user.id}); expected: '#{image.user_id}'.", status: :unauthorized)
+    false
   end
 
   # POST /images
   def uploadImages
     projectIDs = []
     if image_create_params.to_h.key?("projectID")
-      @project = Project.find(image_create_params.to_h[:projectID])
-      authorize_project! @project
+      projectID = image_create_params.to_h[:projectID]
+      begin
+        @project = Project.find(projectID)
+      rescue Mongoid::Errors::DocumentNotFound => error
+        render_error(error, status: :not_found, json: { error: "project not found with id #{projectID}" }) and return
+      end
+      return unless authorize_project! @project
       projectIDs.push(@project.id.to_s)
     end
 
@@ -36,7 +43,7 @@ class ImagesController < ApplicationController
             copyCounter += 1
           else
             image.destroy
-            raise VCError, "Image failed: #{image.errors.full_messages.join("\n")}"
+            render_error("Image failed: #{image.errors.full_messages.join("\n")}", status: :unprocessable_entity) and return
           end
         end
       end
@@ -52,7 +59,11 @@ class ImagesController < ApplicationController
     # p params[:imageID_filename]
     imageID  = params[:imageID_filename].split("_", 2)[0]
     filename = params[:imageID_filename].split("_", 2)[1]
-    @image   = Image.find(imageID)
+    begin
+      @image = Image.find(imageID)
+    rescue Mongoid::Errors::DocumentNotFound => error
+      render_error(error, status: :not_found, json: { error: "image not found with id #{imageID}" }) and return
+    end
     # Get image file
     path = "#{Rails.root}/public/uploads/#{@image.fileID}"
     File.open(path, 'rb') do |image|
@@ -73,14 +84,22 @@ class ImagesController < ApplicationController
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
     projects   = []
     projectIDs.each do |projectID|
-      project = Project.find(projectID)
-      authorize_project! project
+      begin
+        project = Project.find(projectID)
+      rescue Mongoid::Errors::DocumentNotFound => error
+        render_error(error, status: :not_found, json: { error: "project not found with id #{projectID}" }) and return
+      end
+      return unless authorize_project! project
       projects.push(project)
     end
     images = []
     imageIDs.each do |imageID|
-      image         = Image.find(imageID)
-      authorize_image! image
+      begin
+        image = Image.find(imageID)
+      rescue Mongoid::Errors::DocumentNotFound => error
+        render_error(error, status: :not_found, json: { error: "image not found with id #{imageID}" }) and return
+      end
+      return unless authorize_image! image
       images.push(image)
     end
     projects.each do |project|
@@ -102,14 +121,23 @@ class ImagesController < ApplicationController
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
     projects   = []
     projectIDs.each do |projectID|
-      project = Project.find(projectID)
-      authorize_project! project
+      begin
+        project = Project.find(projectID)
+      rescue Mongoid::Errors::DocumentNotFound => error
+        render_error(error, status: :not_found, json: { error: "project not found with id #{projectID}" }) and return
+      end
+      return unless authorize_project! project
       projects.push(project)
     end
     images = []
     imageIDs.each do |imageID|
-      image = Image.find(imageID.split("_", 2)[0])
-      authorize_image! image
+      imageID = imageID.split("_", 2)[0]
+      begin
+        image = Image.find(imageID)
+      rescue Mongoid::Errors::DocumentNotFound => error
+        render_error(error, status: :not_found, json: { error: "image not found with id #{imageID}" }) and return
+      end
+      return unless authorize_image! image
       images.push(image)
     end
     projects.each do |project|
@@ -139,9 +167,13 @@ class ImagesController < ApplicationController
     images = []
     images_destroy_params.to_h[:imageIDs].each do |imageIDParam|
       imageID = imageIDParam.split("_", 2)[0]
-      image   = Image.find(imageID)
+      begin
+        image = Image.find(imageID)
+      rescue Mongoid::Errors::DocumentNotFound => error
+        render_error(error, status: :not_found, json: { error: "image not found with id #{imageID}" }) and return
+      end
       images.push(image)
-      authorize_image! image
+      return unless authorize_image! image
     end
     images.each do |image|
       image.destroy

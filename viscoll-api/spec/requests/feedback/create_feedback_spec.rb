@@ -26,6 +26,7 @@ describe "POST /feedback", :type => :request do
       end
       
       it 'requires a title' do
+        expect(Honeybadger).not_to receive(:notify)
         @parameters[:feedback][:title] = ''
         post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         expect(response).to have_http_status(:unprocessable_entity)
@@ -40,7 +41,9 @@ describe "POST /feedback", :type => :request do
       end
       
       it 'handles exceptions' do
-        expect(FeedbackMailer).to receive(:sendFeedback).and_raise('AnException')
+        error = RuntimeError.new('AnException')
+        expect(Honeybadger).to receive(:notify).with(error)
+        expect(FeedbackMailer).to receive(:sendFeedback).and_raise(error)
         post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)['error']).to eq 'AnException'

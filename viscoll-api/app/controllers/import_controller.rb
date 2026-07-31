@@ -18,7 +18,7 @@ class ImportController < ApplicationController
       if errors.empty? || errors2.empty?
         handleXMLImport(xml)
       else
-        raise VCError, "XML import failed: #{(errors + errors2).join "\n"}"
+        render_error("XML import failed: #{(errors + errors2).join "\n"}", status: :unprocessable_entity) and return
       end
     end
     newProject = current_user.projects.order_by(:updated_at => 'desc').first
@@ -27,6 +27,9 @@ class ImportController < ApplicationController
     @projects = current_user.projects.order_by(:updated_at => 'desc')
     @images   = current_user.images
     render :'projects/index', status: :ok and return
+  rescue JSON::ParserError => error
+    message = "Sorry, the imported data cannot be validated. Please check your file for errors and make sure the correct import format is selected above."
+    render_error(error, status: :unprocessable_entity, json: { error: message })
   end
 
   private

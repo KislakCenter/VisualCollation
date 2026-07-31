@@ -24,14 +24,20 @@ class GroupsController < ApplicationController
       end
     end
     if (hasAdditionalErrors)
-      raise VCError, "Additional group errors: #{@additionalErrors}"
+      render_error("Additional group errors", status: :unprocessable_entity, json: { additional: @additionalErrors }) and return
     end
     @groupErrors = { project_id: [] }
     if (project_id == nil)
-      raise VCError, "Project ID is nil. Group has following errors: #{@groupErrors}"
+      @groupErrors[:project_id].push("not found")
+      render_error("Project ID is missing", status: :unprocessable_entity, json: { group: @groupErrors }) and return
     end
 
-    @project = Project.find(project_id)
+    begin
+      @project = Project.find(project_id)
+    rescue Mongoid::Errors::DocumentNotFound
+      @groupErrors[:project_id].push("project not found with id #{project_id}")
+      render_error("Project not found", status: :unprocessable_entity, json: { group: @groupErrors }) and return
+    end
 
     new_groups    = []
     new_group_ids = []
@@ -54,7 +60,7 @@ class GroupsController < ApplicationController
         new_groups.push(group)
         new_group_ids.push(group.id.to_s)
       else
-        raise VCError, "Group (#{group.id}) was unable to save: #{group.errors.full_messages.join('\n')}"
+        render_error("Group could not be saved", status: :unprocessable_entity, json: { group: group.errors }) and return
       end
     end
     # Add new group(s) to parent
@@ -78,7 +84,7 @@ class GroupsController < ApplicationController
   # PATCH/PUT /groups/1
   def update
     unless @group.update(group_params)
-      raise VCError, "Some failed to update Group #{@group.id}"
+      render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors) and return
     end
   end
 
@@ -88,14 +94,14 @@ class GroupsController < ApplicationController
     # Run validations
     errors = validateGroupBatchUpdate(allGroups)
     if not errors.empty?
-      raise VCError, "Batch update error: #{errors}"
+      render_error("Batch update failed", status: :unprocessable_entity, json: { groups: errors }) and return
     end
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
       @project = Project.find(@group.project_id)
-      authorize_project! @project
+      return unless authorize_project! @project
       if !@group.update(group_params[:attributes])
-        raise VCError, "Group: #{@group} could not be updated. Errors: #{errors}"
+        render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors) and return
       end
     end
   end
@@ -113,9 +119,13 @@ class GroupsController < ApplicationController
     # Delete groups
     groupIDs.each do |groupID|
       # Wrapping destroy in begin/rescue because group may no longer exist when it's nested
-      group    = Group.find(groupID)
-      @project = Project.find(group.project_id)
-      authorize_project! @project
+      begin
+        group    = Group.find(groupID)
+        @project = Project.find(group.project_id)
+      rescue Mongoid::Errors::DocumentNotFound
+        next
+      end
+      return unless authorize_project! @project
       group.destroy
     end
   end
@@ -125,7 +135,9 @@ class GroupsController < ApplicationController
   def set_group
     @group   = Group.find(params[:id])
     @project = Project.find(@group.project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
+  rescue Mongoid::Errors::DocumentNotFound => error
+    render_error(error, status: :not_found, json: { error: "group not found" })
   end
 
   def group_params

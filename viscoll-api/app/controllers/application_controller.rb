@@ -1,22 +1,10 @@
 class ApplicationController < ActionController::API
-    class VCError < StandardError; end
-
-    rescue_from Mongoid::Errors::DocumentNotFound do |e|
-        Honeybadger.notify(e)
-        Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
-        render json: { errors: e.message }, status: :not_found
+    rescue_from StandardError do |error|
+      render_error(error, status: :unprocessable_entity, report: true)
     end
 
-    rescue_from VCError do |e|
-        Honeybadger.notify(e)
-        Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
-        render json: { errors: e.message }, status: :bad_request
-    end
-
-    rescue_from StandardError do |e|
-        Honeybadger.notify(e)
-        Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
-        render json: { errors: e.message }, status: :bad_request
+    rescue_from Mongoid::Errors::DocumentNotFound do |error|
+      render_error(error, status: :not_found)
     end
 
     before_action :set_base_api_url
@@ -37,4 +25,19 @@ class ApplicationController < ActionController::API
     include ValidationHelper::ProjectValidationHelper
     include ValidationHelper::GroupValidationHelper
     include ValidationHelper::LeafValidationHelper
+
+    private
+
+    def render_error(error, status:, json: nil, report: false)
+      message = error.respond_to?(:message) ? error.message : error.to_s
+
+      if report
+        Rails.logger.error(([message] + Array(error.backtrace)).join("\n"))
+        Honeybadger.notify(error)
+      else
+        Rails.logger.warn(message)
+      end
+
+      render json: json || { error: message }, status: status
+    end
 end

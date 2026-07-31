@@ -17,7 +17,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      raise VCError, "User update failed: #{current_user.errors.full_messages.join "\n"}"
+      render_error("User update failed", status: :unprocessable_entity, json: current_user.errors) and return
     end
 
   end
@@ -33,8 +33,10 @@ class UsersController < ApplicationController
   def set_user
     @user = User.find(params[:id])
     if (@user != current_user)
-      raise VCError, "Unauthorized. User's do not match."
+      render_error("Unauthorized. User's do not match.", status: :unauthorized) and return
     end
+  rescue Mongoid::Errors::DocumentNotFound => error
+    render_error(error, status: :not_found, json: { error: "user not found with id #{params[:id]}" })
   end
 
   # Only allow a trusted parameter "white list" through.

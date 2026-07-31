@@ -32,7 +32,7 @@ class ProjectsController < ApplicationController
 
     validationResult = validateProjectCreateGroupsParams(allGroups)
     if (not validationResult[:status])
-      raise VCError, "Validation of create groups params failed: #{validationResult[:errors]}"
+      render_error("Project group validation failed", status: :unprocessable_entity, json: { groups: validationResult[:errors] }) and return
     end
     # Instantiate a new project with the given params
     @project = Project.new(project_params)
@@ -52,8 +52,10 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      raise VCError, "Project could not save: #{@project.errors.full_messages.join "\n"}"
+      render_error("Project could not save: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity) and return
     end
+  rescue StandardError => error
+    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
   end
 
   # PATCH/PUT /projects/1
@@ -64,8 +66,10 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      raise VCError, "Project could not update: #{@project.errors.full_messages.join "\n"}"
+      render_error("Project could not update: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity) and return
     end
+  rescue StandardError => error
+    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
   end
 
   # DELETE /projects/1
@@ -84,6 +88,8 @@ class ProjectsController < ApplicationController
       @projects = current_user.projects
       @images   = current_user.images
       render :index, status: :ok and return
+    rescue StandardError => error
+      render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
     ensure
       # Enable callbacks again
       Image.set_callback(:destroy, :before, :unlink_sides_before_delete)
@@ -105,27 +111,33 @@ class ProjectsController < ApplicationController
     @projects = current_user.projects
     @images   = current_user.images
     render :show, status: :ok and return
+  rescue StandardError => error
+    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
   end
 
   # PATCH/PUT /projects/:id/manifests
   def updateManifest
     manifest = manifest_params.to_h
     if not manifest.key?("id")
-      raise VCError, "ID is required."
+      render_error("Param required: id.", status: :unprocessable_entity) and return
     end
     if not @project.manifests.key?(manifest["id"])
-      raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
+      message = "Manifest with id: #{manifest["id"]} not found in project with id: #{@project.id}."
+      render_error(message, status: :unprocessable_entity) and return
     end
     # ONLY UPDATING MANIFEST NAME FOR NOW
     @project.manifests[manifest["id"]]["name"] = manifest["name"]
     @project.save
+  rescue StandardError => error
+    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
   end
 
   # DELETE /projects/:id/manifests
   def deleteManifest
     manifestIDToDelete = manifest_params.to_h[:id]
     if not @project.manifests.key?(manifestIDToDelete)
-      raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
+      message = "Manifest with id: #{manifestIDToDelete} not found in project with id: #{@project.id}."
+      render_error(message, status: :unprocessable_entity) and return
     end
     @project.manifests.delete(manifestIDToDelete)
     # Update all sides that have the deleted manuscripts mapping
@@ -135,6 +147,8 @@ class ProjectsController < ApplicationController
       end
     end
     @project.save
+  rescue StandardError => error
+    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
   end
 
   # GET /projects/:id/clone
@@ -168,7 +182,7 @@ class ProjectsController < ApplicationController
 
   def set_project
     @project = Project.find(params[:id])
-    authorize_project! @project
+    return unless authorize_project! @project
   end
 
   # Never trust parameters from the scary Internet, only allow the white list through.
