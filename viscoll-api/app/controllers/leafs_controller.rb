@@ -125,9 +125,8 @@ class LeafsController < ApplicationController
     allLeafs.each do |leaf_params, index|
       leaf_id = leaf_params[:id]
       @leaf = find_batch_leaf(leaf_id)
-      return unless @leaf
+      return unless @leaf && authorize_project!(@project)
 
-      return unless authorize_project! @project
       if !@leaf.update(leaf_params[:attributes])
         return render_error("Leaf could not be updated", status: :unprocessable_entity, json: { leafs: { attributes: { index: @leaf.errors } } })
       end
