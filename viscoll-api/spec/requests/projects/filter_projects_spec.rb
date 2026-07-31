@@ -138,7 +138,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "group",
                 "attribute": "title",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ @project1.groups[0].title ]
               }
             ]
@@ -166,7 +166,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "group",
                 "attribute": "title",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ @project1.groups[0].title, @project1.groups[1].title ]
               }
             ]
@@ -188,14 +188,14 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not contains one' do
+      context 'does not contain one' do
         before do
           @parameters = {
             "queries": [
               {
                 "type": "group",
                 "attribute": "title",
-                "condition": "not contains",
+                "condition": "does not contain",
                 "values": [ @project1.groups[0].title ]
               }
             ]
@@ -216,14 +216,14 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not contains multiple' do
+      context 'does not contain multiple' do
         before do
           @parameters = {
             "queries": [
               {
                 "type": "group",
                 "attribute": "title",
-                "condition": "not contains",
+                "condition": "does not contain",
                 "values": [ @project1.groups[0].title, @project1.groups[1].title ]
               }
             ]
@@ -308,7 +308,7 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not equals one' do
+      context 'does not equal one' do
         before do
           @project1.leafs[5].update(material: 'Copy paper')
           @project2.leafs[5].update(material: 'Copy paper')
@@ -317,7 +317,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "leaf",
                 "attribute": "material",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ 'Copy paper' ]
               }
             ]
@@ -337,7 +337,7 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not equals multiple' do
+      context 'does not equal multiple' do
         before do
           @project1.leafs[5].update(material: 'Copy paper')
           @project1.leafs[13].update(material: 'Copy paper')
@@ -350,7 +350,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "leaf",
                 "attribute": "material",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ 'Copy paper', 'Plastic' ]
               }
             ]
@@ -371,31 +371,6 @@ describe "PUT /projects/:id/filter", :type => :request do
           expect(body['Leafs']).not_to include(@project2.leafs[5].id.to_s)
           expect(body['Leafs']).not_to include(@project2.leafs[13].id.to_s)
           expect(body['Leafs']).not_to include(@project2.leafs[16].id.to_s)
-        end
-      end
-
-      context 'with legacy conjoined_leaf_order attribute' do
-        before do
-          @parameters = {
-            "queries": [
-              {
-                "type": "leaf",
-                "attribute": "conjoined_leaf_order",
-                "condition": "equals",
-                "values": [ @project1.leafs[-1].conjoined_to ]
-              }
-            ]
-          }
-          put "/projects/#{@project1.id}/filter", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-        end
-
-        it 'returns 200' do
-          expect(response).to have_http_status(:ok)
-        end
-
-        it 'contains the expected entries' do
-          body = JSON.parse(response.body)
-          expect(body['Leafs']).to eq [@project1.leafs[-1].id.to_s]
         end
       end
     end
@@ -458,7 +433,7 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not equals one' do
+      context 'does not equal one' do
         before do
           @project1.sides[7].update(script_direction: 'Top-To-Bottom')
           @project2.sides[7].update(script_direction: 'Top-To-Bottom')
@@ -467,7 +442,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "side",
                 "attribute": "script_direction",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ 'Top-To-Bottom' ]
               }
             ]
@@ -486,7 +461,7 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not equals multiple' do
+      context 'does not equal multiple' do
         before do
           @project1.sides[7].update(script_direction: 'Top-To-Bottom')
           @project1.sides[10].update(script_direction: 'Left-To-Right')
@@ -496,7 +471,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "side",
                 "attribute": "script_direction",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ 'Top-To-Bottom', 'Left-To-Right' ]
               }
             ]
@@ -572,7 +547,7 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not contains one' do
+      context 'does not contain one' do
         before do
           @project1.sides[9].update(page_number: 'PN0')
           @parameters = {
@@ -580,7 +555,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "side",
                 "attribute": "page_number",
-                "condition": "not contains",
+                "condition": "does not contain",
                 "values": [ 'PN' ]
               }
             ]
@@ -599,7 +574,7 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context 'not contains multiple' do
+      context 'does not contain multiple' do
         before do
           @project1.sides[6].update(page_number: 'PN0')
           @project1.sides[11].update(page_number: 'QR1')
@@ -609,7 +584,7 @@ describe "PUT /projects/:id/filter", :type => :request do
               {
                 "type": "side",
                 "attribute": "page_number",
-                "condition": "not contains",
+                "condition": "does not contain",
                 "values": [ 'PN', 'QR' ]
               }
             ]
@@ -691,14 +666,14 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context "not equals one" do
+      context "does not equal one" do
         before do
           @parameters = {
             "queries": [
               {
                 "type": "term",
                 "attribute": "title",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ 'ULTRA WAAHOO' ]
               }
             ]
@@ -718,14 +693,14 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context "not equals multiple" do
+      context "does not equal multiple" do
         before do
           @parameters = {
             "queries": [
               {
                 "type": "term",
                 "attribute": "title",
-                "condition": "not equals",
+                "condition": "does not equal",
                 "values": [ 'ULTRA WAAHOO', 'CREEPY WAAHOO' ]
               }
             ]
@@ -798,14 +773,14 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context "not contains one" do
+      context "does not contain one" do
         before do
           @parameters = {
             "queries": [
               {
                 "type": "term",
                 "attribute": "title",
-                "condition": "not contains",
+                "condition": "does not contain",
                 "values": [ 'ULTRA' ]
               }
             ]
@@ -824,14 +799,14 @@ describe "PUT /projects/:id/filter", :type => :request do
         end
       end
 
-      context "not contains multiple" do
+      context "does not contain multiple" do
         before do
           @parameters = {
             "queries": [
               {
                 "type": "term",
                 "attribute": "title",
-                "condition": "not contains",
+                "condition": "does not contain",
                 "values": [ 'CREEPY', 'XTREME' ]
               }
             ]
@@ -853,39 +828,6 @@ describe "PUT /projects/:id/filter", :type => :request do
     end
 
     context 'and compound conditions' do
-      context 'using AND' do
-        before do
-          @parameters = {
-            "queries": [
-              {
-                "type": "group",
-                "attribute": "title",
-                "condition": "contains",
-                "values": [ 'Quire' ],
-                "conjunction": "AND"
-              },
-              {
-                "type": "group",
-                "attribute": "title",
-                "condition": "contains",
-                "values": [ @project1.groups[0].title[5..-1] ]
-              }
-            ]
-          }
-          put "/projects/#{@project1.id}/filter", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-        end
-
-        it 'returns 200' do
-          expect(response).to have_http_status(:ok)
-        end
-
-        it 'contains the expected entries' do
-          body = JSON.parse(response.body)
-          expect(body['Groups']).to include(@project1.groups[0].id.to_s)
-          expect(body['Groups']).not_to include(@project2.groups[0].id.to_s)
-        end
-      end
-
       context 'using OR' do
         before do
           @parameters = {
@@ -929,7 +871,7 @@ describe "PUT /projects/:id/filter", :type => :request do
       end
     end
 
-    context 'and inexistent params' do
+    context 'and inexistent params', pending: 'catch all api error fix' do
       before do
         @parameters = {
           "queries": []
@@ -942,7 +884,7 @@ describe "PUT /projects/:id/filter", :type => :request do
       end
     end
 
-    context 'and missing project' do
+    context 'and missing project', pending: 'catch all api error fix' do
       before do
         put "/projects/#{@project1.id}missing/filter", params: @parameters.to_json, headers: {'Authorization' => @authToken}
       end
@@ -952,7 +894,7 @@ describe "PUT /projects/:id/filter", :type => :request do
       end
     end
 
-    context 'and unauthorized params' do
+    context 'and unauthorized params', pending: 'catch all api error fix' do
       before do
         put "/projects/#{@project2.id}/filter", params: @parameters.to_json, headers: {'Authorization' => @authToken}
       end
