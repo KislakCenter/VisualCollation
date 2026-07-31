@@ -2,10 +2,7 @@ class ImagesController < ApplicationController
   before_action :authenticate!, except: [:show, :getZipImages]
 
   def authorize_image! image
-    return true if current_user.id == image.user_id
-
-    render_error("Image (#{image.id}) is not authorized for current user (#{current_user.id}); expected: '#{image.user_id}'.", status: :unauthorized)
-    false
+    authorize_owner!(image)
   end
 
   # POST /images

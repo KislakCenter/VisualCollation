@@ -36,12 +36,18 @@ class ApplicationController < ActionController::API
       render json: json || { error: message }, status: status
     end
 
-    def find_document(model, id)
+    def find_document(model, id, status: :not_found)
       model.find(id)
     rescue Mongoid::Errors::DocumentNotFound => error
-      message = "#{model.name.downcase} not found with id #{id}"
-      render_error(error, status: :not_found, json: { error: message })
+      render_error(error, status: status, json: { error: "#{model.name.downcase} not found with id #{id}" })
       nil
+    end
+
+    def authorize_owner!(record)
+      return true if current_user.id == record.user_id
+
+      render_error("#{record.class} (#{record.id}) is not authorized for current user (#{current_user.id}); expected: '#{record.user_id}'.", status: :unauthorized)
+      false
     end
 
     def report_error(error, message)

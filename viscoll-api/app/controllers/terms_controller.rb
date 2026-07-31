@@ -146,7 +146,7 @@ class TermsController < ApplicationController
                end
     @term    = Term.find(term_id)
     @project = Project.find(@term.project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
   end
 
   def set_attached_project
@@ -154,7 +154,14 @@ class TermsController < ApplicationController
     @project = find_term_project(project_id)
     return unless @project
 
-    authorize_project! @project
+    return unless authorize_project! @project
+  end
+
+  def find_term_project(project_id)
+    Project.find(project_id)
+  rescue Mongoid::Errors::DocumentNotFound => error
+    render_error(error, status: :unprocessable_entity, json: { project_id: "project not found with id #{project_id}" })
+    nil
   end
 
   def find_term_object(type, id)
@@ -167,14 +174,6 @@ class TermsController < ApplicationController
     model.find(id)
   rescue Mongoid::Errors::DocumentNotFound => error
     render_error(error, status: :unprocessable_entity, json: { id: "#{type} object not found with id #{id}" })
-    nil
-  end
-
-  def find_term_project(project_id)
-    Project.find(project_id)
-  rescue Mongoid::Errors::DocumentNotFound => error
-    message = "project not found with id #{project_id}"
-    render_error(error, status: :unprocessable_entity, json: { project_id: message })
     nil
   end
 

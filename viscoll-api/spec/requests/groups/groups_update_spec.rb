@@ -54,7 +54,7 @@ describe "PUT /groups/id", :type => :request do
       end
       
       it 'returns the right error message' do
-        expect(@body['error']).to eq "group not found"
+        expect(@body['error']).to eq "group not found with id #{@group.id.to_str}missing"
       end
     end
     

@@ -127,25 +127,17 @@ class GroupsController < ApplicationController
   private
 
   def set_group
-    @group = find_group(params[:id])
+    @group = find_document(Group, params[:id])
     return unless @group
 
     @project = Project.find(@group.project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
   end
 
   def find_group_project(project_id)
     Project.find(project_id)
   rescue Mongoid::Errors::DocumentNotFound => error
-    errors = { project_id: ["project not found with id #{project_id}"] }
-    render_error(error, status: :unprocessable_entity, json: { group: errors })
-    nil
-  end
-
-  def find_group(group_id)
-    Group.find(group_id)
-  rescue Mongoid::Errors::DocumentNotFound => error
-    render_error(error, status: :not_found, json: { error: "group not found" })
+    render_error(error, status: :unprocessable_entity, json: { group: { project_id: ["project not found with id #{project_id}"] } })
     nil
   end
 

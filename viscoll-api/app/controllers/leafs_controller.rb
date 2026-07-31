@@ -119,7 +119,7 @@ class LeafsController < ApplicationController
   def updateMultiple
     allLeafs = leaf_params_batch_update.to_h[:leafs]
     project_id = leaf_params_batch_update.to_h[:project_id]
-    @project = find_batch_project(project_id)
+    @project = find_document(Project, project_id, status: :unprocessable_entity)
     return unless @project
 
     allLeafs.each do |leaf_params, index|
@@ -243,13 +243,6 @@ class LeafsController < ApplicationController
 
   private
 
-  def find_batch_project(project_id)
-    Project.find(project_id)
-  rescue Mongoid::Errors::DocumentNotFound => error
-    render_error(error, status: :unprocessable_entity, json: { error: "project not found with id #{project_id}" })
-    nil
-  end
-
   def find_batch_leaf(leaf_id)
     Leaf.find(leaf_id)
   rescue Mongoid::Errors::DocumentNotFound => error
@@ -261,7 +254,7 @@ class LeafsController < ApplicationController
   def set_leaf
     @leaf    = Leaf.find(params[:id])
     @project = Project.find(@leaf.project_id)
-    authorize_project! @project
+    return unless authorize_project! @project
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
