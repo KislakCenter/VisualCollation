@@ -17,7 +17,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      render_error("User update failed", status: :unprocessable_entity, json: current_user.errors) and return
+      return render_error("User update failed", status: :unprocessable_entity, json: current_user.errors)
     end
 
   end
@@ -31,12 +31,12 @@ class UsersController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_user
-    @user = User.find(params[:id])
+    @user = find_document(User, params[:id])
+    return unless @user
+
     if (@user != current_user)
-      render_error("Unauthorized. User's do not match.", status: :unauthorized) and return
+      return render_error("Unauthorized. User's do not match.", status: :unauthorized)
     end
-  rescue Mongoid::Errors::DocumentNotFound => error
-    render_error(error, status: :not_found, json: { error: "user not found with id #{params[:id]}" })
   end
 
   # Only allow a trusted parameter "white list" through.

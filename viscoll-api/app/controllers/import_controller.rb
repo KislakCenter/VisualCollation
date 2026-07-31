@@ -1,4 +1,6 @@
 class ImportController < ApplicationController
+  INVALID_IMPORT_MESSAGE = "Sorry, the imported data cannot be validated. Please check your file for errors and make sure the correct import format is selected above.".freeze
+
   before_action :authenticate!
 
   # PUT /projects/import
@@ -18,7 +20,7 @@ class ImportController < ApplicationController
       if errors.empty? || errors2.empty?
         handleXMLImport(xml)
       else
-        render_error("XML import failed: #{(errors + errors2).join "\n"}", status: :unprocessable_entity) and return
+        return render_error("XML import failed: #{(errors + errors2).join "\n"}", status: :unprocessable_entity)
       end
     end
     newProject = current_user.projects.order_by(:updated_at => 'desc').first
@@ -28,8 +30,7 @@ class ImportController < ApplicationController
     @images   = current_user.images
     render :'projects/index', status: :ok and return
   rescue JSON::ParserError => error
-    message = "Sorry, the imported data cannot be validated. Please check your file for errors and make sure the correct import format is selected above."
-    render_error(error, status: :unprocessable_entity, json: { error: message })
+    render_error(error, status: :unprocessable_entity, json: { error: INVALID_IMPORT_MESSAGE })
   end
 
   private

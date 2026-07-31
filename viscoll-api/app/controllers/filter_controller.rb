@@ -7,7 +7,7 @@ class FilterController < ApplicationController
     queries = filter_params.to_h[:queries]
     errors  = runValidations(queries)
     if errors != []
-      render_error("Errors: #{errors.join('\n')}", status: :unprocessable_entity) and return
+      return render_error("Errors: #{errors.join('\n')}", status: :unprocessable_entity)
     end
     @objectIDs             = { Groups: [], Leafs: [], Sides: [], Terms: [] }
     @visibleAttributes     = {
@@ -195,7 +195,7 @@ class FilterController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_project
     @project = Project.find(params[:id])
-    return unless authorize_project! @project
+    authorize_project! @project
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

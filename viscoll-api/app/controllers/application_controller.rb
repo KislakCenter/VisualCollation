@@ -31,13 +31,21 @@ class ApplicationController < ActionController::API
     def render_error(error, status:, json: nil, report: false)
       message = error.respond_to?(:message) ? error.message : error.to_s
 
-      if report
-        Rails.logger.error(([message] + Array(error.backtrace)).join("\n"))
-        Honeybadger.notify(error)
-      else
-        Rails.logger.warn(message)
-      end
-
+      report_error(error, message) if report
+      Rails.logger.warn(message) unless report
       render json: json || { error: message }, status: status
+    end
+
+    def find_document(model, id)
+      model.find(id)
+    rescue Mongoid::Errors::DocumentNotFound => error
+      message = "#{model.name.downcase} not found with id #{id}"
+      render_error(error, status: :not_found, json: { error: message })
+      nil
+    end
+
+    def report_error(error, message)
+      Rails.logger.error(([message] + Array(error.backtrace)).join("\n"))
+      Honeybadger.notify(error)
     end
 end

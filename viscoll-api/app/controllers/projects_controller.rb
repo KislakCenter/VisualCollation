@@ -32,7 +32,7 @@ class ProjectsController < ApplicationController
 
     validationResult = validateProjectCreateGroupsParams(allGroups)
     if (not validationResult[:status])
-      render_error("Project group validation failed", status: :unprocessable_entity, json: { groups: validationResult[:errors] }) and return
+      return render_error("Project group validation failed", status: :unprocessable_entity, json: { groups: validationResult[:errors] })
     end
     # Instantiate a new project with the given params
     @project = Project.new(project_params)
@@ -52,10 +52,10 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      render_error("Project could not save: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity) and return
+      return render_error("Project could not save: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity)
     end
   rescue StandardError => error
-    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+    render_project_error(error)
   end
 
   # PATCH/PUT /projects/1
@@ -66,10 +66,10 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      render_error("Project could not update: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity) and return
+      return render_error("Project could not update: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity)
     end
   rescue StandardError => error
-    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+    render_project_error(error)
   end
 
   # DELETE /projects/1
@@ -89,7 +89,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     rescue StandardError => error
-      render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+      render_project_error(error)
     ensure
       # Enable callbacks again
       Image.set_callback(:destroy, :before, :unlink_sides_before_delete)
@@ -112,24 +112,24 @@ class ProjectsController < ApplicationController
     @images   = current_user.images
     render :show, status: :ok and return
   rescue StandardError => error
-    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+    render_project_error(error)
   end
 
   # PATCH/PUT /projects/:id/manifests
   def updateManifest
     manifest = manifest_params.to_h
     if not manifest.key?("id")
-      render_error("Param required: id.", status: :unprocessable_entity) and return
+      return render_error("Param required: id.", status: :unprocessable_entity)
     end
     if not @project.manifests.key?(manifest["id"])
       message = "Manifest with id: #{manifest["id"]} not found in project with id: #{@project.id}."
-      render_error(message, status: :unprocessable_entity) and return
+      return render_error(message, status: :unprocessable_entity)
     end
     # ONLY UPDATING MANIFEST NAME FOR NOW
     @project.manifests[manifest["id"]]["name"] = manifest["name"]
     @project.save
   rescue StandardError => error
-    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+    render_project_error(error)
   end
 
   # DELETE /projects/:id/manifests
@@ -137,7 +137,7 @@ class ProjectsController < ApplicationController
     manifestIDToDelete = manifest_params.to_h[:id]
     if not @project.manifests.key?(manifestIDToDelete)
       message = "Manifest with id: #{manifestIDToDelete} not found in project with id: #{@project.id}."
-      render_error(message, status: :unprocessable_entity) and return
+      return render_error(message, status: :unprocessable_entity)
     end
     @project.manifests.delete(manifestIDToDelete)
     # Update all sides that have the deleted manuscripts mapping
@@ -148,7 +148,7 @@ class ProjectsController < ApplicationController
     end
     @project.save
   rescue StandardError => error
-    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+    render_project_error(error)
   end
 
   # GET /projects/:id/clone
@@ -180,9 +180,14 @@ class ProjectsController < ApplicationController
 
   private
 
+  # These actions have an established 400 response with an `errors` key.
+  def render_project_error(error)
+    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+  end
+
   def set_project
     @project = Project.find(params[:id])
-    return unless authorize_project! @project
+    authorize_project! @project
   end
 
   # Never trust parameters from the scary Internet, only allow the white list through.

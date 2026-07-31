@@ -24,20 +24,16 @@ class GroupsController < ApplicationController
       end
     end
     if (hasAdditionalErrors)
-      render_error("Additional group errors", status: :unprocessable_entity, json: { additional: @additionalErrors }) and return
+      return render_error("Additional group errors", status: :unprocessable_entity, json: { additional: @additionalErrors })
     end
     @groupErrors = { project_id: [] }
     if (project_id == nil)
       @groupErrors[:project_id].push("not found")
-      render_error("Project ID is missing", status: :unprocessable_entity, json: { group: @groupErrors }) and return
+      return render_error("Project ID is missing", status: :unprocessable_entity, json: { group: @groupErrors })
     end
 
-    begin
-      @project = Project.find(project_id)
-    rescue Mongoid::Errors::DocumentNotFound
-      @groupErrors[:project_id].push("project not found with id #{project_id}")
-      render_error("Project not found", status: :unprocessable_entity, json: { group: @groupErrors }) and return
-    end
+    @project = find_group_project(project_id)
+    return unless @project
 
     new_groups    = []
     new_group_ids = []
@@ -60,7 +56,7 @@ class GroupsController < ApplicationController
         new_groups.push(group)
         new_group_ids.push(group.id.to_s)
       else
-        render_error("Group could not be saved", status: :unprocessable_entity, json: { group: group.errors }) and return
+        return render_error("Group could not be saved", status: :unprocessable_entity, json: { group: group.errors })
       end
     end
     # Add new group(s) to parent
@@ -84,7 +80,7 @@ class GroupsController < ApplicationController
   # PATCH/PUT /groups/1
   def update
     unless @group.update(group_params)
-      render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors) and return
+      return render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors)
     end
   end
 
@@ -94,14 +90,14 @@ class GroupsController < ApplicationController
     # Run validations
     errors = validateGroupBatchUpdate(allGroups)
     if not errors.empty?
-      render_error("Batch update failed", status: :unprocessable_entity, json: { groups: errors }) and return
+      return render_error("Batch update failed", status: :unprocessable_entity, json: { groups: errors })
     end
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
       @project = Project.find(@group.project_id)
       return unless authorize_project! @project
       if !@group.update(group_params[:attributes])
-        render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors) and return
+        return render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors)
       end
     end
   end
@@ -118,13 +114,11 @@ class GroupsController < ApplicationController
     projectID = group_params_batch_delete.to_h[:projectID]
     # Delete groups
     groupIDs.each do |groupID|
-      # Wrapping destroy in begin/rescue because group may no longer exist when it's nested
-      begin
-        group    = Group.find(groupID)
-        @project = Project.find(group.project_id)
-      rescue Mongoid::Errors::DocumentNotFound
-        next
-      end
+      # Nested groups may already have been removed by an earlier deletion.
+      group = Group.where(id: groupID).first
+      next unless group
+
+      @project = Project.find(group.project_id)
       return unless authorize_project! @project
       group.destroy
     end
@@ -133,11 +127,26 @@ class GroupsController < ApplicationController
   private
 
   def set_group
-    @group   = Group.find(params[:id])
+    @group = find_group(params[:id])
+    return unless @group
+
     @project = Project.find(@group.project_id)
-    return unless authorize_project! @project
+    authorize_project! @project
+  end
+
+  def find_group_project(project_id)
+    Project.find(project_id)
+  rescue Mongoid::Errors::DocumentNotFound => error
+    errors = { project_id: ["project not found with id #{project_id}"] }
+    render_error(error, status: :unprocessable_entity, json: { group: errors })
+    nil
+  end
+
+  def find_group(group_id)
+    Group.find(group_id)
   rescue Mongoid::Errors::DocumentNotFound => error
     render_error(error, status: :not_found, json: { error: "group not found" })
+    nil
   end
 
   def group_params
