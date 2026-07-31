@@ -25,7 +25,7 @@
   <p:for-each>
       <p:with-input pipe="secondary@xslt"/>
       <p:store serialization="map{'encoding': 'utf-8', 'indent': false(), 'omit-xml-declaration': false()}">
-         <p:with-option name="href" select="p:base-uri()"/>
+         <p:with-option name="href" select="base-uri()"/>
       </p:store>
   </p:for-each>
 </p:declare-step>

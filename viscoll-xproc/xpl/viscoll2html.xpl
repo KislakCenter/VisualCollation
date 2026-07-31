@@ -21,7 +21,7 @@
   </p:load>
   <p:xslt name="preprocessing">
     <p:with-option name="output-base-uri" select="$job-dir"/>
-    <p:with-option name="parameters" select="map{'job-base': $job-dir"/>
+    <p:with-option name="parameters" select="map{'job-base': $job-dir}"/>
     <p:with-input port="stylesheet">
       <p:document href="xsl/viscoll2processed.xsl"/>
     </p:with-input>
@@ -31,7 +31,7 @@
     <p:with-input pipe="secondary@preprocessing"/>
     <p:xslt name="html">
       <p:with-option name="output-base-uri" select="$job-dir"/>
-      <p:with-option name="parameters" select="map{'job-base': $job-dir"/>
+      <p:with-option name="parameters" select="map{'job-base': $job-dir}"/>
       <p:with-input port="stylesheet">
         <p:document href="xsl/processed2html.xsl"/>
       </p:with-input>
@@ -39,7 +39,7 @@
     <p:for-each>
       <p:with-input pipe="secondary@html"/>
       <p:store serialization="map{'encoding': 'utf-8', 'indent': false(), 'omit-xml-declaration': false()}">
-        <p:with-option name="href" select="p:base-uri()"/>
+        <p:with-option name="href" select="base-uri()"/>
       </p:store>
     </p:for-each>
   </p:for-each>
