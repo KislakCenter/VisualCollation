@@ -115,7 +115,7 @@ development:
 test:
   clients:
     default:
-      database: viscoll_test
+      database: viscoll_api_test
       hosts:
         - mongo:27017
       options:
