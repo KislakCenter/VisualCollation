@@ -23,7 +23,7 @@
   <p:for-each>
       <p:with-input pipe="secondary@xslt"/>
       <p:store>
-         <p:with-option name="href" select="p:base-uri()"/>
+         <p:with-option name="href" select="base-uri()"/>
       </p:store>
    </p:for-each>
 </p:declare-step>
