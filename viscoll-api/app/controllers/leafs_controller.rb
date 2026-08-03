@@ -33,7 +33,7 @@ class LeafsController < ApplicationController
 
     # Attempt to validate ownership
     @project = Project.find(project_id)
-    return unless authorize_project! @project
+    return unless authorize_owner! @project
 
     # Skip all callbacks for side creation if leafIDs and SideIDs were give in the request
     begin
@@ -125,7 +125,7 @@ class LeafsController < ApplicationController
     allLeafs.each do |leaf_params, index|
       leaf_id = leaf_params[:id]
       @leaf = find_batch_leaf(leaf_id)
-      return unless @leaf && authorize_project!(@project)
+      return unless @leaf && authorize_owner!(@project)
 
       if !@leaf.update(leaf_params[:attributes])
         return render_error("Leaf could not be updated", status: :unprocessable_entity, json: { leafs: { attributes: { index: @leaf.errors } } })
@@ -253,7 +253,7 @@ class LeafsController < ApplicationController
   def set_leaf
     @leaf    = Leaf.find(params[:id])
     @project = Project.find(@leaf.project_id)
-    return unless authorize_project! @project
+    return unless authorize_owner! @project
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

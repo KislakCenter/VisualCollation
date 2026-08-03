@@ -95,7 +95,7 @@ class GroupsController < ApplicationController
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
       @project = Project.find(@group.project_id)
-      return unless authorize_project! @project
+      return unless authorize_owner! @project
       if !@group.update(group_params[:attributes])
         return render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors)
       end
@@ -119,7 +119,7 @@ class GroupsController < ApplicationController
       next unless group
 
       @project = Project.find(group.project_id)
-      return unless authorize_project! @project
+      return unless authorize_owner! @project
       group.destroy
     end
   end
@@ -131,7 +131,7 @@ class GroupsController < ApplicationController
     return unless @group
 
     @project = Project.find(@group.project_id)
-    return unless authorize_project! @project
+    return unless authorize_owner! @project
   end
 
   def find_group_project(project_id)

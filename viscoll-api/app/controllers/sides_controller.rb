@@ -26,7 +26,7 @@ class SidesController < ApplicationController
       end
     end
     @project = Project.find(sides[0].project_id)
-    return unless authorize_project! @project
+    return unless authorize_owner! @project
     if haveErrors
       return render_error("Errors occurred when updating: #{@errors.join "\n"}", status: :unprocessable_entity)
     end
@@ -91,7 +91,7 @@ class SidesController < ApplicationController
   def set_side
     @side    = Side.find(params[:id])
     @project = Project.find(@side.project_id)
-    return unless authorize_project! @project
+    return unless authorize_owner! @project
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

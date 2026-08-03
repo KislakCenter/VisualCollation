@@ -3,10 +3,6 @@ module ControllerHelper
   module ProjectsHelper
     include ControllerHelper::LeafsHelper
 
-    def authorize_project! project
-      authorize_owner!(project)
-    end
-
     def addGroupsLeafsConjoin(project, allGroups, folioNumber, pageNumber, startingTexture)
       groupIDs = []
       allGroups.each do |groupInfo|

@@ -1,17 +1,13 @@
 class ImagesController < ApplicationController
   before_action :authenticate!, except: [:show, :getZipImages]
 
-  def authorize_image! image
-    authorize_owner!(image)
-  end
-
   # POST /images
   def uploadImages
     projectIDs = []
     if image_create_params.to_h.key?("projectID")
       projectID = image_create_params.to_h[:projectID]
       @project = find_document(Project, projectID)
-      return unless @project && authorize_project!(@project)
+      return unless @project && authorize_owner!(@project)
 
       projectIDs.push(@project.id.to_s)
     end
@@ -77,14 +73,14 @@ class ImagesController < ApplicationController
     projects   = []
     projectIDs.each do |projectID|
       project = find_document(Project, projectID)
-      return unless project && authorize_project!(project)
+      return unless project && authorize_owner!(project)
 
       projects.push(project)
     end
     images = []
     imageIDs.each do |imageID|
       image = find_document(Image, imageID)
-      return unless image && authorize_image!(image)
+      return unless image && authorize_owner!(image)
 
       images.push(image)
     end
@@ -108,7 +104,7 @@ class ImagesController < ApplicationController
     projects   = []
     projectIDs.each do |projectID|
       project = find_document(Project, projectID)
-      return unless project && authorize_project!(project)
+      return unless project && authorize_owner!(project)
 
       projects.push(project)
     end
@@ -116,7 +112,7 @@ class ImagesController < ApplicationController
     imageIDs.each do |imageID|
       imageID = imageID.split("_", 2)[0]
       image = find_document(Image, imageID)
-      return unless image && authorize_image!(image)
+      return unless image && authorize_owner!(image)
 
       images.push(image)
     end
@@ -148,7 +144,7 @@ class ImagesController < ApplicationController
     images_destroy_params.to_h[:imageIDs].each do |imageIDParam|
       imageID = imageIDParam.split("_", 2)[0]
       image = find_document(Image, imageID)
-      return unless image && authorize_image!(image)
+      return unless image && authorize_owner!(image)
 
       images.push(image)
     end
