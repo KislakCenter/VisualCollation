@@ -155,10 +155,9 @@ class ExportController < ApplicationController
   private
 
   def set_project
-    @project = find_document(Project, params[:id])
+    @project = find_and_authorize_owner(Project, params[:id])
     return unless @project
 
-    return unless authorize_owner @project
     @format = params[:format]
   end
 
