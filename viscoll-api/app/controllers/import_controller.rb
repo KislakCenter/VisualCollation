@@ -20,7 +20,7 @@ class ImportController < ApplicationController
       if errors.empty? || errors2.empty?
         handleXMLImport(xml)
       else
-        return render_error("XML import failed: #{(errors + errors2).join "\n"}", status: :unprocessable_entity)
+        raise VCError.new("XML import failed: #{(errors + errors2).join "\n"}", status: :unprocessable_entity)
       end
     end
     newProject = current_user.projects.order_by(:updated_at => 'desc').first
@@ -30,7 +30,7 @@ class ImportController < ApplicationController
     @images   = current_user.images
     render :'projects/index', status: :ok and return
   rescue JSON::ParserError => error
-    render_error(error, status: :unprocessable_entity, json: { error: INVALID_IMPORT_MESSAGE })
+    raise VCError.new(INVALID_IMPORT_MESSAGE, status: :unprocessable_entity)
   end
 
   private

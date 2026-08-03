@@ -32,7 +32,7 @@ class ProjectsController < ApplicationController
 
     validationResult = validateProjectCreateGroupsParams(allGroups)
     if (not validationResult[:status])
-      return render_error("Project group validation failed", status: :unprocessable_entity, json: { groups: validationResult[:errors] })
+      raise VCError.new("Project group validation failed", status: :unprocessable_entity, json: { groups: validationResult[:errors] })
     end
     # Instantiate a new project with the given params
     @project = Project.new(project_params)
@@ -52,7 +52,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      return render_error("Project could not save: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity)
+      raise VCError.new("Project could not save: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity)
     end
   rescue StandardError => error
     render_project_error(error)
@@ -66,7 +66,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      return render_error("Project could not update: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity)
+      raise VCError.new("Project could not update: #{@project.errors.full_messages.join "\n"}", status: :unprocessable_entity)
     end
   rescue StandardError => error
     render_project_error(error)
@@ -119,11 +119,11 @@ class ProjectsController < ApplicationController
   def updateManifest
     manifest = manifest_params.to_h
     if not manifest.key?("id")
-      return render_error("Param required: id.", status: :unprocessable_entity)
+      raise VCError.new("Param required: id.", status: :unprocessable_entity)
     end
     if not @project.manifests.key?(manifest["id"])
       message = "Manifest with id: #{manifest["id"]} not found in project with id: #{@project.id}."
-      return render_error(message, status: :unprocessable_entity)
+      raise VCError.new(message, status: :unprocessable_entity)
     end
     # ONLY UPDATING MANIFEST NAME FOR NOW
     @project.manifests[manifest["id"]]["name"] = manifest["name"]
@@ -137,7 +137,7 @@ class ProjectsController < ApplicationController
     manifestIDToDelete = manifest_params.to_h[:id]
     if not @project.manifests.key?(manifestIDToDelete)
       message = "Manifest with id: #{manifestIDToDelete} not found in project with id: #{@project.id}."
-      return render_error(message, status: :unprocessable_entity)
+      raise VCError.new(message, status: :unprocessable_entity)
     end
     @project.manifests.delete(manifestIDToDelete)
     # Update all sides that have the deleted manuscripts mapping
@@ -182,12 +182,17 @@ class ProjectsController < ApplicationController
 
   # These actions have an established 400 response with an `errors` key.
   def render_project_error(error)
-    render_error(error, status: :bad_request, json: { errors: error.message }, report: true)
+    # VCError carries its own status; let the base rescue_from handle it.
+    raise if error.is_a?(VCError)
+
+    Honeybadger.notify(error)
+    Rails.logger.error(error.message + "\n" + error.backtrace.join("\n"))
+    render json: { errors: error.message }, status: :bad_request
   end
 
   def set_project
     @project = Project.find(params[:id])
-    return unless authorize_owner @project
+    authorize_project! @project
   end
 
   # Never trust parameters from the scary Internet, only allow the white list through.

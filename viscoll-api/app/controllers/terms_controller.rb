@@ -14,16 +14,16 @@ class TermsController < ApplicationController
   def create
     @term    = Term.new(term_create_params)
     @project = find_term_project(@term.project_id)
-    return unless @project && authorize_owner(@project)
+    authorize_project! @project
 
     if @term.save
       if not Project.find(@term.project_id).taxonomies.include?(@term.taxonomy)
         @term.delete
         options = @project.taxonomies
-        return render_error("Invalid taxonomy", status: :unprocessable_entity, json: { taxonomy: ["should be one of #{options}"] })
+        raise VCError.new("Invalid taxonomy", status: :unprocessable_entity, json: { taxonomy: ["should be one of #{options}"] })
       end
     else
-      return render_error("Term could not be saved", status: :unprocessable_entity, json: @term.errors)
+      raise VCError.new("Term could not be saved", status: :unprocessable_entity, json: @term.errors)
     end
   end
 
@@ -32,10 +32,10 @@ class TermsController < ApplicationController
     taxonomy = term_update_params.to_h[:taxonomy]
     if not Project.find(@term.project_id).taxonomies.include?(taxonomy)
       options = Project.find(@term.project_id).taxonomies
-      return render_error("Invalid taxonomy", status: :unprocessable_entity, json: { taxonomy: "should be one of #{options}" })
+      raise VCError.new("Invalid taxonomy", status: :unprocessable_entity, json: { taxonomy: "should be one of #{options}" })
     end
     if !@term.update(term_update_params)
-      return render_error("Term (#{@term.id}) could not update: #{@term.errors.full_messages.join "\n"}", status: :unprocessable_entity)
+      raise VCError.new("Term (#{@term.id}) could not update: #{@term.errors.full_messages.join "\n"}", status: :unprocessable_entity)
     end
   end
 
@@ -51,11 +51,10 @@ class TermsController < ApplicationController
       type = object[:type]
       id   = object[:id]
       @object = find_term_object(type, id)
-      return unless @object
 
       authorized = @object.project.user_id == current_user.id
       unless authorized
-        return render_error("Action not authorized.", status: :unauthorized)
+        raise VCError.new("Action not authorized.", status: :unauthorized)
       end
       @object.terms.push(@term)
       @object.save
@@ -73,11 +72,10 @@ class TermsController < ApplicationController
       type = object[:type]
       id   = object[:id]
       @object = find_term_object(type, id)
-      return unless @object
 
       authorized = @object.project.user_id == current_user.id
       unless authorized
-        return render_error("Action not authorized.", status: :unauthorized)
+        raise VCError.new("Action not authorized.", status: :unauthorized)
       end
       @object.terms.delete(@term)
       @object.save
@@ -90,7 +88,7 @@ class TermsController < ApplicationController
   def createTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
     if @project.taxonomies.include?(taxonomy)
-      return render_error("Duplicate taxonomy", status: :unprocessable_entity, json: { taxonomy: "#{taxonomy} taxonomy already exists in the project" })
+      raise VCError.new("Duplicate taxonomy", status: :unprocessable_entity, json: { taxonomy: "#{taxonomy} taxonomy already exists in the project" })
     else
       @project.taxonomies.push(taxonomy)
       @project.save
@@ -101,7 +99,7 @@ class TermsController < ApplicationController
   def deleteTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
     if not @project.taxonomies.include?(taxonomy)
-      return render_error("Unknown taxonomy", status: :unprocessable_entity, json: { taxonomy: "#{taxonomy} taxonomy doesn't exist in the project" })
+      raise VCError.new("Unknown taxonomy", status: :unprocessable_entity, json: { taxonomy: "#{taxonomy} taxonomy doesn't exist in the project" })
     else
       @project.taxonomies.delete(taxonomy)
       @project.save
@@ -117,9 +115,9 @@ class TermsController < ApplicationController
     old_taxonomy = taxonomy_params.to_h[:old_taxonomy]
     taxonomy     = taxonomy_params.to_h[:taxonomy]
     if not @project.taxonomies.include?(old_taxonomy)
-      return render_error("Unknown taxonomy", status: :unprocessable_entity, json: { old_taxonomy: "#{old_taxonomy} taxonomy doesn't exist in the project" })
+      raise VCError.new("Unknown taxonomy", status: :unprocessable_entity, json: { old_taxonomy: "#{old_taxonomy} taxonomy doesn't exist in the project" })
     elsif @project.taxonomies.include?(taxonomy)
-      return render_error("Duplicate taxonomy", status: :unprocessable_entity, json: { taxonomy: "#{taxonomy} already exists in the project" })
+      raise VCError.new("Duplicate taxonomy", status: :unprocessable_entity, json: { taxonomy: "#{taxonomy} already exists in the project" })
     else
       indexToEdit                      = @project.taxonomies.index(old_taxonomy)
       @project.taxonomies[indexToEdit] = taxonomy
@@ -145,33 +143,30 @@ class TermsController < ApplicationController
                end
     @term    = Term.find(term_id)
     @project = Project.find(@term.project_id)
-    return unless authorize_owner @project
+    authorize_project! @project
   end
 
   def set_attached_project
     project_id = taxonomy_params.to_h[:project_id]
     @project = find_term_project(project_id)
-    return unless @project && authorize_owner(@project)
+    authorize_project! @project
   end
 
   def find_term_project(project_id)
     Project.find(project_id)
-  rescue Mongoid::Errors::DocumentNotFound => error
-    render_error(error, status: :unprocessable_entity, json: { project_id: "project not found with id #{project_id}" })
-    nil
+  rescue Mongoid::Errors::DocumentNotFound
+    raise VCError.new("Project not found", status: :unprocessable_entity, json: { project_id: "project not found with id #{project_id}" })
   end
 
   def find_term_object(type, id)
     model = TERM_OBJECT_MODELS[type]
     unless model
-      render_error("Unknown object type", status: :unprocessable_entity, json: { type: "object not found with type #{type}" })
-      return
+      raise VCError.new("Unknown object type", status: :unprocessable_entity, json: { type: "object not found with type #{type}" })
     end
 
     model.find(id)
-  rescue Mongoid::Errors::DocumentNotFound => error
-    render_error(error, status: :unprocessable_entity, json: { id: "#{type} object not found with id #{id}" })
-    nil
+  rescue Mongoid::Errors::DocumentNotFound
+    raise VCError.new("#{type} object not found with id #{id}", status: :unprocessable_entity, json: { id: "#{type} object not found with id #{id}" })
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

@@ -11,7 +11,7 @@ class FeedbackController < ApplicationController
       @browserInformation = feedback_params[:browserInformation]
       @projectJSONExport = feedback_params[:project]
       if @title.blank? or @message.blank?
-        return render_error("[title] and [message] params required.", status: :unprocessable_entity)
+        raise VCError.new("[title] and [message] params required.", status: :unprocessable_entity)
       end
       FeedbackMailer.sendFeedback(
         @title, 

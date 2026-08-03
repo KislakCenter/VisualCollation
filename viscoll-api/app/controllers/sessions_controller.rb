@@ -31,11 +31,7 @@ class SessionsController < RailsJwtAuth::SessionsController
     current_user.destroy_auth_token Jwt::Request.new(request).auth_token
     render_204
   rescue JWT::DecodeError => error
-    render_error(
-      error,
-      status: :unprocessable_entity,
-      json: { error: "Authorization Header: #{error.message}" }
-    )
+    raise VCError.new("Authorization Header: #{error.message}", status: :unprocessable_entity)
   end
 end
 

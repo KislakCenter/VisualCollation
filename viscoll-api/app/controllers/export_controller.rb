@@ -144,10 +144,10 @@ class ExportController < ApplicationController
 
           render json: { data: exportData, type: 'formula', Images: { exportedImages: @zipFilePath ? @zipFilePath : false } }, status: :ok and return
         else
-          return render_error("Export format must be one of [json, xml, svg, formula, html]", status: :unprocessable_entity)
+          raise VCError.new("Export format must be one of [json, xml, svg, formula, html]", status: :unprocessable_entity)
         end
       else
-        return render_error("Something went wrong when exporting #{@format}: #{errors}", status: :unprocessable_entity)
+        raise VCError.new("Something went wrong when exporting #{@format}: #{errors}", status: :unprocessable_entity)
       end
 
   end
@@ -155,9 +155,8 @@ class ExportController < ApplicationController
   private
 
   def set_project
-    @project = find_and_authorize_owner(Project, params[:id])
-    return unless @project
-
+    @project = find_document(Project, params[:id])
+    authorize_project! @project
     @format = params[:format]
   end
 

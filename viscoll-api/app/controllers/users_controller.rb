@@ -17,7 +17,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      return render_error("User update failed", status: :unprocessable_entity, json: current_user.errors)
+      raise VCError.new("User update failed", status: :unprocessable_entity, json: current_user.errors)
     end
 
   end
@@ -32,10 +32,9 @@ class UsersController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_user
     @user = find_document(User, params[:id])
-    return unless @user
 
     if (@user != current_user)
-      return render_error("Unauthorized. User's do not match.", status: :unauthorized)
+      raise VCError.new("Unauthorized. User's do not match.", status: :unauthorized)
     end
   end
 

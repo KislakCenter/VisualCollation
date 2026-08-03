@@ -24,16 +24,15 @@ class GroupsController < ApplicationController
       end
     end
     if (hasAdditionalErrors)
-      return render_error("Additional group errors", status: :unprocessable_entity, json: { additional: @additionalErrors })
+      raise VCError.new("Additional group errors", status: :unprocessable_entity, json: { additional: @additionalErrors })
     end
     @groupErrors = { project_id: [] }
     if (project_id == nil)
       @groupErrors[:project_id].push("not found")
-      return render_error("Project ID is missing", status: :unprocessable_entity, json: { group: @groupErrors })
+      raise VCError.new("Project ID is missing", status: :unprocessable_entity, json: { group: @groupErrors })
     end
 
     @project = find_group_project(project_id)
-    return unless @project
 
     new_groups    = []
     new_group_ids = []
@@ -56,7 +55,7 @@ class GroupsController < ApplicationController
         new_groups.push(group)
         new_group_ids.push(group.id.to_s)
       else
-        return render_error("Group could not be saved", status: :unprocessable_entity, json: { group: group.errors })
+        raise VCError.new("Group could not be saved", status: :unprocessable_entity, json: { group: group.errors })
       end
     end
     # Add new group(s) to parent
@@ -80,7 +79,7 @@ class GroupsController < ApplicationController
   # PATCH/PUT /groups/1
   def update
     unless @group.update(group_params)
-      return render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors)
+      raise VCError.new("Group could not be updated", status: :unprocessable_entity, json: @group.errors)
     end
   end
 
@@ -90,14 +89,14 @@ class GroupsController < ApplicationController
     # Run validations
     errors = validateGroupBatchUpdate(allGroups)
     if not errors.empty?
-      return render_error("Batch update failed", status: :unprocessable_entity, json: { groups: errors })
+      raise VCError.new("Batch update failed", status: :unprocessable_entity, json: { groups: errors })
     end
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
       @project = Project.find(@group.project_id)
-      return unless authorize_owner @project
+      authorize_project! @project
       unless @group.update(group_params[:attributes])
-        return render_error("Group could not be updated", status: :unprocessable_entity, json: @group.errors)
+        raise VCError.new("Group could not be updated", status: :unprocessable_entity, json: @group.errors)
       end
     end
   end
@@ -119,7 +118,7 @@ class GroupsController < ApplicationController
       next unless group
 
       @project = Project.find(group.project_id)
-      return unless authorize_owner @project
+      authorize_project! @project
       group.destroy
     end
   end
@@ -128,18 +127,15 @@ class GroupsController < ApplicationController
 
   def set_group
     @group = find_document(Group, params[:id])
-    return unless @group
 
     @project = find_group_project(@group.project_id)
-    return unless @project
-    return unless authorize_owner @project
+    authorize_project! @project
   end
 
   def find_group_project(project_id)
     Project.find(project_id)
-  rescue Mongoid::Errors::DocumentNotFound => error
-    render_error(error, status: :unprocessable_entity, json: { group: { project_id: ["project not found with id #{project_id}"] } })
-    nil
+  rescue Mongoid::Errors::DocumentNotFound
+    raise VCError.new("Project not found", status: :unprocessable_entity, json: { group: { project_id: ["project not found with id #{project_id}"] } })
   end
 
   def group_params

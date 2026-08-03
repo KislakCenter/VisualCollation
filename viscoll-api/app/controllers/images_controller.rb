@@ -6,8 +6,8 @@ class ImagesController < ApplicationController
     projectIDs = []
     if image_create_params.to_h.key?("projectID")
       projectID = image_create_params.to_h[:projectID]
-      @project = find_and_authorize_owner(Project, projectID)
-      return unless @project
+      @project = find_document(Project, projectID)
+      authorize_project! @project
 
       projectIDs.push(@project.id.to_s)
     end
@@ -33,7 +33,7 @@ class ImagesController < ApplicationController
             copyCounter += 1
           else
             image.destroy
-            return render_error("Image failed: #{image.errors.full_messages.join("\n")}", status: :unprocessable_entity)
+            raise VCError.new("Image failed: #{image.errors.full_messages.join("\n")}", status: :unprocessable_entity)
           end
         end
       end
@@ -50,7 +50,6 @@ class ImagesController < ApplicationController
     imageID  = params[:imageID_filename].split("_", 2)[0]
     filename = params[:imageID_filename].split("_", 2)[1]
     @image = find_document(Image, imageID)
-    return unless @image
 
     # Get image file
     path = "#{Rails.root}/public/uploads/#{@image.fileID}"
@@ -72,15 +71,15 @@ class ImagesController < ApplicationController
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
     projects   = []
     projectIDs.each do |projectID|
-      project = find_and_authorize_owner(Project, projectID)
-      return unless project
+      project = find_document(Project, projectID)
+      authorize_project!(project)
 
       projects.push(project)
     end
     images = []
     imageIDs.each do |imageID|
-      image = find_and_authorize_owner(Image, imageID)
-      return unless image
+      image = find_document(Image, imageID)
+      authorize_image!(image)
 
       images.push(image)
     end
@@ -103,16 +102,16 @@ class ImagesController < ApplicationController
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
     projects   = []
     projectIDs.each do |projectID|
-      project = find_and_authorize_owner(Project, projectID)
-      return unless project
+      project = find_document(Project, projectID)
+      authorize_project!(project)
 
       projects.push(project)
     end
     images = []
     imageIDs.each do |imageID|
       imageID = imageID.split("_", 2)[0]
-      image = find_and_authorize_owner(Image, imageID)
-      return unless image
+      image = find_document(Image, imageID)
+      authorize_image!(image)
 
       images.push(image)
     end
@@ -143,8 +142,8 @@ class ImagesController < ApplicationController
     images = []
     images_destroy_params.to_h[:imageIDs].each do |imageIDParam|
       imageID = imageIDParam.split("_", 2)[0]
-      image = find_and_authorize_owner(Image, imageID)
-      return unless image
+      image = find_document(Image, imageID)
+      authorize_image!(image)
 
       images.push(image)
     end

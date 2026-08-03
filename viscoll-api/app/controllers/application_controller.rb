@@ -1,10 +1,31 @@
 class ApplicationController < ActionController::API
-    rescue_from StandardError do |error|
-      render_error(error, status: :unprocessable_entity, report: true)
+    # Carries the HTTP status (and optional structured body) for expected
+    # errors raised across controllers. `raise` halts execution, so callers
+    # need no return guards (render alone does not stop an action).
+    class VCError < StandardError
+      attr_reader :status, :json
+
+      def initialize(message = nil, status: :unprocessable_entity, json: nil)
+        super(message)
+        @status = status
+        @json = json
+      end
     end
 
+    rescue_from StandardError do |error|
+      Honeybadger.notify(error)
+      Rails.logger.error(error.message + "\n" + error.backtrace.join("\n"))
+      render json: { error: error.message }, status: :unprocessable_entity
+    end
+
+    # Registered after StandardError so the more specific handlers below are matched first.
     rescue_from Mongoid::Errors::DocumentNotFound do |error|
-      render_error(error, status: :not_found)
+      render json: { error: error.message }, status: :not_found
+    end
+
+    rescue_from VCError do |error|
+      Rails.logger.warn(error.message)
+      render json: { error: error.message }.merge(error.json || {}), status: error.status
     end
 
     before_action :set_base_api_url
@@ -28,36 +49,21 @@ class ApplicationController < ActionController::API
 
     private
 
-    def render_error(error, status:, json: nil, report: false)
-      message = error.try(:message) || error.to_s
-
-      report ? report_error(error, message) : Rails.logger.warn(message)
-      render json: json || { error: message }, status: status
-    end
-
     def find_document(model, id, status: :not_found)
       model.find(id)
-    rescue Mongoid::Errors::DocumentNotFound => error
-      render_error(error, status: status, json: { error: "#{model.name.downcase} not found with id #{id}" })
-      nil
+    rescue Mongoid::Errors::DocumentNotFound
+      raise VCError.new("#{model.name.downcase} not found with id #{id}", status: status)
     end
 
-    def find_and_authorize_owner(model, id)
-      record = find_document(model, id)
-      return nil unless record && authorize_owner(record)
+    def authorize_project!(project)
+      return if current_user.id == project.user_id
 
-      record
+      raise VCError.new("Project (#{project.id}) is not authorized for current user; expected: '#{project.user_id}'.", status: :unauthorized)
     end
 
-    def authorize_owner(record)
-      return true if current_user.id == record.user_id
+    def authorize_image!(image)
+      return if current_user.id == image.user_id
 
-      render_error("#{record.class} (#{record.id}) is not authorized for current user; expected: '#{record.user_id}'.", status: :unauthorized)
-      false
-    end
-
-    def report_error(error, message)
-      Rails.logger.error(([message] + Array(error.backtrace)).join("\n"))
-      Honeybadger.notify(error)
+      raise VCError.new("Image (#{image.id}) is not authorized for current user; expected: '#{image.user_id}'.", status: :unauthorized)
     end
 end
