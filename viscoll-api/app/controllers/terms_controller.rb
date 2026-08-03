@@ -14,7 +14,7 @@ class TermsController < ApplicationController
   def create
     @term    = Term.new(term_create_params)
     @project = find_term_project(@term.project_id)
-    return unless @project && authorize_owner!(@project)
+    return unless @project && authorize_owner(@project)
 
     if @term.save
       if not Project.find(@term.project_id).taxonomies.include?(@term.taxonomy)
@@ -145,13 +145,13 @@ class TermsController < ApplicationController
                end
     @term    = Term.find(term_id)
     @project = Project.find(@term.project_id)
-    return unless authorize_owner! @project
+    return unless authorize_owner @project
   end
 
   def set_attached_project
     project_id = taxonomy_params.to_h[:project_id]
     @project = find_term_project(project_id)
-    return unless @project && authorize_owner!(@project)
+    return unless @project && authorize_owner(@project)
   end
 
   def find_term_project(project_id)

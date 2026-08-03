@@ -158,7 +158,7 @@ class ExportController < ApplicationController
     @project = find_document(Project, params[:id])
     return unless @project
 
-    return unless authorize_owner! @project
+    return unless authorize_owner @project
     @format = params[:format]
   end
 

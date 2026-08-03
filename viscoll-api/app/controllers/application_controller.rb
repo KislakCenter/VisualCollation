@@ -29,10 +29,9 @@ class ApplicationController < ActionController::API
     private
 
     def render_error(error, status:, json: nil, report: false)
-      message = error.respond_to?(:message) ? error.message : error.to_s
+      message = error.try(:message) || error.to_s
 
-      report_error(error, message) if report
-      Rails.logger.warn(message) unless report
+      report ? report_error(error, message) : Rails.logger.warn(message)
       render json: json || { error: message }, status: status
     end
 
@@ -43,10 +42,17 @@ class ApplicationController < ActionController::API
       nil
     end
 
-    def authorize_owner!(record)
+    def find_and_authorize_owner(model, id)
+      record = find_document(model, id)
+      return nil unless record && authorize_owner(record)
+
+      record
+    end
+
+    def authorize_owner(record)
       return true if current_user.id == record.user_id
 
-      render_error("#{record.class} (#{record.id}) is not authorized for current user (#{current_user.id}); expected: '#{record.user_id}'.", status: :unauthorized)
+      render_error("#{record.class} (#{record.id}) is not authorized for current user; expected: '#{record.user_id}'.", status: :unauthorized)
       false
     end
 

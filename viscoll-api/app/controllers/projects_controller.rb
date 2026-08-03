@@ -187,7 +187,7 @@ class ProjectsController < ApplicationController
 
   def set_project
     @project = Project.find(params[:id])
-    return unless authorize_owner! @project
+    return unless authorize_owner @project
   end
 
   # Never trust parameters from the scary Internet, only allow the white list through.

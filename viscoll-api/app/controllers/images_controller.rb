@@ -6,8 +6,8 @@ class ImagesController < ApplicationController
     projectIDs = []
     if image_create_params.to_h.key?("projectID")
       projectID = image_create_params.to_h[:projectID]
-      @project = find_document(Project, projectID)
-      return unless @project && authorize_owner!(@project)
+      @project = find_and_authorize_owner(Project, projectID)
+      return unless @project
 
       projectIDs.push(@project.id.to_s)
     end
@@ -72,15 +72,15 @@ class ImagesController < ApplicationController
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
     projects   = []
     projectIDs.each do |projectID|
-      project = find_document(Project, projectID)
-      return unless project && authorize_owner!(project)
+      project = find_and_authorize_owner(Project, projectID)
+      return unless project
 
       projects.push(project)
     end
     images = []
     imageIDs.each do |imageID|
-      image = find_document(Image, imageID)
-      return unless image && authorize_owner!(image)
+      image = find_and_authorize_owner(Image, imageID)
+      return unless image
 
       images.push(image)
     end
@@ -103,16 +103,16 @@ class ImagesController < ApplicationController
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
     projects   = []
     projectIDs.each do |projectID|
-      project = find_document(Project, projectID)
-      return unless project && authorize_owner!(project)
+      project = find_and_authorize_owner(Project, projectID)
+      return unless project
 
       projects.push(project)
     end
     images = []
     imageIDs.each do |imageID|
       imageID = imageID.split("_", 2)[0]
-      image = find_document(Image, imageID)
-      return unless image && authorize_owner!(image)
+      image = find_and_authorize_owner(Image, imageID)
+      return unless image
 
       images.push(image)
     end
@@ -143,8 +143,8 @@ class ImagesController < ApplicationController
     images = []
     images_destroy_params.to_h[:imageIDs].each do |imageIDParam|
       imageID = imageIDParam.split("_", 2)[0]
-      image = find_document(Image, imageID)
-      return unless image && authorize_owner!(image)
+      image = find_and_authorize_owner(Image, imageID)
+      return unless image
 
       images.push(image)
     end
