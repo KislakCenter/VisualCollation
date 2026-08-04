@@ -54,16 +54,4 @@ class ApplicationController < ActionController::API
     rescue Mongoid::Errors::DocumentNotFound
       raise VCError.new("#{model.name.downcase} not found with id #{id}", status: status)
     end
-
-    def authorize_project!(project)
-      return if current_user.id == project.user_id
-
-      raise VCError.new("Project (#{project.id}) is not authorized for current user; expected: '#{project.user_id}'.", status: :unauthorized)
-    end
-
-    def authorize_image!(image)
-      return if current_user.id == image.user_id
-
-      raise VCError.new("Image (#{image.id}) is not authorized for current user; expected: '#{image.user_id}'.", status: :unauthorized)
-    end
 end

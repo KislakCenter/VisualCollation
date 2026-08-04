@@ -157,6 +157,12 @@ class ImagesController < ApplicationController
 
   private
 
+  def authorize_image!(image)
+    return if current_user.id == image.user_id
+
+    raise VCError.new("Image (#{image.id}) is not authorized for current user; expected: '#{image.user_id}'.", status: :unauthorized)
+  end
+
   def image_create_params
     params.permit(:projectID, :images => [:filename, :content])
   end
