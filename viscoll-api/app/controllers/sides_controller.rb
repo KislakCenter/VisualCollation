@@ -20,16 +20,21 @@ class SidesController < ApplicationController
       begin
         side = Side.find(sideID)
         sides.push(side)
-      rescue Exception => e
-        @errors.push("side not found with id " + sideID)
+      rescue Mongoid::Errors::DocumentNotFound => e
+        @errors.push("side not found with id " + sideID['id'])
         haveErrors = true
       end
     end
+
     @project = Project.find(sides[0].project_id)
-    authorize_project! @project
-    if haveErrors
-      raise VCError, "Errors occurred when updating: #{@errors.join "\n"}"
+    if current_user.id != @project.user_id
+      render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
     end
+
+    if haveErrors
+      render(json: { error: "Errors occurred when updating: #{@errors.join "\n"}" }, status: :not_found) and return
+    end
+
     allSides.each_with_index do |side_params, index|
       side              = sides[index]
       previousSideImage = side.image.clone
