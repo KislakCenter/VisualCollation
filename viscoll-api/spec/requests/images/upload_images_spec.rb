@@ -91,8 +91,8 @@ describe "POST /images", :type => :request do
         post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
       
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
     end
 
