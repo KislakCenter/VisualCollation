@@ -93,7 +93,9 @@ class GroupsController < ApplicationController
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
       @project = Project.find(@group.project_id)
-      authorize_project! @project
+      if current_user.id != @project.user_id
+        render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
+      end
       if !@group.update(group_params[:attributes])
         raise VCError, "Group: #{@group} could not be updated. Errors: #{errors}"
       end
@@ -115,7 +117,9 @@ class GroupsController < ApplicationController
       # Wrapping destroy in begin/rescue because group may no longer exist when it's nested
       group    = Group.find(groupID)
       @project = Project.find(group.project_id)
-      authorize_project! @project
+      if current_user.id != @project.user_id
+        render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
+      end
       group.destroy
     end
   end

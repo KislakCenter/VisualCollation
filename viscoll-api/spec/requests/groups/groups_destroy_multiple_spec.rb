@@ -80,8 +80,8 @@ describe "DELETE /groups", :type => :request do
         @project.reload
       end
       
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
       
       it 'leaves the groups alone' do
