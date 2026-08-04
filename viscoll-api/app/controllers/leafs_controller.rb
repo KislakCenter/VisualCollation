@@ -33,7 +33,9 @@ class LeafsController < ApplicationController
 
     # Attempt to validate ownership
     @project = Project.find(project_id)
-    authorize_project! @project
+    if current_user.id != @project.user_id
+      render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
+    end
 
     # Skip all callbacks for side creation if leafIDs and SideIDs were give in the request
     begin
@@ -121,7 +123,9 @@ class LeafsController < ApplicationController
     @project = Project.find(leaf_params_batch_update.to_h[:project_id])
     allLeafs.each do |leaf_params, index|
       @leaf = Leaf.find(leaf_params[:id])
-      authorize_project! @project
+      if current_user.id != @project.user_id
+        render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
+      end
       if !@leaf.update(leaf_params[:attributes])
         raise VCError, "Leaf could not be updated: #{leaf.errors.full_messages.join "\n"}"
       end
@@ -170,7 +174,7 @@ class LeafsController < ApplicationController
       end
       memberOrder = @parent.memberIDs.index(leaf.id.to_s)
       if leaf.project.user_id != current_user.id
-        raise VCError, "Leaf belongs to user (#{leaf.project.user_id}) which does not match the current user's ID (#{current_user.id})"
+        render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
 
       # Detach its conjoined leaf if any
