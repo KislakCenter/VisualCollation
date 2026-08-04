@@ -218,20 +218,19 @@ class LeafsController < ApplicationController
       begin
         leaf = Leaf.find(leafID)
         if not allowed_project_ids.include?(leaf.project_id.to_s)
-          raise VCError, "Conjoin not allowed."
+          render(json: { error: "Conjoin not allowed." }, status: :forbidden) and return
         end
         leaves.push(leaf)
-      rescue Exception => e
+      rescue Mongoid::Errors::DocumentNotFound => e
         @errors.push("leaf not found with id " + leafID)
         haveErrors = true
       end
     end
     if leafIDs.size < 2
-      @errors.push("Minimum of 2 leaves required to conjoin")
-      haveErrors = true
+      render(json: { leafs: ["Minimum of 2 leaves required to conjoin"] }, status: :unprocessable_entity) and return
     end
     if haveErrors
-      raise VCError, "Error with conjoin: #{@errors.join "\n"}"
+      render(json: { error: "Error with conjoin: #{@errors.join "\n"}" }, status: :not_found) and return
     end
     @project = Project.find(leaves[0].project_id)
     autoConjoinLeaves(leaves, (leaves.length + 1) / 2)
