@@ -52,7 +52,7 @@ services:
       - internal
       - traefik
     volumes:
-      - xproc:/docs
+      - xproc:/app/htdocs
 
 networks:
   internal:
