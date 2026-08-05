@@ -147,7 +147,7 @@ class FilterRow extends Component {
             errorText={(this.props.type!=="" && this.props.type!==null && this.props.condition==="")?"Required":""}
             disabled={this.props.disableNewRow}
             tabIndex={this.props.tabIndex}
-            data={['equals', 'contains', 'not equals', 'not contains'].filter((item)=>this.filterConditionItems(item)).map(this.mapConditionItems)}
+            data={['equals', 'contains', 'does not equal', 'does not contain'].filter((item)=>this.filterConditionItems(item)).map(this.mapConditionItems)}
             {...floatFieldLight}
           >
           </SelectField>

@@ -67,11 +67,11 @@ class FilterController < ApplicationController
       case condition
       when 'equals'
         query_condition_params = { attribute => (values.length > 1) ? { '$in': values } : values[0] }
-      when 'not equals'
+      when 'does not equal'
         query_condition_params = { attribute => (values.length > 1) ? { '$nin': values } : { '$ne': values[0] } }
       when 'contains'
         query_condition_params = { attribute => (values.length > 1) ? { '$in': values.map { |x| /^#{Regexp.escape(x)}/} } : /#{Regexp.escape(values[0])}/ }
-      when 'not contains'
+      when 'does not contain'
         query_condition_params = { attribute => (values.length > 1) ? { '$nin': values.map { |x| /^#{Regexp.escape(x)}/} } : { '$not': /#{Regexp.escape(values[0])}/} }
       end
 
