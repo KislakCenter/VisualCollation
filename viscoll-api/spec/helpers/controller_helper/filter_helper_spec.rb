@@ -114,7 +114,7 @@ RSpec.describe ControllerHelper::FilterHelper, type: :helper do
       end
     end
 
-    it 'should reject invalid conditions for folio_number and uri' do
+    it 'should reject invalid conditions for page_number and uri' do
       ['page_number', 'uri'].each do |attribute|
         result = runValidations([
           { 'type' => 'side', 'attribute' => attribute, 'condition' => 'waahoo', 'values' => ['value'] }
@@ -123,7 +123,7 @@ RSpec.describe ControllerHelper::FilterHelper, type: :helper do
       end
     end
 
-    it 'should accept valid conditions for folio_number and uri' do
+    it 'should accept valid conditions for page_number and uri' do
       ['page_number', 'uri'].each do |attribute|
         ['equals', 'does not equal', 'contains', 'does not contain'].each do |condition|
           result = runValidations([
