@@ -75,7 +75,7 @@ describe "PUT /images/link", :type => :request do
       end
 
       it 'shows the error' do
-        expect(@body['error']).to eq "project not found with id #{@project2.id}missing"
+        expect(@body['error']).to eq "Project not found with id #{@project2.id}missing"
       end
       
       it 'leaves the images alone' do

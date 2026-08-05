@@ -81,7 +81,7 @@ describe "POST /images", :type => :request do
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to eq("project not found with id #{@project.id.to_str}missing")
+        expect(@body['error']).to eq("Project not found with id #{@project.id.to_str}missing")
       end
     end
     
