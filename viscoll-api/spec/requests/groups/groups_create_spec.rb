@@ -85,12 +85,12 @@ describe "POST /groups", :type => :request do
         @body = JSON.parse(response.body)
       end
       
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 404' do
+        expect(response).to have_http_status(:not_found)
       end
       
       it 'returns the error message' do
-        expect(@body['group']['project_id']).to include("project not found with id #{@project.id.to_str}missing")
+        expect(@body['error']).to include("Project not found.")
       end
     end
 
@@ -107,7 +107,7 @@ describe "POST /groups", :type => :request do
 
     context 'and uncaught exception' do
       before do
-        allow_any_instance_of(Group).to receive(:save).and_raise("Exception")
+        allow_any_instance_of(Group).to receive(:save).and_raise(StandardError)
         post '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
@@ -118,7 +118,7 @@ describe "POST /groups", :type => :request do
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to eq "Exception"
+        expect(@body['error']).to eq "Group was unable to save"
       end
     end
   end

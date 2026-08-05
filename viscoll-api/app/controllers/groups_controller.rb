@@ -30,7 +30,11 @@ class GroupsController < ApplicationController
       render(json: { error: "Project ID is nil." }, status: :unprocessable_entity) and return
     end
 
-    @project = Project.find(project_id)
+    begin
+      @project = Project.find(project_id)
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render(json: { error: "Project not found."}, status: :not_found) and return
+    end
 
     new_groups    = []
     new_group_ids = []
@@ -49,10 +53,14 @@ class GroupsController < ApplicationController
         group.parentID  = parentGroupID
         group.nestLevel = parent_group.nestLevel + 1
       end
-      if group.save
-        new_groups.push(group)
-        new_group_ids.push(group.id.to_s)
-      else
+      begin
+        if group.save
+          new_groups.push(group)
+          new_group_ids.push(group.id.to_s)
+        else
+          render(json: { error: "Group was unable to save" }, status: :unprocessable_entity) and return
+        end
+      rescue StandardError => e
         render(json: { error: "Group was unable to save" }, status: :unprocessable_entity) and return
       end
     end
