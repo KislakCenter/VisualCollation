@@ -150,7 +150,7 @@ describe "PUT /images/link", :type => :request do
     
     context 'and exception in projects' do
       before do
-        allow(Project).to receive(:find).and_raise('waahooexception')
+        allow(Project).to receive(:find).and_raise(StandardError, 'waahooexception')
         @parameters[:projectIDs] = [@project1.id.to_s]
         @parameters[:imageIDs] = [@image1.id.to_s]
         put '/images/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
@@ -158,12 +158,12 @@ describe "PUT /images/link", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
       
       it 'shows the error' do
-        expect(@body['error']).to eq 'waahooexception'
+        expect(@body['errors']).to eq 'waahooexception'
       end
       
       it 'leaves the images alone' do
