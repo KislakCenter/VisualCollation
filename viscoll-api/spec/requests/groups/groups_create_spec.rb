@@ -74,7 +74,7 @@ describe "POST /groups", :type => :request do
       end
       
       it 'returns the error message' do
-        expect(@body['group']['project_id']).to include("not found")
+        expect(@body['error']).to include("Project ID is nil.")
       end
     end
     

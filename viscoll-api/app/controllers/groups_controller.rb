@@ -26,9 +26,8 @@ class GroupsController < ApplicationController
     if (hasAdditionalErrors)
       raise VCError, "Additional group errors: #{@additionalErrors}"
     end
-    @groupErrors = { project_id: [] }
     if (project_id == nil)
-      raise VCError, "Project ID is nil. Group has following errors: #{@groupErrors}"
+      render(json: { error: "Project ID is nil." }, status: :unprocessable_entity) and return
     end
 
     @project = Project.find(project_id)
@@ -54,7 +53,7 @@ class GroupsController < ApplicationController
         new_groups.push(group)
         new_group_ids.push(group.id.to_s)
       else
-        raise VCError, "Group (#{group.id}) was unable to save: #{group.errors.full_messages.join('\n')}"
+        render(json: { error: "Group was unable to save" }, status: :unprocessable_entity) and return
       end
     end
     # Add new group(s) to parent
