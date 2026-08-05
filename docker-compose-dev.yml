@@ -30,19 +30,12 @@ services:
       - mongo
       - xproc
   xproc:
-    container_name: viscoll_idrovora
-    image: gremid/idrovora:0.0.2020082920
+    container_name: vceditor_xproc
     build:
-      context: ./vceditor_idrovora
+      context: ./viscoll-xproc
     volumes:
-      - ./vceditor_idrovora/xproc/xpl:/xpl
-      - ./vceditor_idrovora/xproc/docs:/docs
-    command: ["--http", "2000",
-              "--http-context-path", "/xproc",
-              "--http-doc-root", "/docs",
-              "--http-cleanup-schedule", "0 0 * * * ?",
-              "--http-job-max-age", "PT168H",
-              "/xpl"]
+      - ./viscoll-xproc/xpl:/app/xpl
+      - ./viscoll-xproc/htdocs:/app/htdocs
     ports:
       - 2000:2000
   mongo:

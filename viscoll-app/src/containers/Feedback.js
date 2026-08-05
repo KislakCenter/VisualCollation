@@ -165,8 +165,7 @@ class Feedback extends Component {
             For <a href="https://github.com/KislakCenter/VisualCollation" target="_blank">VCEditor</a> we have made several
             modification, particularly to the back end, to ensure that the output
             validates to the most recent version of the VisColl data model. Development of the XSLT pipelines for
-            VCEditor, called <a href="https://github.com/gremid/idrovora" target="_blank">Idrovora</a>, was done by Gregor Middel, and
-            primary development of VCEditor was done by Patrick Perkins.
+            VCEditor was done by Gregor Middell, and primary development of VCEditor was done by Patrick Perkins.
           </p>
 
           <p>

@@ -63,7 +63,7 @@ describe "PUT /sides/id", :type => :request do
       end
 
       it 'returns 404' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -98,8 +98,8 @@ describe "PUT /sides/id", :type => :request do
         @side1.reload
       end
 
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
 
       it 'leaves the side alone' do

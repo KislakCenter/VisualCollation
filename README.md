@@ -2,203 +2,109 @@
 
 VCEditor is for building models of the physical collation of manuscripts, and then visualizing them in various ways. The VCEditor project is led by Dot Porter at the [Schoenberg Institute for Manuscript Studies](https://schoenberginstitute.org/) at the University of Pennsylvania and Alberto Campagnolo. VCEditor is built on code developed by the [University of Toronto Libraries](https://onesearch.library.utoronto.ca/about) and the [Old Books New Science lab](https://oldbooksnewscience.com/), under the direction of Alexandra Gillespie.
 
-## System Requirements
-
-- `rvm` (>= 1.29.1)
-- `ruby` (>= 2.4.1)
-- `node` (>= 6.11.4)
-- `npm` (>= 3.10.10)
-
-### Additional Requirements for Development:
-
-- [`mailcatcher`](https://mailcatcher.me/) (>= 0.6.5)
-- [Redux DevTools for Firefox or Chrome](https://github.com/zalmoxisus/redux-devtools-extension) (>= 2.15.1)
-
 ## Development setup with Docker
 
-Instead of manually installing the dependencies locally on your machine for development, you can use Docker with the provided Dockerfile and docker-compose.yml.
+The VCEditor development environment runs on machine-local docker.
 
-Update the mongo host name on line 12 in `viscoll-api/config/mongoid.yml` from `localhost` to `mongo` (this is the Docker service name defined in docker-compose.yml).
+### Docker environment
 
-Bring up the containers with:
+Copy the file `docker-environment-dev-sample` to `.docker-environment-dev`:
 
-```
-docker-compose up
-```
-
-TOOO: Change following: give instructions for creating Ethereal mail account. The following paragraph needs to be removed.
-
-To access emails being sent by the app (for user account activation, password reset, etc), set up Ethereal with the following credentials:
-
-```
-:user_name => 'libby.corkery17@ethereal.email',
-:password => 'RP4P6zMm3rVW9adMZF'
+```shell
+cp docker-environment-dev-sample .docker-environment-dev
 ```
 
-Once the account is created, set the credentials in the `.docker-environment-dev` file:
+### Bring up the docker env
+
 
 ```
-MAILER_USR=<ACCOUNT>@ethereal.email
-MAILER_PWD=<PASSWORD>
+docker-compose -f docker-compose-dev.yml up  
 ```
 
-Replace `<ACCOUNT>` with the actual account name and `<PASSWORD>` with the actual password.
+Note: Do not use the `-d` flag. You'll need information from the log output to create the user account needed to work with VCEditor (instructions below). 
 
-## Deploying with Docker Swarm and Traefik
+The application is accessible at http://localhost:3000
 
-To deploy the application with Docker Swarm using Traefik, first deploy the Traefik stack by running the following command:
+### Create a user account
 
-```
-docker stack deploy -c docker-compose.traefik.yml traefik
-```
+When a user creates an account, an email is sent to a VCEditor team member who is given a link to confirm the account. In development, the content of the email with the link is printed to the app service log.
 
-Before running the project you will need to set the environment variable `PROJECT_URL` to the URL you are using (e.g. `export PROJECT_URL=my-viscoll-url.com`). Then deploy the project:
+To create and approve a development user:
 
-```
-docker stack deploy -c docker-compose.yml viscoll
-```
-
-#### Other required environment variables
-
-Set in the ENV the following:
-
-* `MAILER_USR` -- the SMTP account to use (if needed)
-* `MAILER_PWD` -- the password of of the SMTP account (if needed)
-* `MAILER_DEFAULT_FROM` -- the default mail from account
-* `MAILER_HOST` -- the SMTP host
-* `MAILER_DOMAIN` -- the application host (e.g., `my-app.com`)
-* `PROJECT_URL` -- the application host; used by Traefik
-* `RELEASE_TAG` -- the release tag of the docker image (e.g., `lastest`)
-* `ADMIN_EMAIL` -- the mailto address for admin emails
-* `APPLICATION_HOST` -- the application host; used by VCEditor
-* `SECRET_KEY_BASE` -- the Rails secret key base (production and staging environments)
-* `RAILS_ENV` -- 'production', use only if deploying to staging or production
-                  environments
-* `XPROC_URL` -- full URL to the xproc service; e.g., `http://host.com:<PORT>`
-
-In development set environment in `.docker-environment-dev`. See the `docker-environment-dev-sample` file for a template.
-
-## Installation and Setup
-
-Skip this section if you are using Docker for development.
-
-### VisCodex API (Rails)
-
-Rails-driven back-end for VisCodex
-
-#### System Requirements
-
-- `rvm` (>= 1.29.1)
-- `ruby` (>= 2.4.1)
-
-##### Additional Requirements for Development:
-
-- [`mailcatcher`](https://mailcatcher.me/) (>= 0.6.5)
-
-#### Setup
-
-Run the following commands to install the dependencies:
-
-```
-rvm --ruby-version use 2.4.1@viscollobns
-bundle install
-```
-
-Set the admin email address in two locations:
-
-`viscoll-api/app/mailers/mailer.rb` on line 18:
-
-```
-toEmail = Rails.application.secrets.admin_email || "dummy-admin@library.utoronto.ca"
-```
-
-and `viscoll-api/app/mailers/feedback_mailer.rb` on line 10:
-
-```
-to:"utlviscoll@library.utoronto.ca",
-```
-
-Then run this to start the API server:
-
-```
-rails s -p 3001
-```
-
-If you wish to receive confirmation and password reset emails while developing, also start the mailcatcher daemon:
-
-```
-mailcatcher
-```
+- Go to the home page <http://localhost:3000>
+- Click "Create account"
+- Enter a name, email and password. It does not have to be a real email address; e.g., `test@test.com` is fine.
+- From the docker log copy the link from the confirmation email body It will look like this: 
+  - https://localhost/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
+- Paste the link into a browser, change the protcol to `http`, and add port `3000` to the domain:
+  - http://localhost:3000/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
+- Hit enter and the account will be approved
 
 #### Testing
 
-Run this command to test once:
+Testing is run in the docker containers.
+
+To run the Rails tests, do:
 
 ```
-rspec
+docker exec -it $(docker ps -q -f name="viscoll_api") bash
+RAILS_ENV=test bundle exec rspec 
 ```
 
-Alternatively, run this command to test continually while monitoring for changes:
+To run the Javascript tests, do:
 
 ```
-guard
-```
-
-### VisCodex App (React-Redux)
-
-Redux-driven user interface for VisCodex
-
-#### System Requirements
-
-- `node` (>= 6.11.4)
-- `npm` (>= 3.10.10)
-
-##### Additional Requirements for Development:
-
-- [Redux DevTools for Firefox or Chrome](https://github.com/zalmoxisus/redux-devtools-extension) (>= 2.15.1)
-
-#### Setup
-
-Run this to install the dependencies:
-
-```
-npm install
-```
-
-Then run the dev server which brings up a browser window serving the user interface:
-
-```
-npm start
-```
-
-#### Testing
-
-Run this command to test once:
-
-```
+docker exec -it $(docker ps -q -f name="viscoll_app") bash
 npm test
 ```
 
-Alternatively, run this command to test continually while monitoring for changes:
+### Development docker stack
 
+Five docker services run in the development environment:
+
+- `app` -- the React/Redux frontend
+- `api` -- the Rails backend
+- `xproc` -- the XSLT pipeline service
+- `mongo` -- MongoDB instance
+- `mongo-express` -- Mongo admin interface
+
+The `api` and `xproc` service images are built during docker compose startup. 
+
+## Deploying in Portainer
+
+Staging and production deployments are run as docker stacks in Portainer. Both are on the same host. There are addresses are:
+
+- Staging: https://vceditor.library.upenn.edu:8443
+- Production: https://vceditor.library.upenn.edu
+
+#### Required environment variables
+
+These variables are set in each stack's environment variable section:
+
+```dotenv
+MAILER_HOST=an.smtp.host
+MAILER_DEFAULT_FROM=<siteadmin>@upenn.edu
+MAILER_DOMAIN=vceditor.library.upenn.edu
+MAILER_PORT=25
+APPLICATION_HOST=vceditor.library.upenn.edu:443 # or vceditor.library.upenn.edu:8443 
+# ADMIN_EMAIL: addresses of confirmation email recipients
+ADMIN_EMAIL=address1@upenn.edu,address2@upenn.edu,adress3@gmail.com
+SECRET_KEY_BASE=railssecretkey
+RAILS_ENV=production
+RAILS_SERVE_STATIC_ FILES=true
+XPROC_URL=http://xproc:2000
+# `PROJECT_URL` -- the application host; used by Traefik
+PROJECT_URL=vceditor.library.upenn.edu
+RELEASE_TAG=animagetag
+INSTANCE=production # or staging
+HONEYBADGER_API_KEY=anapikey
 ```
-npm test -- --watch
-```
 
-#### Building
+#### Prduction docker images
 
-Before building the app, edit line 3 in `viscoll-app/src/store/axiosConfig.js` to contain the correct root endpoint of the VisCodex API:
+The GitLab pipeline builds the production API and XProc images. 
 
-```Javascript
-export let API_URL = '/api';
-
-```
-
-Build the app with:
-
-```
-npm build
-```
+The pipeline push the images in GitLab container registry, but does not deploy the application. The Portainer Stacks feature is used to pull images and deploy the application. 
 
 ## Copyright and License
 
