@@ -871,7 +871,7 @@ describe "PUT /projects/:id/filter", :type => :request do
       end
     end
 
-    context 'and inexistent params', pending: 'catch all api error fix' do
+    context 'and inexistent params' do
       before do
         @parameters = {
           "queries": []
@@ -894,7 +894,7 @@ describe "PUT /projects/:id/filter", :type => :request do
       end
     end
 
-    context 'and unauthorized params', pending: 'catch all api error fix' do
+    context 'and unauthorized params' do
       before do
         put "/projects/#{@project2.id}/filter", params: @parameters.to_json, headers: {'Authorization' => @authToken}
       end
