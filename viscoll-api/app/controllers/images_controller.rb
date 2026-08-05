@@ -143,7 +143,7 @@ class ImagesController < ApplicationController
       begin
         Project.find(project_id)
       rescue Mongoid::Errors::DocumentNotFound
-        render(json: { error: "project not found with id #{project_id}" }, status: :not_found) and return
+        render(json: { error: "Project not found with id #{project_id}" }, status: :not_found) and return
       end
     end
   end
