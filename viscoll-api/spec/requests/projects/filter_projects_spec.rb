@@ -884,7 +884,7 @@ describe "PUT /projects/:id/filter", :type => :request do
       end
     end
 
-    context 'and missing project', pending: 'catch all api error fix' do
+    context 'and missing project' do
       before do
         put "/projects/#{@project1.id}missing/filter", params: @parameters.to_json, headers: {'Authorization' => @authToken}
       end
