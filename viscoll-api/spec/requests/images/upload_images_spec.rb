@@ -81,7 +81,7 @@ describe "POST /images", :type => :request do
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to eq("project not found with id #{@project.id.to_str}missing")
+        expect(@body['error']).to eq("Project not found with id #{@project.id.to_str}missing")
       end
     end
     
@@ -91,8 +91,8 @@ describe "POST /images", :type => :request do
         post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
       
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
     end
 
@@ -109,18 +109,17 @@ describe "POST /images", :type => :request do
 
     context 'and uncaught exception' do
       before do
-        allow(Project).to receive(:find).and_raise("Exception")
+        allow(Project).to receive(:find).and_raise(StandardError, "Exception")
         post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
-        @body = JSON.parse(response.body)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to eq "Exception"
+        expect(@body['errors']).to eq "Exception"
       end
     end
   end

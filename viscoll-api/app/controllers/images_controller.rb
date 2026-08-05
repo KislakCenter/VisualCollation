@@ -1,5 +1,6 @@
 class ImagesController < ApplicationController
   before_action :authenticate!, except: [:show, :getZipImages]
+  before_action :set_image_projects, :validate_image_projects, only: [:uploadImages, :link, :unlink]
 
   def authorize_image! image
     return if current_user.id == image.user_id
@@ -8,13 +9,7 @@ class ImagesController < ApplicationController
 
   # POST /images
   def uploadImages
-    projectIDs = []
-    if image_create_params.to_h.key?("projectID")
-      @project = Project.find(image_create_params.to_h[:projectID])
-      authorize_project! @project
-      projectIDs.push(@project.id.to_s)
-    end
-
+    projectIDs = @image_projects.map(&:id).map(&:to_s)
     newImages = []
     allImages = image_create_params.to_h[:images]
     allImages.each do |image_data|
@@ -36,7 +31,7 @@ class ImagesController < ApplicationController
             copyCounter += 1
           else
             image.destroy
-            raise VCError, "Image failed: #{image.errors.full_messages.join("\n")}"
+            render(json: { error: "Image failed: #{image.errors.full_messages.join("\n")}"}, status: :unprocessable_entity) and return
           end
         end
       end
@@ -69,21 +64,14 @@ class ImagesController < ApplicationController
 
   # PUT/PATCH /images/link
   def link
-    projectIDs = image_link_unlink_params.to_h[:projectIDs]
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
-    projects   = []
-    projectIDs.each do |projectID|
-      project = Project.find(projectID)
-      authorize_project! project
-      projects.push(project)
-    end
     images = []
     imageIDs.each do |imageID|
       image         = Image.find(imageID)
       authorize_image! image
       images.push(image)
     end
-    projects.each do |project|
+    @image_projects.each do |project|
       images.each do |image|
         if not image.projectIDs.include? project.id.to_s
           image.projectIDs.push(project.id.to_s)
@@ -98,21 +86,14 @@ class ImagesController < ApplicationController
 
   # PUT/PATCH /images/unlink
   def unlink
-    projectIDs = image_link_unlink_params.to_h[:projectIDs]
     imageIDs   = image_link_unlink_params.to_h[:imageIDs]
-    projects   = []
-    projectIDs.each do |projectID|
-      project = Project.find(projectID)
-      authorize_project! project
-      projects.push(project)
-    end
     images = []
     imageIDs.each do |imageID|
       image = Image.find(imageID.split("_", 2)[0])
       authorize_image! image
       images.push(image)
     end
-    projects.each do |project|
+    @image_projects.each do |project|
       images.each do |image|
         if image.projectIDs.include? project.id.to_s
           image.projectIDs.delete(project.id.to_s)
@@ -152,6 +133,29 @@ class ImagesController < ApplicationController
   end
 
   private
+
+
+  # Set the list of projects for the image.
+  def set_image_projects
+    project_ids = Array.wrap(params[:projectID] || params[:projectIDs])
+
+    @image_projects = project_ids.map do |project_id|
+      begin
+        Project.find(project_id)
+      rescue Mongoid::Errors::DocumentNotFound
+        render(json: { error: "Project not found with id #{project_id}" }, status: :not_found) and return
+      end
+    end
+  end
+
+  # Validate that all image projects can be edited by the current_user.
+  def validate_image_projects
+    @image_projects.each do |project|
+      if current_user.id != project.user_id
+        render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
+      end
+    end
+  end
 
   def image_create_params
     params.permit(:projectID, :images => [:filename, :content])
