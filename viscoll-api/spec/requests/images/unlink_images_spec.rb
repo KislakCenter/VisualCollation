@@ -125,7 +125,7 @@ describe "PUT /images/unlink", :type => :request do
       end
 
       it 'shows the error' do
-        expect(@body['error']).to eq "image not found with id #{@image2.id}missing"
+        expect(@body['error']).to eq "Image not found with id #{@image2.id}missing"
       end
       
       it 'leaves the images alone' do
@@ -144,8 +144,8 @@ describe "PUT /images/unlink", :type => :request do
         @image2.reload
       end
 
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
       
       it 'leaves the images alone' do
@@ -188,12 +188,12 @@ describe "PUT /images/unlink", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
       
       it 'shows the error' do
-        expect(@body['error']).to eq 'waahooexception'
+        expect(@body['errors']).to eq 'waahooexception'
       end
       
       it 'leaves the images alone' do
