@@ -116,8 +116,8 @@ describe "PUT /leafs/conjoin", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 404' do
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -142,8 +142,8 @@ describe "PUT /leafs/conjoin", :type => :request do
         @leafs.each { |leaf| leaf.reload }
       end
       
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
       
       it 'should not edit the leaf' do
