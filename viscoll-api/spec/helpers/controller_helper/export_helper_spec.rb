@@ -108,7 +108,7 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
     expect(result.css("textblock shelfmark").text).to eq 'Ravenna 384.2339'
     expect(result.css("textblock date").text).to eq '18th century'
     ####
-    # DE 2026-08-06 These and the following specs fail because
+    # DE 2026-08-06 These commented expectations fail because
     # 1. they reference project config values no long in the XML export, or
     # 2. rely on out-of-date VisColl schema elements and structures
     ####
@@ -140,11 +140,13 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
     # Check that there are 6 rectos and 6 versos
     ns = {n: "http://viscoll.org/schema/collation/"}
     ####
-    # DE 2026-08-06 Note that the commented expectations below fail because (1) they use the wrong terms for @side;
-    ####
-    # (2) they assume mapped terms that are now part of the data model, like leaf_attachment_method; a
-    # and (3) they assume one mapping per temp/element pair, while the new model uses a single
+    # DE 2026-08-06 Note that the commented expectations below fail because
+    # (1) they use the wrong terms for @side;
+    # (2) they assume mapped terms that are now part of the data model, like
+    # leaf_attachment_method; and
+    # (3) they assume one mapping per term/element pair, while the new model uses a single
     # mapping per term with the XML ID for each mapped element listed in the map/@taget attribute
+    ####
     # -    expect(result.xpath("//n:mapping/n:map[@side='recto']", ns).size).to eq(6)
     expect(result.xpath("//n:mapping/n:map[@side='right']/@target", ns).text.split.size).to eq(2)
     # -    expect(result.xpath("//n:mapping/n:map[@side='verso']", ns).size).to eq(6)
