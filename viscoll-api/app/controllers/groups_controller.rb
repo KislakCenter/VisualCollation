@@ -95,7 +95,7 @@ class GroupsController < ApplicationController
     # Run validations
     errors = validateGroupBatchUpdate(allGroups)
     if not errors.empty?
-      raise VCError, "Batch update error: #{errors}"
+      render(json: {error: "Batch update error: #{errors}"}, status: :unprocessable_entity) and return
     end
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
@@ -104,7 +104,7 @@ class GroupsController < ApplicationController
         render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
       if !@group.update(group_params[:attributes])
-        raise VCError, "Group: #{@group} could not be updated. Errors: #{errors}"
+        render(json: { error: "Group: #{@group} could not be updated. Errors: #{errors}" }, status: :unprocessable_entity) and return
       end
     end
   end

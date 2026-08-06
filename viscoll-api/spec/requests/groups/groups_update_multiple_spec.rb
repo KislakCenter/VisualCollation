@@ -99,17 +99,17 @@ describe "PUT /groups", :type => :request do
     
     context 'and raised exception' do
       before do
-        allow_any_instance_of(Group).to receive(:update).and_raise('MyException')
+        allow_any_instance_of(Group).to receive(:update).and_raise(StandardError)
         put '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
 
       it 'shows the exception' do
-        expect(@body['error']).to eq 'MyException'
+        expect(@body['errors']).to eq 'StandardError'
       end
     end
   end
