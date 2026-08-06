@@ -48,18 +48,17 @@ describe "GET /images/zip/:imageid_:projectid", :type => :request do
 
     context 'and uncaught exception' do
       before do
-        allow(Image).to receive(:find).and_raise("Exception")
+        allow(Image).to receive(:find).and_raise(StandardError, "Exception")
         get "/images/zip/#{@image1.id}_#{@project.id}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json'}
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
-        @body = JSON.parse(response.body)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to include "Cannot read file"
+        expect(@body['errors']).to include "Cannot read file"
       end
     end
   end

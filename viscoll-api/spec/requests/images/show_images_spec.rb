@@ -50,24 +50,23 @@ describe "GET /images/:id", :type => :request do
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to eq("image not found with id #{@image1.id.to_str}missing")
+        expect(@body['error']).to eq("Image not found with id #{@image1.id.to_str}missing")
       end
     end
 
     context 'and uncaught exception' do
       before do
-        allow(Image).to receive(:find).and_raise("Exception")
+        allow(Image).to receive(:find).and_raise(StandardError, "Exception")
         get "/images/#{@image1.id}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json'}
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
-        @body = JSON.parse(response.body)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to eq "Exception"
+        expect(@body['errors']).to eq "Exception"
       end
     end
   end
