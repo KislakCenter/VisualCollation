@@ -1,6 +1,6 @@
 class GroupsController < ApplicationController
   before_action :authenticate!
-  before_action :set_group, only: [:update, :destroy]
+  before_action :set_group, only: [:update]
 
   # POST /groups
   def create
@@ -111,8 +111,23 @@ class GroupsController < ApplicationController
 
   # DELETE /groups/1
   def destroy
-    @group = Group.find(params[:id])
-    @group.destroy
+    begin
+      @group = Group.find(params[:id])
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render(json: { error: "Group not found." }, status: :not_found) and return
+    end
+
+    @project = Project.find(@group.project_id)
+
+    if current_user.id != @project.user_id
+      render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
+    end
+
+    begin
+      @group.destroy
+    rescue StandardError => e
+      render(json: { error: "Group could not be destroyed." }, status: :unprocessable_entity) and return
+    end
   end
 
   # DELETE /groups
@@ -121,13 +136,23 @@ class GroupsController < ApplicationController
     projectID = group_params_batch_delete.to_h[:projectID]
     # Delete groups
     groupIDs.each do |groupID|
-      # Wrapping destroy in begin/rescue because group may no longer exist when it's nested
-      group    = Group.find(groupID)
+      begin
+        group = Group.find(groupID)
+      rescue Mongoid::Errors::DocumentNotFound => e
+        render(json: { error: "Group not found." }, status: :not_found) and return
+      end
+
       @project = Project.find(group.project_id)
+
       if current_user.id != @project.user_id
         render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
-      group.destroy
+
+      begin
+        group.destroy
+      rescue StandardError => e
+        render(json: { error: "Group could not be destroyed." }, status: :unprocessable_entity) and return
+      end
     end
   end
 

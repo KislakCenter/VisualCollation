@@ -59,8 +59,8 @@ describe "DELETE /groups", :type => :request do
         delete "/groups", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
       
-      it 'returns 204' do
-        expect(response).to have_http_status(:no_content)
+      it 'returns 404' do
+        expect(response).to have_http_status(:not_found)
       end
       
       it 'leaves the groups alone' do
