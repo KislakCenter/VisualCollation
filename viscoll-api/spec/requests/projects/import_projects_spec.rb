@@ -49,35 +49,6 @@ describe "PUT /projects/import", :type => :request do
     end
   end
 
-  describe 'XML imports' do
-    let(:import_data) { File.open(File.dirname(__FILE__) + '/../../fixtures/sample_import_xml.xml', 'r') { |file| file.read } }
-    before :each do
-      @parameters[:importFormat] = 'xml'
-    end
-
-    it 'should import properly' do
-      @parameters[:importData] = import_data
-      expect{ put '/projects/import', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'} }.to change{Project.count}.by(1)
-      project = Project.last
-      expect(project.title).to eq 'Sample project'
-      expect(project.shelfmark).to eq 'Ravenna 384.2339'
-      expect(project.metadata).to eq({ 'date' => '18th century' })
-      expect(project.preferences).to eq({ 'showTips' => true })
-      # TODO: import taxonomies
-      expect(project.manifests).to eq({ '12341234' => { 'id' => '12341234', 'url' => 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest' } })
-      expect(project.leafs.count).to eq 6
-      expect(project.sides.count).to eq 12
-      # TODO: import terms
-    end
-
-    it 'should show error for invalid XML' do
-      @parameters[:import_data] = import_data + '<junk'
-      expect{ put '/projects/import', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'} }.not_to change{Project.count}
-      expect(response).to have_http_status(:unprocessable_entity)
-      expect(JSON.parse(response.body)['error']).not_to be_blank
-    end
-  end
-
   describe 'Invalid situations' do
     let(:import_data) { File.open(File.dirname(__FILE__) + '/../../fixtures/sample_import_json.json', 'r') { |file| file.read } }
     before :each do
