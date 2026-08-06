@@ -191,8 +191,8 @@ describe "GET /projects/:id/export/:format", :type => :request do
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 
-      it 'should return 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'should return 403' do
+        expect(response).to have_http_status(:forbidden)
       end
     end
 

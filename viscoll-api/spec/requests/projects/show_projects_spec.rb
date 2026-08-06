@@ -37,13 +37,13 @@ describe "GET /projects/id", :type => :request do
       end
     end
 
-    context 'and unauthorized params' do
+    context 'and unauthorized project' do
       before do
         get '/projects/'+@project2._id, params: '', headers: {'Authorization' => @authToken}
       end
     
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
