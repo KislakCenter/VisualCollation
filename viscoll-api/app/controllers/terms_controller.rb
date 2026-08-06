@@ -6,15 +6,24 @@ class TermsController < ApplicationController
   # POST /terms
   def create
     @term    = Term.new(term_create_params)
-    @project = Project.find(@term.project_id)
-    authorize_project! @project
+
+    begin
+      @project = Project.find(@term.project_id)
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render(json: { error: "Project not found." }, status: :not_found) and return
+    end
+
+    if current_user.id != @project.user_id
+      render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
+    end
+
     if @term.save
       if not Project.find(@term.project_id).taxonomies.include?(@term.taxonomy)
         @term.delete
-        raise VCError, "Taxonomy (#{@term.taxonomy}) does not belong to project (#{@project.id})."
+        render(json: { error: "Taxonomy (#{@term.taxonomy}) does not belong to project."}, status: :unprocessable_entity)
       end
     else
-      raise VCError, "Something went wrong with saving terms: #{@term.errors.full_messages.join("\n")}"
+      render(json: { error: "Something went wrong with saving terms." }, status: :unprocessable_entity)
     end
   end
 
