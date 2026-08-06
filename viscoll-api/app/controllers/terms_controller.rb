@@ -162,13 +162,13 @@ class TermsController < ApplicationController
                end
     @term    = Term.find(term_id)
     @project = Project.find(@term.project_id)
-    authorize_project! @project
+    authorize_project!
   end
 
   def set_attached_project
     project_id = taxonomy_params.to_h[:project_id]
     @project   = Project.find(project_id)
-    authorize_project! @project
+    authorize_project!
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

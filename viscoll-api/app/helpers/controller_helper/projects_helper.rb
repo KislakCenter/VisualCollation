@@ -3,8 +3,8 @@ module ControllerHelper
   module ProjectsHelper
     include ControllerHelper::LeafsHelper
 
-    def authorize_project! project
-      if current_user.id != project.user_id
+    def authorize_project!
+      if current_user.id != @project.user_id
         render json: { error: "Project is not authorized for current user." }, status: :forbidden
       end
     end
