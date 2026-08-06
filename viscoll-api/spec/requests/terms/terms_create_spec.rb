@@ -47,7 +47,7 @@ describe "POST /terms", :type => :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it 'return error message' do
+      it 'returns error message' do
         expect(@body['error']).to eq("Taxonomy (WAAHOO) does not belong to project.")
       end
     end
