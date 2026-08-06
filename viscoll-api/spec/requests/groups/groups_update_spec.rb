@@ -66,8 +66,8 @@ describe "PUT /groups/id", :type => :request do
         @group.reload
       end
       
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
     end
     

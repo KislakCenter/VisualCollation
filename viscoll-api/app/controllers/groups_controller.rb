@@ -1,6 +1,6 @@
 class GroupsController < ApplicationController
   before_action :authenticate!
-  before_action :set_group, only: [:update]
+  before_action :set_group, :set_project, only: [:update, :destroy]
 
   # POST /groups
   def create
@@ -95,7 +95,7 @@ class GroupsController < ApplicationController
     # Run validations
     errors = validateGroupBatchUpdate(allGroups)
     if not errors.empty?
-      raise VCError, "Batch update error: #{errors}"
+      render(json: {error: "Batch update error: #{errors}"}, status: :unprocessable_entity) and return
     end
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
@@ -104,7 +104,7 @@ class GroupsController < ApplicationController
         render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
       if !@group.update(group_params[:attributes])
-        raise VCError, "Group: #{@group} could not be updated. Errors: #{errors}"
+        render(json: { error: "Group: #{@group} could not be updated. Errors: #{errors}" }, status: :unprocessable_entity) and return
       end
     end
   end
@@ -115,12 +115,6 @@ class GroupsController < ApplicationController
       @group = Group.find(params[:id])
     rescue Mongoid::Errors::DocumentNotFound => e
       render(json: { error: "Group not found." }, status: :not_found) and return
-    end
-
-    @project = Project.find(@group.project_id)
-
-    if current_user.id != @project.user_id
-      render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
     end
 
     @group.destroy
@@ -151,8 +145,19 @@ class GroupsController < ApplicationController
   private
 
   def set_group
-    @group   = Group.find(params[:id])
-    @project = Project.find(@group.project_id)
+    begin
+      @group = Group.find(params[:id])
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render(json: {error: "Group not found with id #{params[:id]}"}, status: :not_found) and return
+    end
+  end
+
+  def set_project
+    begin
+      @project = Project.find(@group.project_id)
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render(json: {error: "Project not found with id #{@group.projectID}"}, status: :not_found) and return
+    end
     authorize_project! @project
   end
 

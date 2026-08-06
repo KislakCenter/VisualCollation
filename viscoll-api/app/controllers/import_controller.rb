@@ -9,17 +9,6 @@ class ImportController < ApplicationController
     case importFormat
     when "json"
       handleJSONImport(JSON.parse(importData))
-    when "xml"
-      xml     = Nokogiri::XML(importData)
-      schema  = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel2.rng"))
-      schema2 = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel2.0.rng"))
-      errors  = schema.validate(xml)
-      errors2 = schema2.validate(xml)
-      if errors.empty? || errors2.empty?
-        handleXMLImport(xml)
-      else
-        raise VCError, "XML import failed: #{(errors + errors2).join "\n"}"
-      end
     end
     newProject = current_user.projects.order_by(:updated_at => 'desc').first
     handleMappingImport(newProject, imageData, current_user)

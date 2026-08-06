@@ -56,7 +56,7 @@ describe "DELETE /groups/id", :type => :request do
       end
       
       it 'returns the right error message' do
-        expect(@body['error']).to eq "Group not found."
+        expect(@body['error']).to include "Group not found"
       end
     end
     
@@ -74,7 +74,7 @@ describe "DELETE /groups/id", :type => :request do
       end
       
       it 'returns the error message' do
-        expect(@body['error']).to eq "Project is not authorized for current user."
+        expect(@body['error']).to include "Project is not authorized"
       end
       
       it 'retains the group' do

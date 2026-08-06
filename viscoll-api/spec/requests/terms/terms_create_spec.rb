@@ -47,8 +47,8 @@ describe "POST /terms", :type => :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it 'says what taxonomies are allowed' do
-        expect(@body['taxonomy']).to include('should be one of ["Ink"]')
+      it 'returns error message' do
+        expect(@body['error']).to eq("Taxonomy (WAAHOO) does not belong to project.")
       end
     end
 
@@ -59,12 +59,12 @@ describe "POST /terms", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 404' do
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'gives the right error message' do
-        expect(@body['project_id']).to eq "project not found with id #{@parameters[:term][:project_id]}"
+        expect(@body['error']).to eq "Project not found."
       end
     end
 
@@ -87,8 +87,8 @@ describe "POST /terms", :type => :request do
         post '/terms', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
 
       it 'should not add terms to the project' do

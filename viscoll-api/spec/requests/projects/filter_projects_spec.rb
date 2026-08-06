@@ -894,13 +894,13 @@ describe "PUT /projects/:id/filter", :type => :request do
       end
     end
 
-    context 'and unauthorized params' do
+    context 'and unauthorized project' do
       before do
         put "/projects/#{@project2.id}/filter", params: @parameters.to_json, headers: {'Authorization' => @authToken}
       end
 
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

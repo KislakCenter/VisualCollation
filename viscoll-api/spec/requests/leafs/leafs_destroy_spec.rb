@@ -92,7 +92,7 @@ describe "DELETE /leafs/:id", :type => :request do
       end
     end
     
-    context 'and an unauthorized page' do
+    context 'and an unauthorized project' do
       before do
         @user2 = FactoryGirl.create(:user)
         @project.update(user: @user2)
@@ -101,8 +101,8 @@ describe "DELETE /leafs/:id", :type => :request do
         @group.reload
       end
       
-      it 'returns 401' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns 403' do
+        expect(response).to have_http_status(:forbidden)
       end
       
       it 'should not remove any' do
