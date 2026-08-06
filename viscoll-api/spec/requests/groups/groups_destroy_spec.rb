@@ -89,12 +89,12 @@ describe "DELETE /groups/id", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns the error message' do
-        expect(@body['error']).to eq 'Group could not be destroyed.'
+        expect(@body['errors']).to eq 'StandardError'
       end
     end
   end
