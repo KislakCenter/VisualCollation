@@ -144,11 +144,7 @@ class GroupsController < ApplicationController
         render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
 
-      begin
-        group.destroy
-      rescue StandardError => e
-        render(json: { error: "Group could not be destroyed." }, status: :unprocessable_entity) and return
-      end
+      group.destroy
     end
   end
 
