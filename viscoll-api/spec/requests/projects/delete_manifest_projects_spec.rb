@@ -81,7 +81,7 @@ describe "DELETE /projects/:id/manifests", :type => :request do
       end
       
       it 'returns 403' do
-        expect(response).to have_http_status(:unauthorized)
+        expect(response).to have_http_status(:forbidden)
       end
       
       it 'leaves the project alone' do

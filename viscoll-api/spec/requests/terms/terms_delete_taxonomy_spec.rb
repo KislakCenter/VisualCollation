@@ -99,7 +99,7 @@ describe "DELETE /terms/taxonomy", :type => :request do
       end
 
       it 'should return 403' do
-        expect(response).to have_http_status(:unauthorized)
+        expect(response).to have_http_status(:forbidden)
       end
 
       it 'should leave the taxonomies alone' do
