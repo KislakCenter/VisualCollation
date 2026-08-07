@@ -111,10 +111,10 @@ class ProjectsController < ApplicationController
   def updateManifest
     manifest = manifest_params.to_h
     if not manifest.key?("id")
-      raise VCError, "ID is required."
+      render(json: { error: "ID is required." }, status: :unprocessable_entity) and return
     end
     if not @project.manifests.key?(manifest["id"])
-      raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
+      render(json: { error: "Manifest not found in project." }, status: :unprocessable_entity) and return
     end
     # ONLY UPDATING MANIFEST NAME FOR NOW
     @project.manifests[manifest["id"]]["name"] = manifest["name"]
@@ -168,7 +168,7 @@ class ProjectsController < ApplicationController
 
   def set_project
     @project = Project.find(params[:id])
-    authorize_project! @project
+    authorize_project!
   end
 
   # Never trust parameters from the scary Internet, only allow the white list through.

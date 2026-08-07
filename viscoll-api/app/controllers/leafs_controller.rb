@@ -242,7 +242,7 @@ class LeafsController < ApplicationController
   def set_leaf
     @leaf    = Leaf.find(params[:id])
     @project = Project.find(@leaf.project_id)
-    authorize_project! @project
+    authorize_project!
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
