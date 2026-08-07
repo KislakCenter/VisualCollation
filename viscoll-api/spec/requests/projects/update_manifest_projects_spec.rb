@@ -72,7 +72,7 @@ describe "PUT /projects/:id/manifests", :type => :request do
       end
       
       it 'gives the right error' do
-        expect(@body['error']).to eq "Manifest with id: 59ee3c623b0eb75251207cfemissing not found in project with id: #{@project.id.to_str}."
+        expect(@body['error']).to eq "Manifest not found in project."
       end
     end
     context 'with missing id parameter' do
@@ -87,7 +87,7 @@ describe "PUT /projects/:id/manifests", :type => :request do
       end
       
       it 'gives the right error' do
-        expect(@body['error']).to eq "Param required: id."
+        expect(@body['error']).to eq "ID is required."
       end
     end
     context 'with unauthorized project' do
