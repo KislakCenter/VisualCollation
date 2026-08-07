@@ -136,7 +136,7 @@ class GroupsController < ApplicationController
   def set_group
     @group   = Group.find(params[:id])
     @project = Project.find(@group.project_id)
-    authorize_project! @project
+    authorize_project!
   end
 
   def group_params

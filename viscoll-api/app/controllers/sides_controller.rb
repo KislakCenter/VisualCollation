@@ -96,7 +96,7 @@ class SidesController < ApplicationController
   def set_side
     @side    = Side.find(params[:id])
     @project = Project.find(@side.project_id)
-    authorize_project! @project
+    authorize_project!
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

@@ -157,7 +157,7 @@ class ExportController < ApplicationController
   def set_project
     @project = Project.find(params[:id])
     @format = params[:format]
-    authorize_project! @project
+    authorize_project!
   end
 
   def remove_xml_declaration zip_file, input_file
