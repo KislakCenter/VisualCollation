@@ -111,12 +111,6 @@ class GroupsController < ApplicationController
 
   # DELETE /groups/1
   def destroy
-    begin
-      @group = Group.find(params[:id])
-    rescue Mongoid::Errors::DocumentNotFound => e
-      render(json: { error: "Group not found." }, status: :not_found) and return
-    end
-
     @group.destroy
   end
 
@@ -148,7 +142,7 @@ class GroupsController < ApplicationController
     begin
       @group = Group.find(params[:id])
     rescue Mongoid::Errors::DocumentNotFound => e
-      render(json: {error: "Group not found with id #{params[:id]}"}, status: :not_found) and return
+      render(json: {error: "Group not found."}, status: :not_found) and return
     end
   end
 
