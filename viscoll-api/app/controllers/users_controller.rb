@@ -38,7 +38,7 @@ class UsersController < ApplicationController
     end
 
     if (@user != current_user)
-      render json: { error: "Unauthorized. User do not match." }, status: :forbidden
+      render json: { error: "Unauthorized." }, status: :forbidden
     end
   end
 
