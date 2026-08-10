@@ -28,7 +28,7 @@ FactoryGirl.define do
         else
           raise Exception('Terms can only be attached to groups, leafs and sides')
         end
-        object.terms << term
+        object.terms << term unless object.terms.include?(term)
         object.save
       end
     end
