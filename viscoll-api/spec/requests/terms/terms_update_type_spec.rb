@@ -65,12 +65,12 @@ describe "PUT /terms/taxonomy", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'should return 404' do
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'should return the right error message' do
-        expect(@body['project_id']).to eq "project not found with id #{@project.id}missing"
+        expect(@body['error']).to eq "Project not found."
       end
     end
 
@@ -87,7 +87,7 @@ describe "PUT /terms/taxonomy", :type => :request do
       end
 
       it 'should return the right error message' do
-        expect(@body['old_taxonomy']).to eq "Waahoo taxonomy doesn't exist in the project"
+        expect(@body['error']).to eq "Taxonomy (Waahoo) does not exist in the project"
       end
 
       it 'should leave the project alone' do
@@ -108,7 +108,7 @@ describe "PUT /terms/taxonomy", :type => :request do
       end
 
       it 'should return the right error message' do
-        expect(@body['taxonomy']).to eq "Ink already exists in the project"
+        expect(@body['error']).to eq "Taxonomy (Ink) already exists in the project"
       end
 
       it 'should leave the project alone' do
