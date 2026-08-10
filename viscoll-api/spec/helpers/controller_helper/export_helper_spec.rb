@@ -1,30 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ControllerHelper::ExportHelper, type: :helper do
-  ## Reproduce the algorithm in the terms#link action
-  def link_term term, obj_id
-    term.objects ||= {Group: [], Leaf: [], Recto: [], Verso: []}
-    case obj_id[0]
-    when 'G'
-      obj = Group.find(obj_id)
-      term.objects[:Group] << obj_id
-    when 'L'
-      obj = Leaf.find(obj_id)
-      term.objects[:Leaf] << obj_id
-    when 'R'
-      obj = Side.find(obj_id)
-      term.objects[:Recto] << obj_id
-    when 'V'
-      obj = Side.find(obj_id)
-      term.objects[:Verso] << obj_id
-    end
-    obj.terms << term
-    term.save
-    obj.save
-  end
-
   before do
-    # stub_request(:get, 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest').with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200, body: File.read(File.dirname(__FILE__) + '/../../fixtures/villanova_boston.json'), headers: {})
     @project = FactoryGirl.create(:project,
       'title' => 'Sample project',
       'shelfmark' => 'Ravenna 384.2339',
@@ -44,15 +21,15 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
     @project.add_groupIDs([@testgroup.id.to_s, @testmidgroup.id.to_s], 0)
     @testgroup.add_members([@upleafs[0].id.to_s, @upleafs[1].id.to_s, @testmidgroup.id.to_s, @botleafs[0].id.to_s, @botleafs[1].id.to_s], 0)
     @testmidgroup.add_members([@midleafs[0].id.to_s, @midleafs[1].id.to_s], 0)
-    @testterm = FactoryGirl.create(:term, project: @project, title: 'Iron-gall', taxonomy: 'Ink', description: 'This is a test', uri: 'https://www.test.com/', show: true)
-    [
-      @testgroup.id.to_s,
-      @botleafs[0].id.to_s,
-      @botleafs[0].rectoID,
-      @botleafs[0].versoID].each do |obj_id|
-      link_term @testterm, obj_id
-    end
+    @testterm = FactoryGirl.create(:term, project: @project,
+                                   attachments: [@testgroup,
+                                                 @botleafs[0],
+                                                 Side.find(@botleafs[0].rectoID),
+                                                 Side.find(@botleafs[0].versoID)],
+                                   title: 'Iron-gall', taxonomy: 'Ink', description: 'This is a test', uri: 'https://www.test.com/', show: true)
+    @project.reload
   end
+
 
   context 'when exporting JSON' do
   it 'builds the right JSON' do
@@ -131,26 +108,22 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
     end
 
     it 'includes all terms in the catch-all taxonomy' do
-      # why is the term duplicated?
-
       term_elements = result.css("taxonomy[xml|id='id-terms'] > term")
       expect(
         term_elements.map { |term| [term['xml:id'], term.at_css('label').text.strip] }
-      ).to contain_exactly([@testterm.id, 'Iron-gall'], [@testterm.id, 'Iron-gall'])
+      ).to contain_exactly([@testterm.id, 'Iron-gall'])
     end
 
-    it 'includes a taxonomy for the added taxonomy' do
+    it 'includes the added taxonomy' do
       id = "id-#{Digest::MD5.hexdigest('Ink')}"
       expect(result.css("taxonomy[xml|id=#{id}] > label").text.strip).to eq 'Ink'
     end
 
-    it ' includes the added taxonomy\'s terms' do
-      # why is the term duplicated?
-      #
+    it 'includes the added taxonomy\'s terms' do
       id = "id-#{Digest::MD5.hexdigest('Ink')}"
       expect(
         result.css("taxonomy[xml|id=#{id}] term").map { |term| [term['xml:id'], term.text.strip] }
-      ).to contain_exactly([@testterm.id, 'Iron-gall'], [@testterm.id, 'Iron-gall'])
+      ).to contain_exactly([@testterm.id, 'Iron-gall'])
     end
 
     it 'includes the quires' do
@@ -183,66 +156,18 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
       expect(result.css("leaves leaf[xml|id='#{@botleafs.last.id}'] attachment-method[target='##{@botleafs.first.id}']" )).to be_present
     end
 
-    it 'includes the mappings' do
+    it 'includes the mappings per' do
       ns = {n: 'http://viscoll.org/schema/collation/'}
-      expect(result.xpath("//n:mapping/n:map[@side='right']/@target", ns).text.split.size).to eq(2)
-      expect(result.xpath("//n:mapping/n:map[@side='left']/@target", ns).text.split.size).to eq(2)
+      expect(result.xpath("//n:mapping/n:map[@side='right']/@target", ns).text.split.size).to eq(1)
+      expect(result.xpath("//n:mapping/n:map[@side='left']/@target", ns).text.split.size).to eq(1)
     end
 
-    it 'mapping target contains either group or leaf' do
+    it 'targets either group or leaf in the mapping' do
       ns = {n: 'http://viscoll.org/schema/collation/'}
       map_targets = result.xpath("//n:mapping/n:map[@target]/@target", ns)
       map_targets.each do |t|
         expect(t).to match /^#(Leaf|Group)/
       end
     end
-
-    ####
-    # DE 2026-08-06 These commented expectations fail because
-    # 1. they reference project config values no long in the XML export, or
-    # 2. rely on out-of-date VisColl schema elements and structures
-    ####
-    #
-    # expect(result.css("taxonomy[xml|id='manuscript_preferences'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-    #   ['manuscript_preferences_ravenna_384_2339_showTips', 'true']
-    # )
-    # expect(result.css("taxonomy[xml|id='manifests'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-    #   ['manifest_12341234', 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest']
-    # )
-    # # Quires
-    # expect(result.css("taxonomy[xml|id='group_type'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-    #   ['group_type_quire', 'Quire']
-    # )
-    # expect(result.css("taxonomy[xml|id='group_title'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-    #   ['group_title_group_1', 'Group 1'],
-    #   ['group_title_group_2', 'Group 2'],
-    # )
-    # first element should be a group, second element should be a string of all leaves in that group, separated by a space
-    # groups_and_members = result.css("taxonomy[xml|id='group_members'] term").collect { |t| [t['xml:id'], t.text] }
-    # groups_and_members.each do |gm|
-    #   expect(gm[0]).to match /^group_members_Group/
-    #   expect(gm[1]).to match /^#Leaf/
-    # end
-    # Leaves
-    # expect(result.css("taxonomy[xml|id='leaf_material'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-    #   ['leaf_material_paper', 'Paper']
-    # )
-    # Check that there are 6 rectos and 6 versos
-    ns = {n: "http://viscoll.org/schema/collation/"}
-    ####
-    # DE 2026-08-06 Note that the commented expectations below fail because
-    # (1) they use the wrong terms for @side;
-    # (2) they assume mapped terms that are now part of the data model, like
-    # leaf_attachment_method; and
-    # (3) they assume one mapping per term/element pair, while the new model uses a single
-    # mapping per term with the XML ID for each mapped element listed in the map/@taget attribute
-    ####
-    # -    expect(result.xpath("//n:mapping/n:map[@side='recto']", ns).size).to eq(6)
-    # -    expect(result.xpath("//n:mapping/n:map[@side='verso']", ns).size).to eq(6)
-    # Check that the @target contains either Group or Leaf
-    # map_targets = result.xpath("//n:mapping/n:map[@target]/@target", ns)
-    # map_targets.each do |t|
-    #   expect(t).to match /^#(Leaf|Group)/
-    # end
   end
 end
