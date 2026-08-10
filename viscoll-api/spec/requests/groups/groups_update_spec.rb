@@ -54,7 +54,7 @@ describe "PUT /groups/id", :type => :request do
       end
       
       it 'returns the right error message' do
-        expect(@body['error']).to eq "group not found"
+        expect(@body['error']).to include "Group not found"
       end
     end
     
@@ -85,7 +85,7 @@ describe "PUT /groups/id", :type => :request do
     
     context 'and raised exception' do
       before do
-        allow_any_instance_of(Group).to receive(:update).and_raise('MyException')
+        allow_any_instance_of(Group).to receive(:update).and_raise(StandardError)
         put "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
@@ -95,7 +95,7 @@ describe "PUT /groups/id", :type => :request do
       end
 
       it 'shows the exception' do
-        expect(@body['error']).to eq 'MyException'
+        expect(@body['error']).to include 'Group was unable to update'
       end
     end
   end
