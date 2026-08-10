@@ -44,7 +44,7 @@ describe "GET /users/userID", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['error']).to eq('user not found with id invalidID')
+        expect(JSON.parse(response.body)['error']).to eq('User not found')
       end
     end
   end

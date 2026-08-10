@@ -17,9 +17,8 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      raise VCError, "User update failed: #{current_user.errors.full_messages.join "\n"}"
+      render json: { error: "User update failed: #{current_user.errors.full_messages.to_sentence}"} , status: :unprocessable_entity
     end
-
   end
 
   # DELETE /users/1
@@ -31,9 +30,15 @@ class UsersController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_user
-    @user = User.find(params[:id])
+    begin
+      @user = User.find(params[:id])
+
+    rescue Mongoid::Errors::DocumentNotFound
+      render(json: { error: "User not found" }, status: :not_found) and return
+    end
+
     if (@user != current_user)
-      raise VCError, "Unauthorized. User's do not match."
+      render json: { error: "Unauthorized. User do not match." }, status: :forbidden
     end
   end
 
