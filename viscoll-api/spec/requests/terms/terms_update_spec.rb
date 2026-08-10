@@ -78,7 +78,7 @@ describe "PUT /terms/id", :type => :request do
       end
 
       it 'shows the available options' do
-        expect(@body['taxonomy']).to eq 'should be one of ["Ink"]'
+        expect(@body['error']).to eq 'Taxonomy (Ink) does not belong to project.'
       end
 
       it 'leaves the term alone' do
