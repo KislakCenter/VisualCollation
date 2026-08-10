@@ -156,7 +156,7 @@ class GroupsController < ApplicationController
     begin
       @project = Project.find(@group.project_id)
     rescue Mongoid::Errors::DocumentNotFound => e
-      render(json: {error: "Project not found with id #{@group.projectID}"}, status: :not_found) and return
+      render(json: {error: "Project not found."}, status: :not_found) and return
     end
     authorize_project!
   end
