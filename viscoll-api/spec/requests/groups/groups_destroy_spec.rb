@@ -56,7 +56,7 @@ describe "DELETE /groups/id", :type => :request do
       end
       
       it 'returns the right error message' do
-        expect(@body['error']).to eq "group not found"
+        expect(@body['error']).to include "Group not found"
       end
     end
     
@@ -65,11 +65,16 @@ describe "DELETE /groups/id", :type => :request do
         @project.user = FactoryGirl.create(:user)
         @project.save
         delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+        @body = JSON.parse(response.body)
         @group.reload
       end
       
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
+      end
+      
+      it 'returns the error message' do
+        expect(@body['error']).to include "Project is not authorized"
       end
       
       it 'retains the group' do
@@ -79,17 +84,17 @@ describe "DELETE /groups/id", :type => :request do
     
     context 'and raised exception' do
       before do
-        allow_any_instance_of(Group).to receive(:destroy).and_raise('MyException')
+        allow_any_instance_of(Group).to receive(:destroy).and_raise(StandardError)
         delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
 
-      it 'shows the exception' do
-        expect(@body['error']).to eq 'MyException'
+      it 'returns the error message' do
+        expect(@body['errors']).to eq 'StandardError'
       end
     end
   end
