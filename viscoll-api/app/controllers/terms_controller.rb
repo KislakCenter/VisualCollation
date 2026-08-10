@@ -107,7 +107,7 @@ class TermsController < ApplicationController
   def createTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
     if @project.taxonomies.include?(taxonomy)
-      raise VCError, "Taxonomy (#{taxonomy}) already exists in the project (#{@project.id})"
+      render json: { error: "Taxonomy (#{taxonomy}) already exists in the project"}, status: :unprocessable_entity
     else
       @project.taxonomies.push(taxonomy)
       @project.save
@@ -118,7 +118,7 @@ class TermsController < ApplicationController
   def deleteTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
     if not @project.taxonomies.include?(taxonomy)
-      raise VCError, "Taxonomy (#{taxonomy}) does not exist in the project (#{@project.id})"
+      render json: { error: "Taxonomy (#{taxonomy}) does not exist in the project"}, status: :unprocessable_entity
     else
       @project.taxonomies.delete(taxonomy)
       @project.save
@@ -134,9 +134,9 @@ class TermsController < ApplicationController
     old_taxonomy = taxonomy_params.to_h[:old_taxonomy]
     taxonomy     = taxonomy_params.to_h[:taxonomy]
     if not @project.taxonomies.include?(old_taxonomy)
-      raise VCError, "Taxonomy (#{taxonomy}) does not exist in the project (#{@project.id})"
+      render json: { error: "Taxonomy (#{old_taxonomy}) does not exist in the project" }, status: :unprocessable_entity
     elsif @project.taxonomies.include?(taxonomy)
-      raise VCError, "Taxonomy (#{taxonomy}) already exists in the project (#{@project.id})"
+      render json: { error: "Taxonomy (#{taxonomy}) already exists in the project" }, status: :unprocessable_entity
     else
       indexToEdit                      = @project.taxonomies.index(old_taxonomy)
       @project.taxonomies[indexToEdit] = taxonomy
@@ -167,7 +167,13 @@ class TermsController < ApplicationController
 
   def set_attached_project
     project_id = taxonomy_params.to_h[:project_id]
-    @project   = Project.find(project_id)
+
+    begin
+      @project = Project.find(project_id)
+    rescue Mongoid::Errors::DocumentNotFound
+      render(json: { error: "Project not found." }, status: :not_found) and return
+    end
+
     authorize_project!
   end
 
