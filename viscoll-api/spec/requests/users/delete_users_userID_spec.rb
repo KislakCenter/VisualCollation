@@ -42,8 +42,8 @@ describe "DELETE /users/userID", :type => :request do
         delete '/users/'+@user2.id.to_s, params: '', headers: {'Authorization' => @authToken}
       end
 
-      it 'returns unauthorized' do
-        expect(response).to have_http_status(:unauthorized)
+      it 'returns forbidden' do
+        expect(response).to have_http_status(:forbidden)
       end
 
       it 'leaves the other user alone' do
@@ -61,7 +61,7 @@ describe "DELETE /users/userID", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['error']).to eq('user not found with id invalidID')
+        expect(JSON.parse(response.body)['error']).to eq('User not found')
       end
     end
   end

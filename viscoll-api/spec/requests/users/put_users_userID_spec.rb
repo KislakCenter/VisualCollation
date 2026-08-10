@@ -132,7 +132,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to eq('user not found with id invalidID')
+          expect(JSON.parse(response.body)['error']).to eq('User not found')
         end
       end
 
@@ -146,7 +146,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['current_password']).to eq(['invalid'])
+          expect(JSON.parse(response.body)['error']).to include "Current password invalid"
         end
       end
 
@@ -162,7 +162,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['email']).to eq(["is already taken"])
+          expect(JSON.parse(response.body)['error']).to include "Email is already taken"
         end
       end
 
@@ -176,7 +176,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['email']).to eq(["is not an email"])
+          expect(JSON.parse(response.body)['error']).to include "Email is not an email"
         end
       end
 
@@ -190,7 +190,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['current_password']).to eq(['blank'])
+          expect(JSON.parse(response.body)['error']).to include 'Current password blank'
         end
       end
 
@@ -204,10 +204,9 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['password']).to eq(['blank'])
+          expect(JSON.parse(response.body)['error']).to include 'Password blank'
         end
       end
-
     end
   end
 
