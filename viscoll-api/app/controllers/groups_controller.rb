@@ -84,11 +84,7 @@ class GroupsController < ApplicationController
 
   # PATCH/PUT /groups/1
   def update
-    begin
-      unless @group.update(group_params)
-        render(json: { error: "Group was unable to update" }, status: :unprocessable_entity) and return
-      end
-    rescue StandardError => e
+    unless @group.update(group_params)
       render(json: { error: "Group was unable to update" }, status: :unprocessable_entity) and return
     end
   end

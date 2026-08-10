@@ -85,17 +85,17 @@ describe "PUT /groups/id", :type => :request do
     
     context 'and raised exception' do
       before do
-        allow_any_instance_of(Group).to receive(:update).and_raise(StandardError)
+        allow_any_instance_of(Group).to receive(:update).and_raise(StandardError, 'Group was unable to update')
         put "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:bad_request)
       end
 
       it 'shows the exception' do
-        expect(@body['error']).to include 'Group was unable to update'
+        expect(@body['errors']).to include 'Group was unable to update'
       end
     end
   end
