@@ -29,21 +29,21 @@ describe "POST /feedback", :type => :request do
         @parameters[:feedback][:title] = ''
         post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq '[title] and [message] params required.'
+        expect(JSON.parse(response.body)['error']).to eq 'Title and message required.'
       end
       
       it 'requires a message' do
         @parameters[:feedback][:message] = ''
         post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq '[title] and [message] params required.'
+        expect(JSON.parse(response.body)['error']).to eq 'Title and message required.'
       end
       
       it 'handles exceptions' do
-        expect(FeedbackMailer).to receive(:sendFeedback).and_raise('AnException')
+        expect(FeedbackMailer).to receive(:sendFeedback).and_raise(StandardError, 'AnException')
         post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq 'AnException'
+        expect(response).to have_http_status(:bad_request)
+        expect(JSON.parse(response.body)['errors']).to eq 'AnException'
       end
     end
   end
