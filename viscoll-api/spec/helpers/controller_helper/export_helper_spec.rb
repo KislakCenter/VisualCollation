@@ -13,7 +13,9 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
     )
     # Attach group with 2 leafs - (group with 2 leafs) - 2 conjoined leafs
     @testgroup = FactoryGirl.create(:group, project: @project, nestLevel: 1, title: 'Group 1')
-    @upleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
+    upleaf = FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1,
+                                 conjoined_to: create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1).id.to_s)
+    @upleafs = [upleaf, Leaf.find(upleaf.conjoined_to)]
     @testmidgroup = FactoryGirl.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2, title: 'Group 2')
     @midleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
     @botleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
@@ -48,8 +50,8 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
       2 => {:params=>{:type=>"Quire", :title=>"Group 2", :nestLevel=>2}, :tacketed=>[], :sewing=>[], :parentOrder=>1, :memberOrders=>["Leaf_3", "Leaf_4"]}
     })
     expect(result[:leafs]).to eq({
-      1 => {:params=>{:folio_number=>"", :material=>"Paper", :type=>"Original", :attached_above=>"None", :attached_below=>"None", :stub=>"No", :nestLevel=>1}, :conjoined_leaf_order=>nil, :parentOrder=>1, :rectoOrder=>1, :versoOrder=>1},
-      2 => {:params=>{:folio_number=>"", :material=>"Paper", :type=>"Original", :attached_above=>"None", :attached_below=>"None", :stub=>"No", :nestLevel=>1}, :conjoined_leaf_order=>nil, :parentOrder=>1, :rectoOrder=>2, :versoOrder=>2},
+      1 => {:params=>{:folio_number=>"", :material=>"Paper", :type=>"Original", :attached_above=>"None", :attached_below=>"None", :stub=>"No", :nestLevel=>1}, :conjoined_leaf_order=>2, :parentOrder=>1, :rectoOrder=>1, :versoOrder=>1},
+      2 => {:params=>{:folio_number=>"", :material=>"Paper", :type=>"Original", :attached_above=>"None", :attached_below=>"None", :stub=>"No", :nestLevel=>1}, :conjoined_leaf_order=>1, :parentOrder=>1, :rectoOrder=>2, :versoOrder=>2},
       3 => {:params=>{:folio_number=>"", :material=>"Paper", :type=>"Original", :attached_above=>"None", :attached_below=>"None", :stub=>"No", :nestLevel=>2}, :conjoined_leaf_order=>nil, :parentOrder=>2, :rectoOrder=>3, :versoOrder=>3},
       4 => {:params=>{:folio_number=>"", :material=>"Paper", :type=>"Original", :attached_above=>"None", :attached_below=>"None", :stub=>"No", :nestLevel=>2}, :conjoined_leaf_order=>nil, :parentOrder=>2, :rectoOrder=>4, :versoOrder=>4},
       5 => {:params=>{:folio_number=>"", :material=>"Paper", :type=>"Original", :attached_above=>"None", :attached_below=>"None", :stub=>"No", :nestLevel=>1}, :conjoined_leaf_order=>nil, :parentOrder=>1, :rectoOrder=>5, :versoOrder=>5},
@@ -138,6 +140,15 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
       expect(result.css('leaves leaf').size).to eq [@upleafs, @midleafs, @botleafs].sum(&:size)
     end
 
+    it 'includes conjoin elements for conjoined leaves' do
+      expect(result.css('leaf q conjoin').size).to eq 2
+    end
+
+    it 'it correctly targets the conjoined leaf' do
+      expect(result.css("leaf[xml|id='#{@upleafs.first.id}'] q conjoin[target='##{@upleafs.last.id}']")).to be_present
+      expect(result.css("leaf[xml|id='#{@upleafs.last.id}'] q conjoin[target='##{@upleafs.first.id}']")).to be_present
+    end
+
     it 'targets the expected group for a leaf' do
       testgroup_leaf_ids = (@upleafs + @botleafs).map(&:id)
       testgroup_leaf_ids.each do |leaf_id|
@@ -156,7 +167,7 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
       expect(result.css("leaves leaf[xml|id='#{@botleafs.last.id}'] attachment-method[target='##{@botleafs.first.id}']" )).to be_present
     end
 
-    it 'includes the mappings per' do
+    it 'includes the mappings' do
       ns = {n: 'http://viscoll.org/schema/collation/'}
       expect(result.xpath("//n:mapping/n:map[@side='right']/@target", ns).text.split.size).to eq(1)
       expect(result.xpath("//n:mapping/n:map[@side='left']/@target", ns).text.split.size).to eq(1)
