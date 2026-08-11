@@ -240,8 +240,12 @@ class LeafsController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_leaf
-    @leaf    = Leaf.find(params[:id])
-    @project = Project.find(@leaf.project_id)
+    begin
+      @leaf    = Leaf.find(params[:id])
+      @project = Project.find(@leaf.project_id)
+    rescue Mongoid::Errors::DocumentNotFound => exception
+      render(json: {error: "Resource not found"}, status: :not_found) and return
+    end
     authorize_project!
   end
 

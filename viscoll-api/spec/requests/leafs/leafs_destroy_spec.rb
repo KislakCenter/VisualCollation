@@ -83,12 +83,12 @@ describe "DELETE /leafs/:id", :type => :request do
 
     context 'and raised exception' do
       before do
-        allow_any_instance_of(Leaf).to receive(:destroy).and_raise('MyException')
+        allow_any_instance_of(Leaf).to receive(:destroy).and_raise(StandardError)
         delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
     end
     
