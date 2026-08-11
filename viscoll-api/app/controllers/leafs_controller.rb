@@ -31,11 +31,7 @@ class LeafsController < ApplicationController
       render(json: {error: "Validation failed: #{@additionalErrors}"}, status: :unprocessable_entity) and return
     end
 
-    begin
-      @project = Project.find(project_id)
-    rescue Mongoid::Errors::DocumentNotFound => e
-      render(json: {error: 'Project not found'}, status: :not_found) and return
-    end
+    @project = Project.find(project_id)
 
     # Attempt to validate ownership
     if current_user.id != @project.user_id
