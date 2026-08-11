@@ -1,6 +1,6 @@
 class TermsController < ApplicationController
   before_action :authenticate!
-  before_action :set_term, only: [:update, :link, :unlink, :destroy]
+  before_action :set_term, :set_project, only: [:update, :link, :unlink, :destroy]
   before_action :set_attached_project, only: [:createTaxonomy, :deleteTaxonomy, :updateTaxonomy]
 
   # POST /terms
@@ -31,10 +31,10 @@ class TermsController < ApplicationController
   def update
     taxonomy = term_update_params.to_h[:taxonomy]
     if not Project.find(@term.project_id).taxonomies.include?(taxonomy)
-      raise VCError, "Taxonomy (#{@term.taxonomy}) does not belong to project (#{@project.id})."
+      render(json: { error: "Taxonomy (#{@term.taxonomy}) does not belong to project."  }, status: :unprocessable_entity) and return
     end
     if !@term.update(term_update_params)
-      raise VCError, "Term (#{@term.id}) could not update: #{@term.errors.full_messages.join "\n"}"
+      render(json: { error: "Term could not update: #{@term.errors.full_messages.to_sentence}" }, status: :unprocessable_entity)
     end
   end
 
@@ -164,8 +164,21 @@ class TermsController < ApplicationController
                else
                  'Term_' + params[:id]
                end
-    @term    = Term.find(term_id)
-    @project = Project.find(@term.project_id)
+
+    begin
+      @term = Term.find(term_id)
+    rescue Mongoid::Errors::DocumentNotFound
+      render json: { error: "Term not found." }, status: :not_found
+    end
+  end
+
+  def set_project
+    begin
+      @project = Project.find(@term.project_id)
+    rescue Mongoid::Errors::DocumentNotFound
+      render(json: { error: "Project not found." }, status: :not_found) and return
+    end
+
     authorize_project!
   end
 
