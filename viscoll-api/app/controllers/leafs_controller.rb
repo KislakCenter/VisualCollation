@@ -16,7 +16,7 @@ class LeafsController < ApplicationController
     # Validation error for leaf_params
     @leafErrors = validateLeafParams(project_id, parentID)
     if @leafErrors[:project_id].length > 0 || @leafErrors[:parentID].length > 0
-      render(json: {error: "Leaf validation failed: #{format_errors(@leafErrors)}"}, status: :unprocessable_entity) and return
+      render(json: {error: "Leaf validation failed."}, status: :unprocessable_entity) and return
     end
 
     # Validation errors checking for additional parameters
@@ -28,7 +28,7 @@ class LeafsController < ApplicationController
       end
     end
     if hasAdditionalErrors
-      render(json: {error: "Validation failed: #{format_errors(@additionalErrors)}"}, status: :unprocessable_entity) and return
+      render(json: {error: "Leaf validation failed."}, status: :unprocessable_entity) and return
     end
 
     @project = Project.find(project_id)
@@ -269,9 +269,5 @@ class LeafsController < ApplicationController
 
   def leaf_params_generate
     params.permit(:startNumber, :leafIDs => [])
-  end
-
-  def format_errors errors
-    errors.map { | k,v | v }.flatten.to_sentence
   end
 end
