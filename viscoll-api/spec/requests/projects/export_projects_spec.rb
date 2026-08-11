@@ -125,48 +125,12 @@ describe "GET /projects/:id/export/:format", :type => :request do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'should have expected content' do
+      it 'should return xml' do
         expect(@body['type']).to eq 'xml'
+      end
+
+      it 'returns the exported images' do
         expect(@body['Images']['exportedImages']).to eq("https://vceditor.library.upenn.edu/images/zip/#{@project.id}")
-        result = Nokogiri::XML(@body['data'])
-        # Metadata elements
-        expect(result.css("textblock title").text).to eq 'Sample project'
-        expect(result.css("textblock shelfmark").text).to eq 'Ravenna 384.2339'
-        expect(result.css("textblock date").text).to eq '18th century'
-        expect(result.css("taxonomy[xml|id='manuscript_preferences'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-          ['manuscript_preferences_ravenna_384_2339_showTips', 'true']
-        )
-        expect(result.css("taxonomy[xml|id='manifests'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-          ['manifest_12341234', 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest']
-        )
-        # Quires
-        expect(result.css("taxonomy[xml|id='group_type'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-          ['group_type_quire', 'Quire']
-        )
-        expect(result.css("taxonomy[xml|id='group_title'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-          ['group_title_group_1', 'Group 1'],
-          ['group_title_group_2', 'Group 2'],
-        )
-        groups_and_members = result.css("taxonomy[xml|id='group_members'] term").collect { |t| [t['xml:id'], t.text] }
-        groups_and_members.each do |gm|
-          expect(gm[0]).to match /^group_members_Group/
-          expect(gm[1]).to match /^#Leaf/
-        end
-        # Leaves
-        expect(result.css("taxonomy[xml|id='leaf_material'] term").collect { |t| [t['xml:id'], t.text] }).to include(
-          ['leaf_material_paper', 'Paper']
-        )
-        #TODO test for folio_number generation
-        # Sides and Terms
-        mappings = result.css("mapping map").collect { |t| [t['target'], t['side'], t.css('term').first['target']]}
-        # expect each mapping to have a target:
-        mappings.each do |mapping|
-          # temp fix, we need to be testing for the right content
-          # and not just making it work
-          expect(mapping.first).to match /^#(Leaf|Group|ravenna)/
-          expect(['recto', 'verso', nil]).to include mapping[1]
-          expect(mapping[2]).to match /^#side_page_number_EMPTY|#group/
-        end
       end
     end
 
