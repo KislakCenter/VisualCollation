@@ -81,7 +81,7 @@ describe "DELETE /leafs", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
+      it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
     end
