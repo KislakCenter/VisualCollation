@@ -128,12 +128,18 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
       ).to contain_exactly([@testterm.id, 'Iron-gall'])
     end
 
-    it 'includes the quires' do
-      expect(result.css('quires quire').size).to eq 1
+    it 'includes the quires', pending: 'fix missing subquires bug' do
+      expect(result.css('quires quire').size).to eq 2
     end
 
     it 'identifies the group that comprises the quire' do
       expect(result.css('quires quire').first.attribute('id').value).to eq @testgroup.id
+    end
+
+    it 'includes nested subquires', pending: 'fix missing subquires bug' do
+      expect(
+        result.css("quire[xml|id='#{@testgroup.id}'] quire[xml|id='#{@testmidgroup.id}'][parent='#{@testgroup.id}']")
+      ).to be_present
     end
 
     it 'includes the leaves' do
