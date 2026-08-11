@@ -243,7 +243,7 @@ class LeafsController < ApplicationController
     begin
       @leaf    = Leaf.find(params[:id])
       @project = Project.find(@leaf.project_id)
-    rescue StandardError => exception
+    rescue Mongoid::Errors::DocumentNotFound => exception
       render(json: {error: "Resource not found"}, status: :not_found) and return
     end
     authorize_project!
