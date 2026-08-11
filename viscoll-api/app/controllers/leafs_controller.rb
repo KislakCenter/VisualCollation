@@ -68,7 +68,7 @@ class LeafsController < ApplicationController
             @leaf.save
           end
         else
-          render(json: {error: "Leaf creation failed: #{@leaf.errors.full_messages.join("\n")}"}, status: :unprocessable_entity) and return
+          render(json: {error: "Leaf creation failed: #{@leaf.errors.full_messages.to_sentence}"}, status: :unprocessable_entity) and return
         end
         sideIDIndex += 2
       end
