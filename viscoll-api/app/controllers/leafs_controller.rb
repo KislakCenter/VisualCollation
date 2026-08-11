@@ -162,9 +162,13 @@ class LeafsController < ApplicationController
   # DELETE /leafs.json
   def destroyMultiple
     allLeafs   = leaf_params_batch_delete.to_h[:leafs]
-    project_id = Leaf.find(allLeafs[0]).project_id
-    @project   = Project.find(project_id)
+    begin
+      project_id = Leaf.find(allLeafs[0]).project_id
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render(json: {error: "Leaf not found."}, status: :not_found) and return
+    end
 
+    @project   = Project.find(project_id)
     parentAndChildren = {}
 
     allLeafs.each_with_index do |leafID|
