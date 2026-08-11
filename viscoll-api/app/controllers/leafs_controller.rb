@@ -114,21 +114,31 @@ class LeafsController < ApplicationController
         handle_paper_update(@leaf)
       end
     else
-      raise VCError, "Leaf failed to update: #{@leaf.errors.full_messages.join "\n"}"
+      render(json: { error: "Leaf failed to update: #{@leaf.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
     end
   end
 
   # PATCH/PUT /leafs
   def updateMultiple
     allLeafs = leaf_params_batch_update.to_h[:leafs]
-    @project = Project.find(leaf_params_batch_update.to_h[:project_id])
+
+    begin
+      @project = Project.find(leaf_params_batch_update.to_h[:project_id])
+    rescue Mongoid::Errors::DocumentNotFound => e
+      render(json: { error: "Project not found." }, status: :not_found) and return
+    end
+
     allLeafs.each do |leaf_params, index|
-      @leaf = Leaf.find(leaf_params[:id])
+      begin
+        @leaf = Leaf.find(leaf_params[:id])
+      rescue Mongoid::Errors::DocumentNotFound => e
+        render(json: { error: "Leaf not found." }, status: :not_found) and return
+      end
       if current_user.id != @project.user_id
         render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
       if !@leaf.update(leaf_params[:attributes])
-        raise VCError, "Leaf could not be updated: #{leaf.errors.full_messages.join "\n"}"
+        render(json: { error: "Leaf could not be updated: #{@leaf.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
       end
       if (leaf_params[:attributes].key?(:attached_below) || leaf_params[:attributes].key?(:attached_above))
         update_attached_to()
