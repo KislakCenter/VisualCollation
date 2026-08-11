@@ -91,7 +91,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'shows the right leaves error' do
-        expect(@body['groups'][0]['leaves']).to include("should be an Integer")
+        expect(@body['error']).to include("should be an Integer")
       end
     end
 
@@ -107,7 +107,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'shows the right leaves error' do
-        expect(@body['groups'][0]['leaves']).to include("should be greater than 0")
+        expect(@body['error']).to include("should be greater than 0")
       end
     end
 
@@ -124,7 +124,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'shows the right odd-leaf error' do
-        expect(@body['groups'][0]['oddLeaf']).to include("should be an Integer")
+        expect(@body['error']).to include("should be an Integer")
       end
     end
 
@@ -141,7 +141,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'shows the right odd-leaf error' do
-        expect(@body['groups'][0]['oddLeaf']).to include("should be greater than 0")
+        expect(@body['error']).to include("should be greater than 0")
       end
     end
 
@@ -158,7 +158,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'shows the right odd-leaf error' do
-        expect(@body['groups'][0]['oddLeaf']).to include("cannot be greater than leaves")
+        expect(@body['error']).to include("cannot be greater than leaves")
       end
     end
 
@@ -174,7 +174,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'shows the right leaves error' do
-        expect(@body['groups'][0]['conjoin']).to include("should be a Boolean")
+        expect(@body['error']).to include("should be a Boolean")
       end
     end
 
