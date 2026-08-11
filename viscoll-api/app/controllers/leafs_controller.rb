@@ -16,7 +16,7 @@ class LeafsController < ApplicationController
     # Validation error for leaf_params
     @leafErrors = validateLeafParams(project_id, parentID)
     if @leafErrors[:project_id].length > 0 || @leafErrors[:parentID].length > 0
-      raise VCError, "Leaf validation failed: #{@leafErrors.join "\n"}"
+      render(json: {error: "Leaf validation failed."}, status: :unprocessable_entity) and return
     end
 
     # Validation errors checking for additional parameters
@@ -28,11 +28,12 @@ class LeafsController < ApplicationController
       end
     end
     if hasAdditionalErrors
-      raise VCError, "Validation failed: #{@additionalErrors}"
+      render(json: {error: "Leaf validation failed."}, status: :unprocessable_entity) and return
     end
 
-    # Attempt to validate ownership
     @project = Project.find(project_id)
+
+    # Attempt to validate ownership
     if current_user.id != @project.user_id
       render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
     end
@@ -67,7 +68,7 @@ class LeafsController < ApplicationController
             @leaf.save
           end
         else
-          raise VCError, @leaf.errors.full_messages.join("\n")
+          render(json: {error: "Leaf creation failed: #{@leaf.errors.full_messages.to_sentence}"}, status: :unprocessable_entity) and return
         end
         sideIDIndex += 2
       end
@@ -277,5 +278,4 @@ class LeafsController < ApplicationController
   def leaf_params_generate
     params.permit(:startNumber, :leafIDs => [])
   end
-
 end
