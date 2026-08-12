@@ -31,8 +31,10 @@ class ProjectsController < ApplicationController
     startingTexture = group_params.to_h["startingTexture"]
 
     validationResult = validateProjectCreateGroupsParams(allGroups)
-    if (not validationResult[:status])
-      raise VCError, "Validation of create groups params failed: #{validationResult[:errors]}"
+
+    if !validationResult[:status]
+      render json: { error:  "Validation of create groups params failed: #{validationResult[:errors]}"},
+             status: :unprocessable_entity and return
     end
     # Instantiate a new project with the given params
     @project = Project.new(project_params)
@@ -52,7 +54,8 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      raise VCError, "Project could not save: #{@project.errors.full_messages.join "\n"}"
+      render json: { error: "Project could not save: #{@project.errors.full_messages.to_sentence}"},
+             status: :unprocessable_entity
     end
   end
 
