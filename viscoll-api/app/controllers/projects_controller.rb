@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate!, except: [:viewOnly]
-  before_action :set_project, only: [:show, :update, :destroy, :createManifest, :updateManifest, :deleteManifest, :clone]
+  before_action :set_project, :authorize_project!, only: [:show, :update, :destroy, :createManifest, :updateManifest, :deleteManifest, :clone]
 
   # GET /projects
   def index
@@ -61,7 +61,6 @@ class ProjectsController < ApplicationController
 
   # PATCH/PUT /projects/1
   def update
-    @project = Project.find(params[:id])
     if @project.update(project_params)
       @projects = current_user.projects
       @images   = current_user.images
@@ -170,8 +169,11 @@ class ProjectsController < ApplicationController
   private
 
   def set_project
-    @project = Project.find(params[:id])
-    authorize_project!
+    begin
+      @project = Project.find(params[:id])
+    rescue Mongoid::Errors::DocumentNotFound
+      render json: { error: "Project not found." }, status: :not_found
+    end
   end
 
   # Never trust parameters from the scary Internet, only allow the white list through.
