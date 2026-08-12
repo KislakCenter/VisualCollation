@@ -49,22 +49,26 @@ class TermsController < ApplicationController
     objects.each do |object|
       type = object[:type]
       id   = object[:id]
-      case type
-      when "Group"
-        @object    = Group.find(id)
-        authorized = @object.project.user_id == current_user.id
-      when "Leaf"
-        @object    = Leaf.find(id)
-        authorized = @object.project.user_id == current_user.id
-      when "Recto", "Verso"
-        @object    = Side.find(id)
-        authorized = @object.project.user_id == current_user.id
-      else
-        raise VCError, "Object not found with type: #{type}"
+
+      begin
+        case type
+        when "Group"
+          @object    = Group.find(id)
+        when "Leaf"
+          @object    = Leaf.find(id)
+        when "Recto", "Verso"
+          @object    = Side.find(id)
+        else
+          render(json: { error: "Object not found with type: #{type}" }, status: :unprocessable_entity) and return
+        end
+      rescue Mongoid::Errors::DocumentNotFound
+        render(json: { error: "#{type} not found." }, status: :not_found) and return
       end
-      unless authorized
-        raise VCError, "Action not authorized."
+
+      if @object.project.user_id != current_user.id
+        render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
+
       @object.terms.push(@term)
       @object.save
       if (not @term.objects[type].include?(id))

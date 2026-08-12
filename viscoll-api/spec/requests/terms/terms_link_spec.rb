@@ -125,8 +125,8 @@ describe "PUT /terms/id/link", :type => :request do
           @group2.reload
         end
 
-        it 'should return 401' do
-          expect(response).to have_http_status(:unauthorized)
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
         end
 
         it 'should leave the group alone' do
@@ -149,8 +149,8 @@ describe "PUT /terms/id/link", :type => :request do
           @leaf2.reload
         end
 
-        it 'should return 401' do
-          expect(response).to have_http_status(:unauthorized)
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
         end
 
         it 'should leave the leaf alone' do
@@ -174,8 +174,8 @@ describe "PUT /terms/id/link", :type => :request do
           @side2.reload
         end
 
-        it 'should return 401' do
-          expect(response).to have_http_status(:unauthorized)
+        it 'should return 403' do
+          expect(response).to have_http_status(:forbidden)
         end
 
         it 'should leave the side alone' do
@@ -195,7 +195,7 @@ describe "PUT /terms/id/link", :type => :request do
       end
 
       it 'should give the right error message' do
-        expect(@body['type']).to eq "object not found with type unknown"
+        expect(@body['error']).to eq "Object not found with type: unknown"
       end
     end
     context 'and missing term' do
@@ -224,17 +224,17 @@ describe "PUT /terms/id/link", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
-        expect(response).to have_http_status :unprocessable_entity
+      it 'should return 404' do
+        expect(response).to have_http_status :not_found
       end
 
       it 'should give the right error message' do
-        expect(@body['id']).to eq "Group object not found with id #{@group.id.to_str}weird"
+        expect(@body['error']).to eq "Group not found."
       end
     end
     context 'and uncaught exception' do
       before do
-        allow_any_instance_of(Term).to receive(:save).and_raise("Exception!")
+        allow_any_instance_of(Term).to receive(:save).and_raise(StandardError)
         @group = FactoryGirl.create(:group, { project: @project })
         @parameters = {
           objects: [
@@ -249,8 +249,8 @@ describe "PUT /terms/id/link", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 422' do
-        expect(response).to have_http_status :unprocessable_entity
+      it 'should return 400' do
+        expect(response).to have_http_status :bad_request
       end
     end
   end
