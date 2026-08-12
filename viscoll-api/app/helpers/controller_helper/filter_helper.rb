@@ -4,10 +4,10 @@ module ControllerHelper
     def runValidations(queries)
       errors = []
       haveErrors = false
-      if queries == []
+      if Array.wrap(queries) == []
         return ["should contain at least 1 query"]
       end
-      queries.each_with_index do |query, index| 
+      queries.each_with_index do |query, index|
         error = {type: "", attribute: "", condition: "", values: "", conjunction: ""}
         if (qc = query_types['type'][query['type']]).nil?
           error['type'] = "type should be one of: [#{query_types['type'].keys.join(', ')}]"
@@ -36,9 +36,9 @@ module ControllerHelper
       end
       return errors
     end
-    
+
     private
-    
+
     def query_types
       {
         'type' => {
