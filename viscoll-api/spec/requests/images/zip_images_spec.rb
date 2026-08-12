@@ -41,8 +41,8 @@ describe "GET /images/zip/:imageid_:projectid", :type => :request do
         @body = JSON.parse(response.body)
       end
       
-      it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 400' do
+        expect(response).to have_http_status(:bad_request)
       end
     end
 
