@@ -4,7 +4,7 @@ require 'securerandom'
 class ExportController < ApplicationController
 
   before_action :authenticate!
-  before_action :set_project, only: [:show]
+  before_action :set_project, :authorize_project!, only: [:show]
 
   # GET /projects/:id/export/:format
   def show
@@ -35,7 +35,9 @@ class ExportController < ApplicationController
       schema     = Nokogiri::XML::RelaxNG(File.open("public/viscoll-datamodel2.0.rng"))
       errors     = schema.validate(xml)
 
-      if errors.empty?
+    @format = params[:format]
+
+    if errors.empty?
         case @format
         when "xml"
           render json: { data: exportData, type: @format, Images: { exportedImages: @zipFilePath ? @zipFilePath : false } }, status: :ok and return
@@ -160,8 +162,6 @@ class ExportController < ApplicationController
     rescue Mongoid::Errors::DocumentNotFound
       render(json: { error: "Project not found." }, status: :not_found) and return
     end
-    @format = params[:format]
-    authorize_project!
   end
 
   def remove_xml_declaration zip_file, input_file
