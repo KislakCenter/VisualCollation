@@ -66,7 +66,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      raise VCError, "Project could not update: #{@project.errors.full_messages.join "\n"}"
+      render json: { error: "Project could not be updated: #{@project.errors.full_messages.to_sentence}" }, status: :unprocessable_entity
     end
   end
 
@@ -127,7 +127,7 @@ class ProjectsController < ApplicationController
   def deleteManifest
     manifestIDToDelete = manifest_params.to_h[:id]
     if not @project.manifests.key?(manifestIDToDelete)
-      raise VCError, "Manifest (#{manifest["id"]}) is not found in project (#{@project.id})"
+      render(json: { error: "Manifest not found in Project." }, status: :unprocessable_entity) and return
     end
     @project.manifests.delete(manifestIDToDelete)
     # Update all sides that have the deleted manuscripts mapping
