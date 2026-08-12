@@ -144,10 +144,10 @@ class ExportController < ApplicationController
 
           render json: { data: exportData, type: 'formula', Images: { exportedImages: @zipFilePath ? @zipFilePath : false } }, status: :ok and return
         else
-          raise VCError, "Export format must be one of [json, xml, svg, formula, html]. The format received is: '#{@format}'."
+          render json: { error: "Export format must be one of [json, xml, svg, formula, html]."}, status: :unprocessable_entity
         end
       else
-        raise VCError, "Something went wrong when exporting #{@format}: #{errors}"
+        render json: { error:  "Something went wrong when exporting #{@format}: #{errors}" }, status: :unprocessable_entity
       end
 
   end
@@ -155,7 +155,11 @@ class ExportController < ApplicationController
   private
 
   def set_project
-    @project = Project.find(params[:id])
+    begin
+      @project = Project.find(params[:id])
+    rescue Mongoid::Errors::DocumentNotFound
+      render(json: { error: "Project not found." }, status: :not_found) and return
+    end
     @format = params[:format]
     authorize_project!
   end
