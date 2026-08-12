@@ -1,13 +1,13 @@
 class FilterController < ApplicationController
   before_action :authenticate!
-  before_action :set_project, only: [:show]
+  before_action :set_project, :authorize_project!, only: [:show]
 
   # PUT /projects/filter
   def show
     queries = filter_params.to_h[:queries]
     errors  = runValidations(queries)
     if errors != []
-      raise VCError, "Errors: #{errors.join('\n')}"
+      render json: { error: errors }, status: :unprocessable_entity and return
     end
     @objectIDs             = { Groups: [], Leafs: [], Sides: [], Terms: [] }
     @visibleAttributes     = {
@@ -194,8 +194,11 @@ class FilterController < ApplicationController
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_project
-    @project = Project.find(params[:id])
-    authorize_project!
+    begin
+      @project = Project.find(params[:id])
+    rescue Mongoid::Errors::DocumentNotFound
+      render json: { error: "Project not found." }, status: :not_found
+    end
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
