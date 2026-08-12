@@ -54,7 +54,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      render json: { error: "Project could not save: #{@project.errors.full_messages.join "\n"}"},
+      render json: { error: "Project could not save: #{@project.errors.full_messages.to_sentence}"},
              status: :unprocessable_entity
     end
   end
