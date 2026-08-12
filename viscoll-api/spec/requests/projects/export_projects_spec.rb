@@ -181,7 +181,7 @@ describe "GET /projects/:id/export/:format", :type => :request do
       end
 
       it 'should show error' do
-        expect(@body['error']).to eq "project not found with id #{@project.id}missing"
+        expect(@body['error']).to eq "Project not found."
       end
     end
 
@@ -208,7 +208,7 @@ describe "GET /projects/:id/export/:format", :type => :request do
       end
 
       it 'should show error' do
-        expect(@body['error']).to eq "Export format must be one of [json, xml, svg, formula, html]"
+        expect(@body['error']).to eq "Export format must be one of [json, xml, svg, formula, html]."
       end
     end
   end
