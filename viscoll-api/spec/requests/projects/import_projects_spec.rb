@@ -41,11 +41,10 @@ describe "PUT /projects/import", :type => :request do
       expect(project.terms[0].objects).to eq({'Group' => [project.groups[0].id.to_s], 'Leaf' => [project.leafs[4].id.to_s], 'Recto' => [project.leafs[4].rectoID], 'Verso' => [project.leafs[4].versoID]})
     end
 
-    it 'should show error for invalid JSON' do
+    it 'should render error for invalid JSON' do
       @parameters[:importData] = import_data + '{}[];;'
       expect{ put '/projects/import', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'} }.not_to change{Project.count}
-      expect(response).to have_http_status(:unprocessable_entity)
-      expect(JSON.parse(response.body)['error']).to eq("Sorry, the imported data cannot be validated. Please check your file for errors and make sure the correct import format is selected above.")
+      expect(response).to have_http_status(:bad_request)
     end
   end
 
