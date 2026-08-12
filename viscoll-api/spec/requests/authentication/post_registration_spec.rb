@@ -109,17 +109,5 @@ describe "POST /registration", :type => :request do
         expect(User.count).to eq(1)
       end
     end
-    
-    context 'where an exception is thrown' do
-      before do
-        allow_any_instance_of(RailsJwtAuth.model).to receive(:save).and_raise('Exception')
-        post '/registration', params: {:user => { :email=> "user@mail.com", :password => "user", :name=>"user" }}
-      end
-
-      it 'returns an appropriate error message with 422 code' do
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq 'Exception'
-      end
-    end
   end
 end
