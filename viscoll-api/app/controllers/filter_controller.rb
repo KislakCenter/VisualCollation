@@ -1,6 +1,6 @@
 class FilterController < ApplicationController
   before_action :authenticate!
-  before_action :set_project, only: [:show]
+  before_action :set_project, :authorize_project!, only: [:show]
 
   # PUT /projects/filter
   def show
@@ -194,8 +194,11 @@ class FilterController < ApplicationController
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_project
-    @project = Project.find(params[:id])
-    authorize_project!
+    begin
+      @project = Project.find(params[:id])
+    rescue Mongoid::Errors::DocumentNotFound
+      render json: { error: "Project not found." }, status: :not_found
+    end
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
