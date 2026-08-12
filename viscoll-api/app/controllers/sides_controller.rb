@@ -5,7 +5,7 @@ class SidesController < ApplicationController
   # PATCH/PUT /sides/1
   def update
     if !@side.update(side_params)
-      raise VCError, "Side (#{@side.id} could not be updated: #{@side.errors.full_messages.join "\n"})"
+      render(json: { error: "Side could not be updated: #{@side.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
     end
   end
 
@@ -94,7 +94,11 @@ class SidesController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_side
-    @side    = Side.find(params[:id])
+    begin
+      @side    = Side.find(params[:id])
+    rescue Mongoid::Errors::DocumentNotFound
+      render(json: { error: "Side not found." }, status: :not_found) and return
+    end
     @project = Project.find(@side.project_id)
     authorize_project!
   end
