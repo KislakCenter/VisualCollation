@@ -63,13 +63,11 @@ build_xproc_image:
   tags:
     - build
 
-rspec_app_test:
+rspec_api_test:
   stage: test
   image: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
   services:
     - name: mongo:4.0
-  extends:
-    - .rspec
   needs:
     - build_web_image
     - build_xproc_image
