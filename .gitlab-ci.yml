@@ -23,6 +23,7 @@ stages:
   - sast:project
   - build:web
   - build:xproc
+  - test
   - sast:web
   - sast:xproc
   - push:web
@@ -59,6 +60,34 @@ build_xproc_image:
     CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
     DOCKER_BUILD_CONTEXT: "viscoll-xproc/"
     DOCKERFILE_PATH: "viscoll-xproc/"
+  tags:
+    - build
+
+rspec_app_test:
+  stage: test
+  image: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
+  services:
+    - name: mongo:4.0
+  extends:
+    - .rspec
+  needs:
+    - build_web_image
+    - build_xproc_image
+  script:
+    - cd "${CI_PROJECT_DIR}/viscoll-api/"
+    - bundle exec rspec --format progress --format RspecJunitFormatter --out rspec.xml
+  artifacts:
+    paths:
+      - viscoll-api/rspec.xml
+    expire_in: 1 week
+    reports:
+      junit: viscoll-api/rspec.xml
+  rules:
+    - if: $DISABLE_RSPEC_TEST == "true"
+      when: never
+    - exists:
+        - viscoll-api/spec/**.rb
+        - viscoll-api/spec/**/**.rb
   tags:
     - build
 
