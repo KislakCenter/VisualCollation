@@ -73,7 +73,7 @@ rspec_api_test:
     - build_xproc_image
   script:
     - cd "${CI_PROJECT_DIR}/viscoll-api/"
-    - bundle exec rspec --format progress --format RspecJunitFormatter --out rspec.xml
+    - DISABLE_SPRING=1 bundle exec rspec --format progress --format RspecJunitFormatter --out rspec.xml
   artifacts:
     paths:
       - viscoll-api/rspec.xml
