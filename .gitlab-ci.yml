@@ -10,6 +10,10 @@ include:
     file:
       - ".shiftleft_container_scanning.yml"
       - ".trivy_container_scanning.yml"
+  - project: "devops/gitlab/ci-templates/ruby"
+    ref: "sans-dind"
+    file:
+      - ".rspec.yml"
 
 workflow:
   rules:
@@ -71,9 +75,11 @@ rspec_api_test:
   needs:
     - build_web_image
     - build_xproc_image
+  extends:
+    - .rspec
   script:
     - cd "${CI_PROJECT_DIR}/viscoll-api/"
-    - DISABLE_SPRING=1 bundle exec rspec --format progress --format RspecJunitFormatter --out rspec.xml
+    - bundle exec rspec --out rspec.xml
   artifacts:
     paths:
       - viscoll-api/rspec.xml
