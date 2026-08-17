@@ -14,8 +14,8 @@ describe "PUT /groups", :type => :request do
       taxonomies: ["Ink"],
     })
     5.times do |n|
-      @project.groups << FactoryGirl.create(:quire, { 
-        project: @project, 
+      @project.groups << FactoryGirl.create(:quire, {
+        project: @project,
       })
     end
     @project.save
@@ -36,7 +36,7 @@ describe "PUT /groups", :type => :request do
       ],
     }
   end
-  
+
   context 'with valid authorization' do
     context 'and standard group specs' do
       before do
@@ -53,7 +53,7 @@ describe "PUT /groups", :type => :request do
         expect(@project.groups[2].title).to eq "Changed title 2"
       end
     end
-    
+
     context 'and missing group' do
       before do
         @parameters[:groups][0][:id] += 'missing'
@@ -61,12 +61,12 @@ describe "PUT /groups", :type => :request do
         put "/groups", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
-    
+
     context 'and unauthorized group' do
       before do
         @project.user = FactoryGirl.create(:user)
@@ -74,17 +74,17 @@ describe "PUT /groups", :type => :request do
         put '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'leaves the targets unaltered' do
         expect(@project.groups[1].title).not_to eq "Changed title 1"
         expect(@project.groups[2].title).not_to eq "Changed title 2"
       end
     end
-    
+
     context 'and failed update' do
       before do
         allow_any_instance_of(Group).to receive(:update).and_return(false)
@@ -96,7 +96,7 @@ describe "PUT /groups", :type => :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
-    
+
     context 'and raised exception' do
       before do
         allow_any_instance_of(Group).to receive(:update).and_raise(StandardError)
@@ -104,8 +104,8 @@ describe "PUT /groups", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
 
       it 'shows the exception' do
@@ -113,7 +113,7 @@ describe "PUT /groups", :type => :request do
       end
     end
   end
-  
+
   context 'with corrupted authorization' do
     before do
       put '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}

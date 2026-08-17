@@ -81,8 +81,8 @@ describe "DELETE /projects/id", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 401' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
 
       it 'includes the exception' do

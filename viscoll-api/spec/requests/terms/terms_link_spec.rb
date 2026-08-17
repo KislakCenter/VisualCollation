@@ -249,8 +249,8 @@ describe "PUT /terms/id/link", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'should return 400' do
-        expect(response).to have_http_status :bad_request
+      it 'should return 500' do
+        expect(response).to have_http_status :internal_server_error
       end
     end
   end

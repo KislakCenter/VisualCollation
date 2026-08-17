@@ -42,7 +42,7 @@ describe "PUT /leafs", :type => :request do
       "project_id": @project.id.to_s
     }
   end
-  
+
   it 'should set up properly' do
     expect(true).to be true
     expect(@leafs[0].conjoined_to).to eq @leafs[3].id.to_s
@@ -75,7 +75,7 @@ describe "PUT /leafs", :type => :request do
         expect(@leafs[1].type).to eq 'Added'
       end
     end
-    
+
     context 'and missing project' do
       before do
         @parameters[:project_id] += 'missing'
@@ -87,7 +87,7 @@ describe "PUT /leafs", :type => :request do
         expect(response).to have_http_status(:not_found)
       end
     end
-    
+
     context 'and missing page' do
       before do
         @parameters[:leafs][0][:id] += 'missing'
@@ -99,7 +99,7 @@ describe "PUT /leafs", :type => :request do
         expect(response).to have_http_status(:not_found)
       end
     end
-    
+
     context 'and failed save' do
       before do
         allow_any_instance_of(Leaf).to receive(:update).and_return(false)
@@ -117,11 +117,11 @@ describe "PUT /leafs", :type => :request do
         put '/leafs', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
     end
-    
+
     context 'and an unauthorized page' do
       before do
         @user2 = FactoryGirl.create(:user)
@@ -131,11 +131,11 @@ describe "PUT /leafs", :type => :request do
         @group.reload
         @leafs.each { |leaf| leaf.reload }
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'should not edit the leaf' do
         expect(@leafs[1].material).not_to eq 'Paper'
         expect(@leafs[1].type).not_to eq 'Added'

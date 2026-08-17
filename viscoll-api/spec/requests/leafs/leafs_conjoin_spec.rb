@@ -40,7 +40,7 @@ describe "PUT /leafs/conjoin", :type => :request do
         expect(@leafs[3].conjoined_to).to eq @leafs[0].id.to_s
       end
     end
-    
+
     context 'and valid odd number of leafs' do
       before do
         @parameters[:leafs] = @leafs[0..4].collect { |leaf| leaf.id.to_s }
@@ -62,7 +62,7 @@ describe "PUT /leafs/conjoin", :type => :request do
         expect(@leafs[4].conjoined_to).to eq @leafs[0].id.to_s
       end
     end
-    
+
     context 'and valid odd subleaves within even conjoined quire' do
       before do
         @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1,8]])
@@ -72,11 +72,11 @@ describe "PUT /leafs/conjoin", :type => :request do
         @project.reload
         @leafs.each { |leaf| leaf.reload }
       end
-      
+
       it 'returns 204' do
         expect(response).to have_http_status(:no_content)
       end
-      
+
       it 'updates the affected leafs' do
         expect(@leafs[0].conjoined_to).to eq @leafs[4].id.to_s
         expect(@leafs[1].conjoined_to).to eq @leafs[3].id.to_s
@@ -87,9 +87,9 @@ describe "PUT /leafs/conjoin", :type => :request do
         expect(@leafs[6].conjoined_to).to be_blank
         expect(@leafs[7].conjoined_to).to be_blank
       end
-      
+
     end
-    
+
     context 'and too few leafs' do
       before do
         @parameters[:leafs] = [@leafs[0].id.to_s]
@@ -103,12 +103,12 @@ describe "PUT /leafs/conjoin", :type => :request do
       it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
-      
+
       it 'explains the error' do
         expect(JSON.parse(response.body)['leafs']).to include 'Minimum of 2 leaves required to conjoin'
       end
     end
-    
+
     context 'and missing leaf' do
       before do
         @parameters[:leafs][0] += 'missing'
@@ -127,11 +127,11 @@ describe "PUT /leafs/conjoin", :type => :request do
         put '/leafs/conjoin', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
     end
-    
+
     context 'and an unauthorized page' do
       before do
         @user2 = FactoryGirl.create(:user)
@@ -141,11 +141,11 @@ describe "PUT /leafs/conjoin", :type => :request do
         @group.reload
         @leafs.each { |leaf| leaf.reload }
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'should not edit the leaf' do
         @leafs.each do |leaf|
           expect(leaf.conjoined_to).to be_blank

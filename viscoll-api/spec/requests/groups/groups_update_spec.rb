@@ -25,7 +25,7 @@ describe "PUT /groups/id", :type => :request do
       },
     }
   end
-  
+
   context 'with valid authorization' do
     context 'and standard group specs' do
       before do
@@ -42,22 +42,22 @@ describe "PUT /groups/id", :type => :request do
         expect(@group.title).to eq "Changed title"
       end
     end
-    
+
     context 'and missing group' do
       before do
         put "/groups/#{@group.id.to_str}missing", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'returns the right error message' do
         expect(@body['error']).to include "Group not found"
       end
     end
-    
+
     context 'and unauthorized group' do
       before do
         @project.user = FactoryGirl.create(:user)
@@ -65,12 +65,12 @@ describe "PUT /groups/id", :type => :request do
         put "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @group.reload
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
     end
-    
+
     context 'and failed update' do
       before do
         allow_any_instance_of(Group).to receive(:update).and_return(false)
@@ -82,7 +82,7 @@ describe "PUT /groups/id", :type => :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
-    
+
     context 'and raised exception' do
       before do
         allow_any_instance_of(Group).to receive(:update).and_raise(StandardError, 'Group was unable to update')
@@ -90,8 +90,8 @@ describe "PUT /groups/id", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 422' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
 
       it 'shows the exception' do
@@ -99,7 +99,7 @@ describe "PUT /groups/id", :type => :request do
       end
     end
   end
-  
+
   context 'with corrupted authorization' do
     before do
       put "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}

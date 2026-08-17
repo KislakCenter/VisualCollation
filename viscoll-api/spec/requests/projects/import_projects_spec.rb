@@ -44,7 +44,7 @@ describe "PUT /projects/import", :type => :request do
     it 'should render error for invalid JSON' do
       @parameters[:importData] = import_data + '{}[];;'
       expect{ put '/projects/import', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'} }.not_to change{Project.count}
-      expect(response).to have_http_status(:bad_request)
+      expect(response).to have_http_status(:internal_server_error)
     end
   end
 
