@@ -39,7 +39,7 @@ class SidesController < ApplicationController
       side              = sides[index]
       previousSideImage = side.image.clone
       if !side.update(side_params[:attributes])
-        raise VCError, "Errors occurred when updating sides: #{side.errors.full_messages.join "\n"}"
+        render(json: { error: "Errors occurred when updating sides: #{side.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
       else
         # SPEICAL CASE FOR DIY IMAGE MAPPING
         if side_params[:attributes]["image"]
