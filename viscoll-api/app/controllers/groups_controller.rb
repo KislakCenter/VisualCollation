@@ -24,7 +24,7 @@ class GroupsController < ApplicationController
       end
     end
     if (hasAdditionalErrors)
-      raise VCError, "Additional group errors: #{@additionalErrors}"
+      render json({ error: "Additional group errors: #{@additionalErrors}" }, status: :unprocessable_entity) and return
     end
     if (project_id == nil)
       render(json: { error: "Project ID is nil." }, status: :unprocessable_entity) and return
