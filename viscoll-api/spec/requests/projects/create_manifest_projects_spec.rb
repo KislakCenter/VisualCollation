@@ -8,7 +8,7 @@ describe "POST /projects/:id/manifests", :type => :request do
     @authToken = JSON.parse(response.body)['session']['jwt']
     stub_request(:get, 'https://iiif.library.utoronto.ca/presentation/v2/hollar:Hollar_a_3000/manifest').with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200, body: File.read(File.dirname(__FILE__) + '/../../fixtures/uoft_hollar.json'), headers: {})
   end
-  
+
   before :each do
     @parameters = {
       "manifest": {
@@ -17,22 +17,22 @@ describe "POST /projects/:id/manifests", :type => :request do
     }
     @project = FactoryGirl.create(:project, { user: @user })
   end
-  
+
   after :each do
     @project.destroy
   end
-  
+
   context 'with valid authorization' do
     context 'with valid parameters' do
       before do
         post "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
       end
-      
+
       it 'returns 200' do
         expect(response).to have_http_status(:ok)
       end
-      
+
       it 'adds the manifest' do
         expect(@project.manifests.any? { |key, manifest| manifest['url'] == "https://iiif.library.utoronto.ca/presentation/v2/hollar:Hollar_a_3000/manifest"}).to be true
       end
@@ -41,7 +41,7 @@ describe "POST /projects/:id/manifests", :type => :request do
       before do
         post "/projects/#{@project.id.to_str}missing/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
@@ -52,11 +52,11 @@ describe "POST /projects/:id/manifests", :type => :request do
         @project.save
         post "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'leaves the project alone' do
         expect(@project.manifests.any? { |key, manifest| manifest['url'] == "https://iiif.library.utoronto.ca/presentation/v2/hollar:Hollar_a_3000/manifest"}).to be false
       end
@@ -67,17 +67,17 @@ describe "POST /projects/:id/manifests", :type => :request do
         post "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'shows the exception' do
         expect(@body['errors']).to eq "WaahooException"
       end
     end
   end
-  
+
   context 'with corrupted authorization' do
     before do
       post "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}

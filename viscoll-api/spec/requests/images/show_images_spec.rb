@@ -38,17 +38,17 @@ describe "GET /images/:id", :type => :request do
         expect(response.body).to eq(File.open("#{Rails.root}/public/uploads/pixel", 'rb') { |file| file.read })
       end
     end
-    
+
     context 'and missing image' do
       before do
         get "/images/#{@image1.id}missing", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'returns the error message' do
         expect(@body['error']).to eq("Image not found with id #{@image1.id.to_str}missing")
       end
@@ -61,10 +61,10 @@ describe "GET /images/:id", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'returns the error message' do
         expect(@body['errors']).to eq "Exception"
       end

@@ -49,18 +49,18 @@ describe "POST /images", :type => :request do
         expect(Image.find_by(filename: 'blue.png').projectIDs).to include @project.id.to_s
       end
     end
-    
+
     context 'and duplicated image' do
       before do
         @parameters[:images][1][:filename] = 'green'
         post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 200' do
         expect(response).to have_http_status(:ok)
       end
-      
+
       it 'creates two new images, the second with the _copy(n) suffix' do
         expect(Image.where(filename: 'green.png')).to exist
         expect(Image.where(filename: 'green_copy(1).png')).to exist
@@ -68,29 +68,29 @@ describe "POST /images", :type => :request do
         expect(Image.find_by(filename: 'green_copy(1).png').projectIDs).to include @project.id.to_s
       end
     end
-    
+
     context 'and missing project' do
       before do
         @parameters[:projectID] += 'missing'
         post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'returns the error message' do
         expect(@body['error']).to eq("Project not found with id #{@project.id.to_str}missing")
       end
     end
-    
+
     context 'and unauthorized project' do
       before do
         @project.update(user: FactoryGirl.create(:user))
         post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
@@ -114,10 +114,10 @@ describe "POST /images", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'returns the error message' do
         expect(@body['errors']).to eq "Exception"
       end

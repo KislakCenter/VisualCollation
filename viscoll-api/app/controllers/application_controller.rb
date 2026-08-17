@@ -16,7 +16,7 @@ class ApplicationController < ActionController::API
     rescue_from StandardError do |e|
         Honeybadger.notify(e)
         Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
-        render json: { errors: e.message }, status: :bad_request
+        render json: { errors: e.message }, status: :internal_server_error
     end
 
     before_action :set_base_api_url

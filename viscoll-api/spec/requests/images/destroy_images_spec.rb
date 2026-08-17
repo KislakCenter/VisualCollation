@@ -33,29 +33,29 @@ describe "DELETE /images", :type => :request do
         expect(Image.where(id: @image2.id)).to exist
       end
     end
-    
+
     context 'and missing image' do
       before do
         @parameters[:imageIDs][0] += 'missing'
         delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
-      
+
       it 'returns the error message' do
         expect(@body['error']).to eq("Image not found with id #{@image1.id.to_str}missing")
       end
     end
-    
+
     context 'and unauthorized image' do
       before do
         @image1.update(user: FactoryGirl.create(:user))
         delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
@@ -68,10 +68,10 @@ describe "DELETE /images", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'returns the error message' do
         expect(@body['errors']).to eq "Exception"
       end

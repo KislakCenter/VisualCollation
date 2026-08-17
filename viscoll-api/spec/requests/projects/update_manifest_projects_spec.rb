@@ -8,7 +8,7 @@ describe "PUT /projects/:id/manifests", :type => :request do
     @authToken = JSON.parse(response.body)['session']['jwt']
     stub_request(:get, 'https://iiif.library.utoronto.ca/presentation/v2/hollar:Hollar_a_3000/manifest').with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200, body: File.read(File.dirname(__FILE__) + '/../../fixtures/uoft_hollar.json'), headers: {})
   end
-  
+
   before :each do
     @project = FactoryGirl.create(:project, {
       user: @user,
@@ -17,7 +17,7 @@ describe "PUT /projects/:id/manifests", :type => :request do
     @defaultGroup = FactoryGirl.create(:quire, project: @project)
     @project[:groupIDs] = [@defaultGroup.id.to_s]
     @leaf1 = FactoryGirl.create(:leaf, {project: @project})
-    @defaultGroup.add_members([@leaf1.id.to_s], 1)   
+    @defaultGroup.add_members([@leaf1.id.to_s], 1)
     @side1 = @project.sides.find(@leaf1.rectoID)
     @side1.image = { label: "IMAGE", manifestID: "59ee3c623b0eb75251207cfe", url: "http://www.example.com/iiif-sample" }
     @side1.save
@@ -30,22 +30,22 @@ describe "PUT /projects/:id/manifests", :type => :request do
     	}
     }
   end
-  
+
   after :each do
     @project.destroy
   end
-  
+
   context 'with valid authorization' do
     context 'with valid parameters' do
       before do
         put "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
       end
-      
+
       it 'returns 204' do
         expect(response).to have_http_status(:no_content)
       end
-      
+
       it 'rename the manifest' do
         expect(@project.manifests.any? { |key, manifest| manifest['name'] == "ASDF"}).to be false
         expect(@project.manifests.any? { |key, manifest| manifest['name'] == "QWER"}).to be true
@@ -55,7 +55,7 @@ describe "PUT /projects/:id/manifests", :type => :request do
       before do
         put "/projects/#{@project.id.to_str}missing/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
-      
+
       it 'returns 404' do
         expect(response).to have_http_status(:not_found)
       end
@@ -66,11 +66,11 @@ describe "PUT /projects/:id/manifests", :type => :request do
         put "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
-      
+
       it 'gives the right error' do
         expect(@body['error']).to eq "Manifest not found in project."
       end
@@ -81,11 +81,11 @@ describe "PUT /projects/:id/manifests", :type => :request do
         put "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
+
       it 'returns 422' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
-      
+
       it 'gives the right error' do
         expect(@body['error']).to eq "ID is required."
       end
@@ -97,11 +97,11 @@ describe "PUT /projects/:id/manifests", :type => :request do
         put "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'leaves the project alone' do
         expect(@project.manifests.any? { |key, manifest| manifest['name'] == "ASDF"}).to be true
         expect(@project.manifests.any? { |key, manifest| manifest['name'] == "QWER"}).to be false
@@ -113,17 +113,17 @@ describe "PUT /projects/:id/manifests", :type => :request do
         put "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'shows the exception' do
         expect(@body['errors']).to eq "WaahooException"
       end
     end
   end
-  
+
   context 'with corrupted authorization' do
     before do
       put "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}

@@ -34,15 +34,15 @@ describe "GET /images/zip/:imageid_:projectid", :type => :request do
         expect(response.body).to eq('testcontent')
       end
     end
-    
+
     context 'and missing image' do
       before do
         get "/images/zip/#{@image1.id}missing_#{@project.id}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json'}
         @body = JSON.parse(response.body)
       end
-      
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
     end
 
@@ -53,10 +53,10 @@ describe "GET /images/zip/:imageid_:projectid", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'returns the error message' do
         expect(@body['errors']).to include "Cannot read file"
       end

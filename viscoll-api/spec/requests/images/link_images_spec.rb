@@ -18,7 +18,7 @@ describe "PUT /images/link", :type => :request do
     	"imageIDs": []
     }
   end
-  
+
   context 'with valid authorization' do
     context 'and valid image and project' do
       before do
@@ -37,7 +37,7 @@ describe "PUT /images/link", :type => :request do
         expect(@image1.projectIDs).to include @project1.id.to_s
       end
     end
-    
+
     context 'and multiple valid images and multiple projects' do
       before do
         @parameters[:projectIDs] = [@project1.id.to_s, @project2.id.to_s]
@@ -59,7 +59,7 @@ describe "PUT /images/link", :type => :request do
         expect(@image2.projectIDs).to include @project2.id.to_s
       end
     end
-    
+
     context 'and valid image but missing project' do
       before do
         @parameters[:projectIDs] = [@project1.id.to_s, @project2.id.to_s+'missing']
@@ -77,13 +77,13 @@ describe "PUT /images/link", :type => :request do
       it 'shows the error' do
         expect(@body['error']).to eq "Project not found with id #{@project2.id}missing"
       end
-      
+
       it 'leaves the images alone' do
         expect(@image1.projectIDs).to be_empty
         expect(@image2.projectIDs).to be_empty
       end
     end
-    
+
     context 'and valid image but unauthorized project' do
       before do
         @project2.update(user: FactoryGirl.create(:user))
@@ -97,13 +97,13 @@ describe "PUT /images/link", :type => :request do
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'leaves the images alone' do
         expect(@image1.projectIDs).to be_empty
         expect(@image2.projectIDs).to be_empty
       end
     end
-    
+
     context 'and missing image but valid project' do
       before do
         @parameters[:projectIDs] = [@project1.id.to_s, @project2.id.to_s]
@@ -121,13 +121,13 @@ describe "PUT /images/link", :type => :request do
       it 'shows the error' do
         expect(@body['error']).to eq "Image not found with id #{@image2.id}missing"
       end
-      
+
       it 'leaves the images alone' do
         expect(@image1.projectIDs).to be_empty
         expect(@image2.projectIDs).to be_empty
       end
     end
-    
+
     context 'and unauthorized image but valid project' do
       before do
         @image2.update(user: FactoryGirl.create(:user))
@@ -141,13 +141,13 @@ describe "PUT /images/link", :type => :request do
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'leaves the images alone' do
         expect(@image1.projectIDs).to be_empty
         expect(@image2.projectIDs).to be_empty
       end
     end
-    
+
     context 'and exception in projects' do
       before do
         allow(Project).to receive(:find).and_raise(StandardError, 'waahooexception')
@@ -158,20 +158,20 @@ describe "PUT /images/link", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'shows the error' do
         expect(@body['errors']).to eq 'waahooexception'
       end
-      
+
       it 'leaves the images alone' do
         expect(@image1.projectIDs).to be_empty
         expect(@image2.projectIDs).to be_empty
       end
     end
-    
+
     context 'and exception in images' do
       before do
         allow(Image).to receive(:find).and_raise(StandardError, 'waahooexception')
@@ -182,21 +182,21 @@ describe "PUT /images/link", :type => :request do
         @body = JSON.parse(response.body)
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
-      
+
       it 'shows the error' do
         expect(@body['errors']).to eq 'waahooexception'
       end
-      
+
       it 'leaves the images alone' do
         expect(@image1.projectIDs).to be_empty
         expect(@image2.projectIDs).to be_empty
       end
     end
   end
-  
+
   context 'with corrupted authorization' do
     before do
       put '/images/link', params: @parameters.to_json, headers: {'Authorization' => @authToken+'asdf', 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
@@ -250,4 +250,4 @@ describe "PUT /images/link", :type => :request do
     end
   end
 end
-  
+

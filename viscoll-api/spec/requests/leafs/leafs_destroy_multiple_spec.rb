@@ -34,7 +34,7 @@ describe "DELETE /leafs", :type => :request do
       ]
     }
   end
-  
+
   it 'should set up properly' do
     expect(true).to be true
     expect(@leafs[0].conjoined_to).to eq @leafs[3].id.to_s
@@ -55,10 +55,10 @@ describe "DELETE /leafs", :type => :request do
         delete '/leafs', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
         @group.reload
-        @leafs.each do |leaf| 
-          if Leaf.where(id: leaf.id).exists? 
-            leaf.reload 
-          end 
+        @leafs.each do |leaf|
+          if Leaf.where(id: leaf.id).exists?
+            leaf.reload
+          end
         end
       end
 
@@ -73,7 +73,7 @@ describe "DELETE /leafs", :type => :request do
         expect(Leaf.where(id: @leafs[3].id.to_s).exists?).to be true
       end
     end
-    
+
     context 'and missing page' do
       before do
         @parameters[:leafs][0] += 'missing'
@@ -92,11 +92,11 @@ describe "DELETE /leafs", :type => :request do
         delete '/leafs', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
     end
-    
+
     context 'and an unauthorized page' do
       before do
         @user2 = FactoryGirl.create(:user)
@@ -104,17 +104,17 @@ describe "DELETE /leafs", :type => :request do
         delete '/leafs', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
         @group.reload
-        @leafs.each do |leaf| 
+        @leafs.each do |leaf|
           if Leaf.where(id: leaf.id).exists?
             leaf.reload
           end
         end
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'should not remove any leafs' do
         4.times.each do |i|
           expect(Leaf.where(id: @leafs[i].id).exists?).to be true

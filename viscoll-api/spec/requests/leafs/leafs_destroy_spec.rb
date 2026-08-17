@@ -28,7 +28,7 @@ describe "DELETE /leafs/:id", :type => :request do
     end
     @group.add_members(@leafs.collect { |leaf| leaf.id.to_s }, 0)
   end
-  
+
   it 'should set up properly' do
     expect(true).to be true
     expect(@leafs[0].conjoined_to).to eq @leafs[3].id.to_s
@@ -59,17 +59,17 @@ describe "DELETE /leafs/:id", :type => :request do
       it 'remove the leaf' do
         expect(Leaf.where(id: @leafs[1].id).exists?).to be false
       end
-      
+
       it 'frees the conjoined leaf' do
         expect(@leafs[2].conjoined_to).to be_blank
       end
-      
+
       it 'frees attached leafs' do
         expect(@leafs[0].attached_below).to eq 'None'
         expect(@leafs[2].attached_above).to eq 'None'
       end
     end
-    
+
     context 'and missing page' do
       before do
         delete "/leafs/#{@leafs[1].id.to_s}waahoo", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
@@ -87,11 +87,11 @@ describe "DELETE /leafs/:id", :type => :request do
         delete "/leafs/#{@leafs[1].id.to_s}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 
-      it 'returns 400' do
-        expect(response).to have_http_status(:bad_request)
+      it 'returns 500' do
+        expect(response).to have_http_status(:internal_server_error)
       end
     end
-    
+
     context 'and an unauthorized project' do
       before do
         @user2 = FactoryGirl.create(:user)
@@ -100,11 +100,11 @@ describe "DELETE /leafs/:id", :type => :request do
         @project.reload
         @group.reload
       end
-      
+
       it 'returns 403' do
         expect(response).to have_http_status(:forbidden)
       end
-      
+
       it 'should not remove any' do
         expect(@project.leafs.count).to eq 4
       end
