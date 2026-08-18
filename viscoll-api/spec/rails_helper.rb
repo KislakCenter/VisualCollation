@@ -13,7 +13,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'mongoid-rspec'
-require 'rails_jwt_auth/spec/helpers'
+require 'rails_jwt_auth/spec_helpers'
 
 # Rails.application.eager_load!
 
@@ -67,8 +67,8 @@ RSpec.configure do |config|
   # add 'Mongoid' matchers
   config.include Mongoid::Matchers, type: :model
 
-  # add 'WardenHelper'
-  config.include RailsJwtAuth::Spec::Helpers, :type => :request
+  # add authentication helpers
+  config.include RailsJwtAuth::SpecHelpers, type: :request
 
   # start by truncating all the tables but then use the faster transaction strategy the rest of the time.
   config.before(:suite) do

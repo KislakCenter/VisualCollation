@@ -1,24 +1,16 @@
-class ConfirmationsController < ApplicationController
+class ConfirmationsController < RailsJwtAuth::ConfirmationsController
+  # todo: should we inherit from RailsJwtAuth::ConfirmationsController
+
   def update
-    if params[:confirmation_token].blank?
-      return render_422(confirmation_token: [I18n.t('rails_jwt_auth.errors.not_found')])
-    end
-    user = RailsJwtAuth.model.where(confirmation_token: params[:confirmation_token]).first
-    return render_422(confirmation_token: [I18n.t('rails_jwt_auth.errors.not_found')]) unless user
+    return render_404 unless
+      params[:id] &&
+      (user = RailsJwtAuth.model.where(confirmation_token: params[:id]).first)
+
     if user.confirm!
       AccountApprovalMailer.sendApprovalStatus(user).deliver_now
       render_204
     else
-      render_422(user.errors)
+      render_422(user.errors.details)
     end
   end
-
-  def render_204
-    render json: {}, status: 204
-  end
-
-  def render_422(errors)
-    render json: {errors: errors}, status: 422
-  end
-
 end

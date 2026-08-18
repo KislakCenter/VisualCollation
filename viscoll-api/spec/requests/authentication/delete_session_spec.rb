@@ -30,12 +30,12 @@ describe "DELETE /session", :type => :request do
         delete '/session', params: '', headers: {'Authorization' => authToken}
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 401' do
+        expect(response).to have_http_status(:unauthorized)
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['error']).to eq('Authorization Header: Signature verification raised')
+        expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
       end
     end
 
@@ -45,12 +45,12 @@ describe "DELETE /session", :type => :request do
         delete '/session', params: '', headers: {'Authorization' => "invalidTokenFormat"}
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns 401' do
+        expect(response).to have_http_status(:unauthorized)
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['error']).to eq('Authorization Header: Not enough or too many segments')
+        expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
       end
     end
 
