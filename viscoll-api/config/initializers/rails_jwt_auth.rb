@@ -21,13 +21,13 @@ RailsJwtAuth.setup do |config|
   config.mailer_sender = 'emeryr@upenn.edu'
 
   # url used to create email link with confirmation token
-  config.confirmations_url = "https://#{ENV['APPLICATION_HOST']}/confirmation"
+  config.confirmations_url = "https://#{ENV['APPLICATION_HOST']}/confirmations"
 
   # expiration time for confirmation tokens
   #config.confirmation_expiration_time = 1.day
 
   # url used to create email link with reset password token
-  config.reset_passwords_url = "https://#{ENV['APPLICATION_HOST']}/password"
+  config.reset_passwords_url = "https://#{ENV['APPLICATION_HOST']}/passwords"
 
   # url used to create email link with set password token
   # by set_and_send_password_instructions method

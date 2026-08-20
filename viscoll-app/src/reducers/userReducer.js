@@ -25,7 +25,7 @@ export default function userReducer(state=initialState, action) {
       break;
     case "LOGIN_FAILED":
       if (action.payload && action.payload.errors) errorMessage = action.payload.errors.session[0].error;
-      if (action.error) errorMessage = [action.error.data];
+      if (action.error) errorMessage = action.error.data;
       state = {
         ...state,
         errors: {

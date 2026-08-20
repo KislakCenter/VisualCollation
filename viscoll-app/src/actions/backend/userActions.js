@@ -34,9 +34,8 @@ export function confirm(confirmation_token) {
     types: ['NO_LOADING','CONFIRM_SUCCESS','CONFIRM_FAILED'],
     payload: {
       request : {
-        url: `/confirmation`,
+        url: `/confirmations/${confirmation_token}`,
         method: 'put',
-        data: { confirmation_token },
         successMessage: "You have successfully confirmed your account" ,
         errorMessage: "Ooops! Something went wrong"
       }
@@ -49,7 +48,7 @@ export function resendConfirmation(email) {
     type: 'RESEND_CONFIRMATION',
     payload: {
       request : {
-        url: `/confirmation`,
+        url: `/confirmations`,
         method: 'post',
         data: {
           confirmation: {
@@ -82,7 +81,7 @@ export function resetPasswordRequest(email) {
     types: ['NO_LOADING','REQUEST_RESET_SUCCESS','REQUEST_RESET_FAILED'],
     payload: {
       request : {
-        url: `/password`,
+        url: `/passwords`,
         method: 'post',
         data: {password: { email }},
         successMessage: "You have successfully requested to reset password" ,
@@ -97,9 +96,9 @@ export function resetPassword(reset_password_token, password) {
     types: ['NO_LOADING','RESET_SUCCESS','RESET_FAILED'],
     payload: {
       request : {
-        url: `/password`,
+        url: `/passwords/${reset_password_token}`,
         method: 'put',
-        data: {reset_password_token, password},
+        data: {password},
         successMessage: "You have successfully reset your password" ,
         errorMessage: "Ooops! Something went wrong"
       }
