@@ -1,6 +1,4 @@
 class ConfirmationsController < RailsJwtAuth::ConfirmationsController
-  # todo: should we inherit from RailsJwtAuth::ConfirmationsController
-
   def update
     return render_404 unless
       params[:id] &&
