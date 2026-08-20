@@ -32,7 +32,7 @@ describe "POST /password", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['unconfirmed email'])
+        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('unconfirmed')
       end
 
       it 'doest not create fields for reset_password in user record' do
@@ -51,7 +51,7 @@ describe "POST /password", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['not found'])
+        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('not_found')
       end
     end
   end

@@ -6,8 +6,8 @@ describe "POST /session", :type => :request do
       post '/session', params: {:session => { :email=> "ghost@mail.com", :password => "ghost" }}
     end
 
-    it 'returns an invalid email / password error message' do
-      expect(JSON.parse(response.body)['errors']['session'][0]).to eq('invalid email / password')
+    it 'returns an invalid_session error message' do
+      expect(JSON.parse(response.body)['errors']['session'][0]['error']).to eq('invalid_session')
     end
 
     it 'returns an unprocessable_entity status' do
@@ -23,7 +23,7 @@ describe "POST /session", :type => :request do
 
     context 'and user email is not confirmed' do
       it 'returns unconfirmed email error' do
-        expect(JSON.parse(response.body)['errors']['session'][0]).to eq('unconfirmed email')
+        expect(JSON.parse(response.body)['errors']['session'][0]['error']).to eq('unconfirmed')
       end
 
       it 'returns an unprocessable_entity status' do
@@ -46,8 +46,8 @@ describe "POST /session", :type => :request do
           post '/session', params: {:session => { :email=> "user@mail.com", :password => "wrong" }}
         end
 
-        it 'returns an invalid email / password error message' do
-          expect(JSON.parse(response.body)['errors']['session'][0]).to eq('invalid email / password')
+        it 'returns an invalid_session error message' do
+          expect(JSON.parse(response.body)['errors']['session'][0]['error']).to eq('invalid_session')
         end
 
         it 'returns an unprocessable_entity status' do

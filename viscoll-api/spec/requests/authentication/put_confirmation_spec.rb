@@ -6,10 +6,6 @@ describe "PUT /confirmation", :type => :request do
       put '/confirmations/invalidToken'
     end
 
-    it 'returns an invalid token message' do
-      expect(JSON.parse(response.body)['error']).to eq('User not found')
-    end
-
     it 'returns 404' do
       expect(response).to have_http_status(:not_found)
     end

@@ -176,7 +176,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include "Email is not an email"
+          expect(JSON.parse(response.body)['error']).to include "Email is invalid"
         end
       end
 
