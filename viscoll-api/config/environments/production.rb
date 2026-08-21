@@ -47,13 +47,22 @@ Rails.application.configure do
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
   # config.active_job.queue_name_prefix = "viscoll-api_#{Rails.env}"
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    :user_name            => ENV['MAILER_USR'],
+    :password             => ENV['MAILER_PWD'],
+    :from                 => ENV['MAILER_DEFAULT_FROM'],
+    :domain               => ENV['MAILER_DOMAIN'],
+    :address              => ENV['MAILER_HOST'],
+    :port                 => ENV['MAILER_PORT'] || 587,
+    :authentication       => :plain,
+    :enable_starttls_auto => true
+  }
+
+  config.action_mailer.default_url_options = { :host => ENV['APPLICATION_HOST'] }
+
   config.action_mailer.perform_caching = false
-  # config.action_mailer.default_url_options = { :host => "utlviscoll.library.utoronto.ca" }
-  # config.action_mailer.smtp_settings = {
-  #   address: 'mailer.library.utoronto.ca',
-  #   port: 25,
-  #   enable_starttls_auto: false
-  # }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
