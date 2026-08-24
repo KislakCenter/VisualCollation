@@ -1,13 +1,11 @@
 Rails.application.routes.draw do
-
   get 'welcome/index'
+
   # AUTHENTICATION ENDPOINTS
   resource :session, controller: 'sessions', only: [:create, :destroy], defaults: {format: :json}
   resource :registration, controller: 'registrations', only: [:create], defaults: {format: :json}
-  resource :registration, controller: 'rails_jwt_auth/registrations', only: [:create, :update, :destroy]
-  resource :password, controller: 'rails_jwt_auth/passwords', only: [:create, :update]
-  resource :confirmation, controller: 'rails_jwt_auth/confirmations', only: [:create]
-  resource :confirmation, controller: 'confirmations', only: [:update]
+  resources :confirmations, controller: 'confirmations', only: [:create, :update]
+  resources :passwords, controller: 'rails_jwt_auth/passwords', only: [:create, :update]
 
   # USER ENDPOINTS
   resources :users, defaults: {format: :json}, only: [:show, :update, :destroy]

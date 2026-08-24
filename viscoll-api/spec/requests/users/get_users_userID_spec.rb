@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "GET /users/userID", :type => :request do
   before do
     @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
+    put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email=> "user@mail.com", :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
@@ -54,12 +54,12 @@ describe "GET /users/userID", :type => :request do
       get '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => @authToken+"invalidify"}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Signature verification raised')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 
@@ -68,12 +68,12 @@ describe "GET /users/userID", :type => :request do
       get '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => ""}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Nil JSON web token')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 
@@ -82,12 +82,12 @@ describe "GET /users/userID", :type => :request do
       get '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => "123456789"}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Not enough or too many segments')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 

@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::API
+    include RailsJwtAuth::AuthenticableHelper
+
     rescue_from Mongoid::Errors::DocumentNotFound do |e|
         Honeybadger.notify(e)
         Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
@@ -11,13 +13,17 @@ class ApplicationController < ActionController::API
         render json: { errors: e.message }, status: :internal_server_error
     end
 
+    # Catch unauthorized errors.
+    rescue_from RailsJwtAuth::NotAuthorized do
+        render json: { error: 'Not Authorized' }, status: :unauthorized
+    end
+
     before_action :set_base_api_url
     def set_base_api_url
       # TODO: we need an env var with a complete URL for this
       @base_api_url = Rails.application.secrets.api_url ? Rails.application.secrets.api_url : "https://#{ENV['APPLICATION_HOST']}"
     end
 
-    include RailsJwtAuth::WardenHelper
     include ControllerHelper::ProjectsHelper
     include ControllerHelper::GroupsHelper
     include ControllerHelper::LeafsHelper

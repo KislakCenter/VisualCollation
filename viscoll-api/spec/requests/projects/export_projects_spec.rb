@@ -5,7 +5,7 @@ describe "GET /projects/:id/export/:format", :type => :request do
     stub_request(:get, 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest').with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200, body: File.read(File.dirname(__FILE__) + '/../../fixtures/villanova_boston.json'), headers: {})
     # Set up an account and allow sign-in
     @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
+    put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
     # Create project
@@ -183,12 +183,12 @@ describe "GET /projects/:id/export/:format", :type => :request do
       @body = JSON.parse(response.body)
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Signature verification raised')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 
@@ -197,12 +197,12 @@ describe "GET /projects/:id/export/:format", :type => :request do
       get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => ""}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Nil JSON web token')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 
@@ -211,12 +211,12 @@ describe "GET /projects/:id/export/:format", :type => :request do
       get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => "123456789"}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Not enough or too many segments')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 

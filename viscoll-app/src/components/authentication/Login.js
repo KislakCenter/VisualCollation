@@ -21,7 +21,7 @@ class Login extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.user.errors.login.errorMessage!==undefined) {
-      this.setState({error: nextProps.user.errors.login.errorMessage[0]});
+      this.setState({error: nextProps.user.errors.login.errorMessage});
     }
   }
 
@@ -63,8 +63,9 @@ class Login extends Component {
       fullWidth 
       {...btnLg} 
     />
+
     let content = <form aria-label="login" onSubmit={this.submit}>
-      <p>{this.state.error}</p>
+      {(this.state.error && this.state.error.length>0) ? <p>Login Failed</p> : ''}
       <TextField fullWidth onChange={(e,v)=>this.onInputChange(v,"email")} name="email" floatingLabelText="E-mail" {...floatFieldDark} aria-invalid={this.state.error && this.state.error.length>0} aria-required={true}/>
       <TextField fullWidth onChange={(e,v)=>this.onInputChange(v,"password")} name="password" type="password" floatingLabelText="Password" {...floatFieldDark} aria-invalid={this.state.error && this.state.error.length>0} aria-required={true} />
       <br /><br />

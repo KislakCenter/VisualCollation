@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "GET /images/zip/:imageid_:projectid", :type => :request do
   before do
     @user = FactoryGirl.create(:user, {:password => "user"})
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
+    put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
     @zipPath = "#{Rails.root}/public/uploads"

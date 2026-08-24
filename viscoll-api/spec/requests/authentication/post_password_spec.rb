@@ -7,7 +7,7 @@ describe "POST /password", :type => :request do
       @user.confirmation_token = nil
       @user.confirmed_at = "2017-07-12T16:08:25.278Z"
       @user.save
-      post '/password', params: {:password => {:email => "user@mail.com"}}
+      post '/passwords', params: {:password => {:email => "user@mail.com"}}
     end
 
     it 'returns a successful no_content response' do
@@ -24,7 +24,7 @@ describe "POST /password", :type => :request do
     context 'and unconfirmed user' do 
       before do
         @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
-        post '/password', params: {:password => {:email => "user@mail.com"}}
+        post '/passwords', params: {:password => {:email => "user@mail.com"}}
       end
 
       it 'returns an unprocessable_entity status' do
@@ -32,7 +32,7 @@ describe "POST /password", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['unconfirmed email'])
+        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('unconfirmed')
       end
 
       it 'doest not create fields for reset_password in user record' do
@@ -43,7 +43,7 @@ describe "POST /password", :type => :request do
 
     context 'and no valid user' do
       before do
-        post '/password', params: {:password => {:email => "user@mail.com"}}
+        post '/passwords', params: {:password => {:email => "user@mail.com"}}
       end
 
       it 'returns an unprocessable_entity status' do
@@ -51,7 +51,7 @@ describe "POST /password", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['not found'])
+        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('not_found')
       end
     end
   end

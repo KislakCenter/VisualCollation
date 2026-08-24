@@ -6,13 +6,13 @@ describe "PUT /password", :type => :request do
     @user.confirmation_token = nil
     @user.confirmed_at = "2017-07-12T16:08:25.278Z"
     @user.save
-    post '/password', params: {:password => {:email => "user@mail.com"}}
+    post "/passwords", params: {:password => {:email => "user@mail.com"}}
     @user = User.find(@user.id)
   end
 
   context 'with valid params' do
     before do
-      put '/password', params: {:reset_password_token => @user.reset_password_token, :password => {:password => "newUser", :password_confirmation => "newUser"}}
+      put "/passwords/#{@user.reset_password_token}", params: { password: {password: "newUser", password_confirmation: "newUser" } }
     end
 
     it 'returns a successful no_content response' do
@@ -35,7 +35,7 @@ describe "PUT /password", :type => :request do
       before do
         @user.reset_password_sent_at = "2017-07-12T16:08:30.278Z"
         @user.save
-        put '/password', params: {:reset_password_token => @user.reset_password_token, :password => {:password => "newUser", :password_confirmation => "newUser"}}
+        put "/passwords/#{@user.reset_password_token}", params: { password: {password: "newUser", password_confirmation: "newUser"}}
       end
 
       it 'returns an unprocessable_entity status' do
@@ -43,7 +43,7 @@ describe "PUT /password", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['reset_password_token']).to eq(['has expired, please request a new one'])
+        expect(JSON.parse(response.body)['errors']['reset_password_token'][0]['error']).to eq('expired')
       end
 
       it 'does not not clear field for reset_password_token in user record' do
@@ -53,15 +53,11 @@ describe "PUT /password", :type => :request do
 
     context 'and invalid reset token' do 
       before do
-        put '/password', params: {:reset_password_token => "invalidToken", :password => {:password => "newUser", :password_confirmation => "newUser"}}
+        put "/passwords/invalidToken", params: { password: {password: "newUser", password_confirmation: "newUser"}}
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
-      it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['reset_password_token']).to eq(['not found'])
+      it 'returns 404' do
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'does not not clear field for reset_password_token in user record' do
@@ -71,7 +67,7 @@ describe "PUT /password", :type => :request do
 
     context 'and blank password' do
       before do
-        put '/password', params: {:reset_password_token => @user.reset_password_token, :password => {:password => "", :password_confirmation => "newUser"}}
+        put "/passwords/#{@user.reset_password_token}", params: {password: {password: "", password_confirmation: "newUser"}}
       end
 
       it 'returns an unprocessable_entity status' do
@@ -79,13 +75,13 @@ describe "PUT /password", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['password']).to eq(['blank'])
+        expect(JSON.parse(response.body)['errors']['password'][0]['error']).to eq('blank')
       end
     end
 
     context 'and no matching passwords' do
       before do
-        put '/password', params: {:reset_password_token => @user.reset_password_token, :password => {:password => "newUser", :password_confirmation => "newUserGhost"}}
+        put "/passwords/#{@user.reset_password_token}", params: { password: {password: "newUser", password_confirmation: "newUserGhost"}}
       end
 
       it 'returns an unprocessable_entity status' do
@@ -93,7 +89,7 @@ describe "PUT /password", :type => :request do
       end
 
       it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['password_confirmation']).to eq(['doesn\'t match Password'])
+        expect(JSON.parse(response.body)['errors']['password_confirmation'][0]['error']).to eq('confirmation')
       end
     end
   end

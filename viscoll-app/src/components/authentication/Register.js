@@ -37,8 +37,8 @@ class Register extends Component {
     let passwordError = "";
     let registerSuccess = false;
     try {
-      emailError = this.props.userState.errors.register.email;
-      passwordError = this.props.userState.errors.register.password;
+      emailError = this.props.userState.errors.register.email[0].error;
+      passwordError = this.props.userState.errors.register.password[0].error;
       registerSuccess = this.props.userState.registerSuccess;
     } catch (e) {}
 

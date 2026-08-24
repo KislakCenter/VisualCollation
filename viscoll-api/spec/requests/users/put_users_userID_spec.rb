@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "PUT /users/userID", :type => :request do
   before do
     @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
-    put '/confirmation', params: {:confirmation_token => @user.confirmation_token}
+    put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email=> "user@mail.com", :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
@@ -153,7 +153,7 @@ describe "PUT /users/userID", :type => :request do
       context 'with duplicate email address' do
         before do
           @user2 = User.create(:name => "newUser", :email => "newUser@mail.com", :password => "newUser")
-          put '/confirmation', params: {:confirmation_token => @user2.confirmation_token}
+          put "/confirmations/#{@user2.confirmation_token}"
           put '/users/'+@user.id.to_s, params: {:user => {:email => "newUser@mail.com"}}, headers: {'Authorization' => @authToken}
         end
 
@@ -176,7 +176,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include "Email is not an email"
+          expect(JSON.parse(response.body)['error']).to include "Email is invalid"
         end
       end
 
@@ -215,12 +215,12 @@ describe "PUT /users/userID", :type => :request do
       put '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => @authToken+"invalidify"}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Signature verification raised')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 
@@ -229,12 +229,12 @@ describe "PUT /users/userID", :type => :request do
       put '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => ""}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Nil JSON web token')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 
@@ -243,12 +243,12 @@ describe "PUT /users/userID", :type => :request do
       put '/users/'+@user.id.to_s, params: '', headers: {'Authorization' => "123456789"}
     end
 
-    it 'returns an bad request error' do
-      expect(response).to have_http_status(:bad_request)
+    it 'returns 401' do
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns an appropriate error message' do
-      expect(JSON.parse(response.body)['error']).to eq('Authorization Token: Not enough or too many segments')
+      expect(JSON.parse(response.body)['error']).to eq('Not Authorized')
     end
   end
 

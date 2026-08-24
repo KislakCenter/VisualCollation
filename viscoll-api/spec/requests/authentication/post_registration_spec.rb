@@ -39,9 +39,9 @@ describe "POST /registration", :type => :request do
         post '/registration', params: {:user => { :email=> "", :password => "newUser", :name=>"newUser" }}
       end
     
-      it 'returns an appropriate error message with 422 code' do
+      it 'returns an appropriate error messages with 422 code' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['can\'t be blank', 'is not an email'])
+        expect(JSON.parse(response.body)['errors']['email'].pluck('error')).to eq(['blank', 'invalid'])
       end
 
       it 'does not create another User object in the database' do
@@ -56,7 +56,7 @@ describe "POST /registration", :type => :request do
     
       it 'returns an appropriate error message with 422 code' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['is not an email'])
+        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('invalid')
       end
 
       it 'does not create another User object in the database' do
@@ -71,7 +71,7 @@ describe "POST /registration", :type => :request do
     
       it 'returns an appropriate error message with 422 code' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['is already taken'])
+        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('taken')
       end
 
       it 'does not create another User object in the database' do
@@ -86,7 +86,7 @@ describe "POST /registration", :type => :request do
     
       it 'returns an appropriate error message with 422 code' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['errors']['password']).to eq(['can\'t be blank'])
+        expect(JSON.parse(response.body)['errors']['password'][0]['error']).to eq('blank')
       end
 
       it 'does not create another User object in the database' do
@@ -101,8 +101,8 @@ describe "POST /registration", :type => :request do
     
       it 'returns an appropriate error message with 422 code' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['errors']['email']).to eq(['is not an email'])
-        expect(JSON.parse(response.body)['errors']['password']).to eq(['can\'t be blank'])
+        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('invalid')
+        expect(JSON.parse(response.body)['errors']['password'][0]['error']).to eq('blank')
       end
 
       it 'does not create another User object in the database' do
