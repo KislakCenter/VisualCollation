@@ -14,10 +14,10 @@ class Project
 
   # Relations
   belongs_to :user, inverse_of: :projects
-  has_many :groups, dependent: :delete
-  has_many :leafs, dependent: :delete
-  has_many :sides, dependent: :delete
-  has_many :terms, dependent: :delete
+  has_many :groups, dependent: :destroy
+  has_many :leafs, dependent: :destroy
+  has_many :sides, dependent: :destroy
+  has_many :terms, dependent: :destroy
 
   # Callbacks
   before_destroy :unlink_images_before_delete
