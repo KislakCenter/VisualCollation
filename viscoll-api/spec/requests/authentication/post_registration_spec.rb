@@ -39,7 +39,7 @@ describe "POST /registration", :type => :request do
         post '/registration', params: {:user => { :email=> "", :password => "newUser", :name=>"newUser" }}
       end
     
-      it 'returns an appropriate error message with 422 code' do
+      it 'returns an appropriate error messages with 422 code' do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)['errors']['email'].pluck('error')).to eq(['blank', 'invalid'])
       end
