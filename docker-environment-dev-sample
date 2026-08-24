@@ -1,9 +1,2 @@
-MAILER_HOST=localhost
-MAILER_PORT=1025
-MAILER_DEFAULT_FROM=emeryr@upenn.edu
-MAILER_DOMAIN=localhost
 APPLICATION_HOST=localhost
-# MAILER PERSON: Emmie Torp
-MAILER_USR=emmie.torp@ethereal.email
-MAILER_PWD=qv56J2S5xPXKk4Y5PW
 RAILS_ENV=development
