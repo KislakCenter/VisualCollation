@@ -36,7 +36,7 @@ module ValidationHelper
             end
           end
         end
-        if (!conjoin.is_a?(Boolean))
+        if (!conjoin.in?([true, false]))
           @group_error[:conjoin].push("should be a Boolean")
           haveGroupError = true
         end

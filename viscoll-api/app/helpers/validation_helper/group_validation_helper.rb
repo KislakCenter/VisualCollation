@@ -35,7 +35,7 @@ module ValidationHelper
         haveErrors = true
       end
       if (conjoin != nil)
-        if (!conjoin.is_a?(Boolean))
+        if (!conjoin.in?([true, false]))
           additionalErrors[:conjoin].push("should be a Boolean")
           haveErrors = true
         elsif (conjoin and (noOfLeafs != nil and noOfLeafs == 1))
