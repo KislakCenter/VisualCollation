@@ -7,7 +7,7 @@ import {
   linkTerm,
   unlinkTerm,
   deleteTerm,
-} from '../../../src/actions/frontend/before/termActions';
+} from '../../../actions/frontend/before/termActions';
 
 import { projectState001 } from '../../testData/projectState001';
 

@@ -4,7 +4,7 @@ import {
   updateGroups,
   deleteGroup,
   deleteGroups,
-} from '../../../src/actions/frontend/before/groupActions';
+} from '../../../actions/frontend/before/groupActions';
 
 import { projectState001 } from '../../testData/projectState001';
 
