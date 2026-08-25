@@ -48,7 +48,7 @@ module ValidationHelper
         additionalErrors[:noOfLeafs].push("should range from 1 to 999")
       end
       if (conjoin != nil)
-        if (!conjoin.is_a?(Boolean))
+        if (!conjoin.in? [true, false])
           additionalErrors[:conjoin].push("should be a Boolean")
         elsif (conjoin and noOfLeafs == 1)
           additionalErrors[:conjoin].push("should be false if the number of leaves is 1")
