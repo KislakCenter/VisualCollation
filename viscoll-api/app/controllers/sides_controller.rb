@@ -23,7 +23,7 @@ class SidesController < ApplicationController
       rescue Mongoid::Errors::DocumentNotFound => e
         @errors.push("side not found with id " + sideID['id'])
         haveErrors = true
-        end
+      end
     end
 
     @project = Project.find(sides[0].project_id)
