@@ -15,7 +15,7 @@ RSpec.describe Side, type: :model do
     @user = FactoryGirl.create(:user)
     @project = FactoryGirl.create(:project, user: @user)
     @leaf = FactoryGirl.create(:leaf, project: @project)
-    @side = Side.find(id: @leaf.rectoID)
+    @side = Side.find(@leaf.rectoID)
   end
 
   describe "Destruction hooks" do

@@ -51,9 +51,9 @@ describe "PUT /projects/id", :type => :request do
       end
 
       it 'changes the right project' do
-        expect(Project.find(id: @project1.id).title).to eq "My modified project"
-        expect(Project.find(id: @project2.id).title).not_to eq "My modified project"
-        expect(Project.find(id: @project3.id).title).not_to eq "My modified project"
+        expect(Project.find(@project1.id).title).to eq "My modified project"
+        expect(Project.find(@project2.id).title).not_to eq "My modified project"
+        expect(Project.find(@project3.id).title).not_to eq "My modified project"
       end
     end
 
@@ -68,9 +68,9 @@ describe "PUT /projects/id", :type => :request do
       end
 
       it 'should not remove anything' do
-        expect(Project.find(id: @project1.id).title).not_to eq "My modified project"
-        expect(Project.find(id: @project2.id).title).not_to eq "My modified project"
-        expect(Project.find(id: @project3.id).title).not_to eq "My modified project"
+        expect(Project.find(@project1.id).title).not_to eq "My modified project"
+        expect(Project.find(@project2.id).title).not_to eq "My modified project"
+        expect(Project.find(@project3.id).title).not_to eq "My modified project"
       end
     end
 
@@ -84,9 +84,9 @@ describe "PUT /projects/id", :type => :request do
       end
 
       it 'should not remove anything' do
-        expect(Project.find(id: @project1.id).title).not_to eq "My modified project"
-        expect(Project.find(id: @project2.id).title).not_to eq "My modified project"
-        expect(Project.find(id: @project3.id).title).not_to eq "My modified project"
+        expect(Project.find(@project1.id).title).not_to eq "My modified project"
+        expect(Project.find(@project2.id).title).not_to eq "My modified project"
+        expect(Project.find(@project3.id).title).not_to eq "My modified project"
       end
     end
 

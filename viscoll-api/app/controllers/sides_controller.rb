@@ -18,7 +18,7 @@ class SidesController < ApplicationController
     sides      = []
     allSides.each do |sideID|
       begin
-        side = Side.find(sideID)
+        side = Side.find(sideID['id'])
         sides.push(side)
       rescue Mongoid::Errors::DocumentNotFound => e
         @errors.push("side not found with id " + sideID['id'])
