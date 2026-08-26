@@ -58,5 +58,5 @@ Rails.application.configure do
   config.logger = Logger.new(STDOUT)
 
   # Set log level
-  config.log_level = :info
+  config.log_level = ENV.fetch('LOG_LEVEL', :warn).to_sym
 end
