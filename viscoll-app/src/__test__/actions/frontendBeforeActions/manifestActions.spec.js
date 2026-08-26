@@ -1,7 +1,7 @@
 import {
   updateManifest,
   deleteManifest,
-} from '../../../src/actions/frontend/before/manifestActions';
+} from '../../../actions/frontend/before/manifestActions';
 
 import {projectState001} from '../../testData/projectState001';
 

@@ -2,7 +2,7 @@ import {
   linkImages,
   unlinkImages,
   deleteImages,
-} from '../../../src/actions/frontend/before/imageActions';
+} from '../../../actions/frontend/before/imageActions';
 
 import {projectState001} from '../../testData/projectState001'
 import {dashboardState001} from '../../testData/dashboardState001'

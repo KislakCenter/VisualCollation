@@ -1,7 +1,7 @@
 import {
   updateProject,
   deleteProject,
-} from '../../../src/actions/frontend/before/projectActions';
+} from '../../../actions/frontend/before/projectActions';
 
 import {dashboardState001} from '../../testData/dashboardState001'
 

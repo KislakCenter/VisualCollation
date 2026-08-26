@@ -7,7 +7,7 @@ import {
   autoConjoinLeafs,
   generateFolioNumbers,
   generatePageNumbers,
-} from '../../../src/actions/frontend/before/leafActions';
+} from '../../../actions/frontend/before/leafActions';
 
 import { projectState001 } from '../../testData/projectState001';
 
