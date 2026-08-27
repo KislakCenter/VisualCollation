@@ -86,7 +86,7 @@ export default function userReducer(state=initialState, action) {
       break;
     case "CONFIRM_FAILED":
       errorMessage = "Error confirming your account!";
-      if (action.payload.errors.confirmation_token.length>0) {
+      if (action.payload.errors?.confirmation_token?.length>0) {
         errorMessage = "Confirmation token " + action.payload.errors.confirmation_token[0];
       }
       state = {
