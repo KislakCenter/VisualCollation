@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "GET /projects", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
@@ -11,10 +11,10 @@ describe "GET /projects", :type => :request do
   context 'with correct authorization' do
     context 'and standard params' do
       before do
-        @user2 = FactoryGirl.create(:user)
-        @project1 = FactoryGirl.create(:project, {:user_id => @user.id})
-        @project2 = FactoryGirl.create(:project, {:user_id => @user.id})
-        @project3 = FactoryGirl.create(:project, {:user_id => @user2.id})
+        @user2 = FactoryBot.create(:user)
+        @project1 = FactoryBot.create(:project, {:user_id => @user.id})
+        @project2 = FactoryBot.create(:project, {:user_id => @user.id})
+        @project3 = FactoryBot.create(:project, {:user_id => @user2.id})
         get '/projects', params: '', headers: {'Authorization' => @authToken}
         @body = JSON.parse(response.body)
       end

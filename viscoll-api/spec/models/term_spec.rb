@@ -13,14 +13,14 @@ RSpec.describe Term, type: :model do
   it { is_expected.to belong_to(:project) }
 
   before :each do
-    @project = FactoryGirl.create(:project, taxonomies: ['Ink'])
-    @group = FactoryGirl.create(:group, project: @project)
-    @leaf = FactoryGirl.create(:leaf, project: @project, parentID: @group.id.to_s)
+    @project = FactoryBot.create(:project, taxonomies: ['Ink'])
+    @group = FactoryBot.create(:group, project: @project)
+    @leaf = FactoryBot.create(:leaf, project: @project, parentID: @group.id.to_s)
     @side1 = Side.find(@leaf.rectoID)
     @side2 = Side.find(@leaf.versoID)
     @project.add_groupIDs([@group.id.to_s], 0)
     @group.add_members([@leaf.id.to_s], 0)
-    @term = FactoryGirl.create(:term, project: @project, taxonomy: ['Ink'], objects: {Group: [@group.id.to_s], Leaf: [@leaf.id.to_s], Recto: [@side1.id.to_s], Verso: [@side2.id.to_s]} )
+    @term = FactoryBot.create(:term, project: @project, taxonomy: ['Ink'], objects: {Group: [@group.id.to_s], Leaf: [@leaf.id.to_s], Recto: [@side1.id.to_s], Verso: [@side2.id.to_s]} )
     @group.terms << @term
     @group.save
     @leaf.terms << @term
@@ -37,15 +37,15 @@ RSpec.describe Term, type: :model do
       expect(@term).not_to be_valid
     end
     it "should be unique within the project" do
-      duplicate_term = FactoryGirl.create(:term, project: @project, taxonomy: ['Ink'], objects: {Group: [@group.id.to_s], Leaf: [], Recto: [], Verso: []} )
+      duplicate_term = FactoryBot.create(:term, project: @project, taxonomy: ['Ink'], objects: {Group: [@group.id.to_s], Leaf: [], Recto: [], Verso: []} )
       duplicate_term.title = @term.title
       expect(duplicate_term).not_to be_valid
     end
     it "should not need to be unique globally" do
-      project2 = FactoryGirl.create(:project)
-      group2 = FactoryGirl.create(:group, project: project2)
+      project2 = FactoryBot.create(:project)
+      group2 = FactoryBot.create(:group, project: project2)
       project2.add_groupIDs([group2.id.to_s], 0)
-      term2 = FactoryGirl.create(:term, project: project2, taxonomy: ['Ink'], objects: {Group: [group2.id.to_s], Leaf: [], Recto: [], Verso: []})
+      term2 = FactoryBot.create(:term, project: project2, taxonomy: ['Ink'], objects: {Group: [group2.id.to_s], Leaf: [], Recto: [], Verso: []})
       expect(term2).to be_valid
     end
     it "should require a taxonomy" do

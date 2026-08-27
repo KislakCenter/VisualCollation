@@ -57,7 +57,7 @@ RSpec.describe ControllerHelper::StubbedImportHelper, type: :helper do
     end
     
     it 'should import properly' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       expect{ handleJSONImport(json_import_data) }.to change{Project.count}.by(1)
       project = Project.last
       expect(project.title).to eq 'Sample project'
@@ -75,8 +75,8 @@ RSpec.describe ControllerHelper::StubbedImportHelper, type: :helper do
     end
     
     it 'should avoid overwriting a project of the same name' do
-      user = FactoryGirl.create(:user)
-      existing_project = FactoryGirl.create(:project, title: 'Ultra waahoo project is ultra waahoo')
+      user = FactoryBot.create(:user)
+      existing_project = FactoryBot.create(:project, title: 'Ultra waahoo project is ultra waahoo')
       duplicated_data = json_import_data
       duplicated_data['project']['title'] = existing_project.title
       expect{ handleJSONImport(duplicated_data) }.to change{Project.count}.by(1)

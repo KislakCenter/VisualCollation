@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ValidationHelper::LeafValidationHelper, type: :helper do
   before :each do
-    @project = FactoryGirl.create(:project)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project)
+    @group = FactoryBot.create(:group, project: @project)
     @project.add_groupIDs([@group.id.to_s], 0)
   end
   
@@ -42,8 +42,8 @@ RSpec.describe ValidationHelper::LeafValidationHelper, type: :helper do
         expect(result[:parentID]).to include 'should be a String'
       end
       it 'should belong to the same project' do
-        project2 = FactoryGirl.create(:project)
-        group2 = FactoryGirl.create(:group, project: project2)
+        project2 = FactoryBot.create(:project)
+        group2 = FactoryBot.create(:group, project: project2)
         project2.add_groupIDs([group2.id.to_s], 0)
         result = validateLeafParams(project_id, group2.id.to_s)
         expect(result[:parentID]).to include 'Group with parentID does not have project_id as a member'

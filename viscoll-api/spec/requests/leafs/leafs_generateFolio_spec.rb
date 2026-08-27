@@ -2,18 +2,18 @@ require 'rails_helper'
 
 describe "PUT /leafs/generateFolio", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {user: @user})
-    @defaultGroup = FactoryGirl.create(:quire, project: @project)
+    @project = FactoryBot.create(:project, {user: @user})
+    @defaultGroup = FactoryBot.create(:quire, project: @project)
     @project.add_groupIDs([@defaultGroup.id.to_s], 0)
-    @leaf1 = FactoryGirl.create(:leaf, {project: @project})
-    @leaf2 = FactoryGirl.create(:leaf, {project: @project})
+    @leaf1 = FactoryBot.create(:leaf, {project: @project})
+    @leaf2 = FactoryBot.create(:leaf, {project: @project})
     @defaultGroup.add_members([@leaf1.id.to_s, @leaf2.id.to_s], 1)   
     @parameters = {
       startNumber: 9,

@@ -2,10 +2,10 @@ require 'rails_helper'
 
 describe "GET /projects/id", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    @user2 = FactoryGirl.create(:user, {:password => "user2"})
-    @project1 = FactoryGirl.create(:project, {:user => @user})
-    @project2 = FactoryGirl.create(:project, {:user => @user2})
+    @user = FactoryBot.create(:user, {:password => "user"})
+    @user2 = FactoryBot.create(:user, {:password => "user2"})
+    @project1 = FactoryBot.create(:project, {:user => @user})
+    @project2 = FactoryBot.create(:project, {:user => @user2})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']

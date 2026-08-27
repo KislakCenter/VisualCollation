@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   sequence :quire_title do |n|
     "Quire #{n}"
   end
@@ -10,7 +10,7 @@ FactoryGirl.define do
   end
   factory :group, class: Group do 
     transient do
-      members []
+      members { [] }
     end
     after(:create) do |group, evaluator|
       group.nestLevel ||= 1
@@ -28,15 +28,15 @@ FactoryGirl.define do
       group.save
     end
     title { generate(:group_title) }
-    type "Quire"
+    type { "Quire" }
   end
   
   factory :quire, class: Group do
     transient do
-      leafs 0
-      conjoined true
+      leafs { 0 }
+      conjoined { true }
       leaf_properties { {} }
-      start_page 1
+      start_page { 1 }
     end
     after(:create) do |group, evaluator|
       group.nestLevel ||= 1
@@ -47,7 +47,7 @@ FactoryGirl.define do
           nestLevel: group.nestLevel
         })
         newleafs = evaluator.leafs.times.collect { |n| 
-          FactoryGirl.build(:leaf, newleafprops.merge({ folio_number: evaluator.start_page+n }))
+          FactoryBot.build(:leaf, newleafprops.merge({ folio_number: evaluator.start_page+n }))
         }
         if evaluator.conjoined
           evaluator.leafs.times.each do |n|
@@ -62,12 +62,12 @@ FactoryGirl.define do
       end
     end
     title { generate(:quire_title) }
-    type "Quire"
+    type { "Quire" }
   end
   
   factory :booklet, parent: :quire do
     title { generate(:booklet_title) }
-    type "Booklet"
-    leafs 0
+    type { "Booklet" }
+    leafs { 0 }
   end
 end

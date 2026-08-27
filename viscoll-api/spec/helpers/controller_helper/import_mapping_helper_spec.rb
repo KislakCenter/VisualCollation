@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe ControllerHelper::ImportMappingHelper, type: :helper do
   before do
     @base_api_url = 'http://127.0.0.1:12345'
-    @user = FactoryGirl.create(:user)
-    @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1,3]])
+    @user = FactoryBot.create(:user)
+    @project = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1,3]])
   end
 
   after do
@@ -17,9 +17,9 @@ RSpec.describe ControllerHelper::ImportMappingHelper, type: :helper do
     it 'should run properly with images in various attachment situations' do
       # Prep user with preloaded images
       preloads = [
-        FactoryGirl.create(:image, user: @user, projectIDs: [@project.id.to_s], filename: '1V.png', fileID: '5a28221ec199860e7a2f5fd1'),
-        FactoryGirl.create(:image, user: @user, projectIDs: [@project.id.to_s], filename: '2R.png', fileID: '5a28221ec199860e7a1shibainu', id: '5a28221ec199860e7a2f5fd1shibainu'),
-        FactoryGirl.create(:image, user: @user, projectIDs: [@project.id.to_s], filename: '2V.png', fileID: '0e7a2f5fd1waahoo', id: '5a28221ec199860e7a2f5fd1waahoo')
+        FactoryBot.create(:image, user: @user, projectIDs: [@project.id.to_s], filename: '1V.png', fileID: '5a28221ec199860e7a2f5fd1'),
+        FactoryBot.create(:image, user: @user, projectIDs: [@project.id.to_s], filename: '2R.png', fileID: '5a28221ec199860e7a1shibainu', id: '5a28221ec199860e7a2f5fd1shibainu'),
+        FactoryBot.create(:image, user: @user, projectIDs: [@project.id.to_s], filename: '2V.png', fileID: '0e7a2f5fd1waahoo', id: '5a28221ec199860e7a2f5fd1waahoo')
       ]
       @user.images = preloads
       @user.save

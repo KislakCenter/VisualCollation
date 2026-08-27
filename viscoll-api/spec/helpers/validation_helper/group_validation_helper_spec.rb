@@ -32,8 +32,8 @@ RSpec.describe ValidationHelper::GroupValidationHelper, type: :helper do
     
     describe "parentGroupID" do
       before do
-        @project = FactoryGirl.create(:project)
-        @parent = FactoryGirl.create(:group, project: @project)
+        @project = FactoryBot.create(:project)
+        @parent = FactoryBot.create(:group, project: @project)
         @project.add_groupIDs([@parent.id.to_s], 0)
       end
       
@@ -56,8 +56,8 @@ RSpec.describe ValidationHelper::GroupValidationHelper, type: :helper do
       
       describe 'with parent' do
         before do
-          @project = FactoryGirl.create(:project)
-          @parent = FactoryGirl.create(:group, project: @project)
+          @project = FactoryBot.create(:project)
+          @parent = FactoryBot.create(:group, project: @project)
           @project.add_groupIDs([@parent.id.to_s], 0)
         end
         it 'should be required' do
@@ -131,9 +131,9 @@ RSpec.describe ValidationHelper::GroupValidationHelper, type: :helper do
   
   describe "validateGroupBatchDelete" do
     before do
-      @project = FactoryGirl.create(:project)
-      @group1 = FactoryGirl.create(:group, project: @project)
-      @group2 = FactoryGirl.create(:group, project: @project)
+      @project = FactoryBot.create(:project)
+      @group1 = FactoryBot.create(:group, project: @project)
+      @group2 = FactoryBot.create(:group, project: @project)
       @params = [@group1.id.to_s, @group2.id.to_s]
       @project.add_groupIDs(@params, 0)
     end
@@ -156,9 +156,9 @@ RSpec.describe ValidationHelper::GroupValidationHelper, type: :helper do
   
   describe "validateGroupBatchUpdate" do
     before do
-      @project = FactoryGirl.create(:project)
-      @group1 = FactoryGirl.create(:quire, project: @project)
-      @group2 = FactoryGirl.create(:booklet, project: @project)
+      @project = FactoryBot.create(:project)
+      @group1 = FactoryBot.create(:quire, project: @project)
+      @group2 = FactoryBot.create(:booklet, project: @project)
       @params = [
         { id: @group1.id.to_s, attributes: { type: 'Quire' } }, 
         { id: @group2.id.to_s, attributes: { type: 'Booklet' } }

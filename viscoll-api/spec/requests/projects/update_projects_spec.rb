@@ -2,17 +2,17 @@ require 'rails_helper'
 
 describe "PUT /projects/id", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @user2 = FactoryGirl.create(:user)
-    @project1 = FactoryGirl.create(:project, {:user => @user})
-    @project2 = FactoryGirl.create(:project, {:user => @user})
-    @project3 = FactoryGirl.create(:project, {:user => @user2})
+    @user2 = FactoryBot.create(:user)
+    @project1 = FactoryBot.create(:project, {:user => @user})
+    @project2 = FactoryBot.create(:project, {:user => @user})
+    @project3 = FactoryBot.create(:project, {:user => @user2})
     @parameters = {
       "project": {
         "title": "My modified project",

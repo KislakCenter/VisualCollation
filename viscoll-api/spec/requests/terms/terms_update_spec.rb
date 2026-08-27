@@ -2,18 +2,18 @@ require 'rails_helper'
 
 describe "PUT /terms/id", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {
+    @project = FactoryBot.create(:project, {
         user: @user,
         taxonomies: ["Ink"]
     })
-    @term = FactoryGirl.create(:term, {
+    @term = FactoryBot.create(:term, {
         taxonomy: "Ink",
       project: @project,
       description: "vermilion"
@@ -89,12 +89,12 @@ describe "PUT /terms/id", :type => :request do
 
     context "and someone else's terms" do
       before do
-        @user2 = FactoryGirl.create(:user)
-        @project2 = FactoryGirl.create(:project, {
+        @user2 = FactoryBot.create(:user)
+        @project2 = FactoryBot.create(:project, {
             user: @user2,
             taxonomies: ["Ink"]
         })
-        @term2 = FactoryGirl.create(:term, {
+        @term2 = FactoryBot.create(:term, {
           taxonomy: "Ink",
           project: @project2,
           description: "Prussian blue"

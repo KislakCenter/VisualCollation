@@ -4,10 +4,10 @@ RSpec.describe ControllerHelper::LeafsHelper, type: :helper do
   describe 'autoConjoinLeaves' do
     describe 'even leaves' do
       before :each do
-        @project = FactoryGirl.create(:project)
-        @group = FactoryGirl.create(:quire, project: @project)
+        @project = FactoryBot.create(:project)
+        @group = FactoryBot.create(:quire, project: @project)
         @project.add_groupIDs([@group.id.to_s], 0)
-        @leaves = 4.times.collect { FactoryGirl.create(:leaf, project: @project) }
+        @leaves = 4.times.collect { FactoryBot.create(:leaf, project: @project) }
         @group.add_members(@leaves.collect { |leaf| leaf.id.to_s }, 0)
         @project.update({ leafs: @leaves })
       end
@@ -40,10 +40,10 @@ RSpec.describe ControllerHelper::LeafsHelper, type: :helper do
     
     describe 'odd leaves' do
       before :each do
-        @project = FactoryGirl.create(:project)
-        @group = FactoryGirl.create(:quire, project: @project)
+        @project = FactoryBot.create(:project)
+        @group = FactoryBot.create(:quire, project: @project)
         @project.add_groupIDs([@group.id.to_s], 0)
-        @leaves = 5.times.collect { FactoryGirl.create(:leaf, project: @project) }
+        @leaves = 5.times.collect { FactoryBot.create(:leaf, project: @project) }
         @group.add_members(@leaves.collect { |leaf| leaf.id.to_s }, 0)
         @project.update({ leafs: @leaves })
       end
@@ -78,7 +78,7 @@ RSpec.describe ControllerHelper::LeafsHelper, type: :helper do
     
     describe 'reconjoin odd subleaves' do
       before do
-        @project = FactoryGirl.create(:codex_project, quire_structure: [[1,8]])
+        @project = FactoryBot.create(:codex_project, quire_structure: [[1,8]])
         @leaves = @project.leafs
       end
       
@@ -101,10 +101,10 @@ RSpec.describe ControllerHelper::LeafsHelper, type: :helper do
   
   describe 'update_attached_to' do
     before :each do
-      @project = FactoryGirl.create(:project)
-      @group = FactoryGirl.create(:quire, project: @project)
+      @project = FactoryBot.create(:project)
+      @group = FactoryBot.create(:quire, project: @project)
       @project.add_groupIDs([@group.id.to_s], 0)
-      @leaves = 5.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @group.id.to_s) }
+      @leaves = 5.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @group.id.to_s) }
       @group.add_members(@leaves.collect { |leaf| leaf.id.to_s }, 0)
       @project.update({ leafs: @leaves })
     end
@@ -144,10 +144,10 @@ RSpec.describe ControllerHelper::LeafsHelper, type: :helper do
     let(:helpers) { ApplicationController.helpers }
     
     before :each do
-      @project = FactoryGirl.create(:project)
-      @group = FactoryGirl.create(:quire, project: @project)
+      @project = FactoryBot.create(:project)
+      @group = FactoryBot.create(:quire, project: @project)
       @project.add_groupIDs([@group.id.to_s], 0)
-      @leaves = 3.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @group.id.to_s) }
+      @leaves = 3.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @group.id.to_s) }
       @group.add_members(@leaves.collect { |leaf| leaf.id.to_s }, 0)
       @project.update({ leafs: @leaves })
     end

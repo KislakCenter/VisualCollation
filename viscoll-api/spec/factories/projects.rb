@@ -1,5 +1,4 @@
-include ActionDispatch::TestProcess
-FactoryGirl.define do
+FactoryBot.define do
   sequence :title do |n|
     "Project #{n}"
   end
@@ -15,13 +14,13 @@ FactoryGirl.define do
 
   factory :empty_project, class: Project do
     title { generate(:title) }
-    user_id { FactoryGirl.create(:user) }
+    user_id { FactoryBot.create(:user) }
   end
 
   factory :project do
     transient do
-      with_members []
-      with_manifests []
+      with_members { [] }
+      with_manifests { [] }
     end
     before(:build) do |project, evaluator|
       evaluator.with_manifests.each do |manifest|
@@ -41,17 +40,17 @@ FactoryGirl.define do
       end
     end
     title { generate(:title) }
-    user_id { FactoryGirl.create(:user) }
+    user_id { FactoryBot.create(:user) }
   end
   
   factory :codex_project, parent: :project do
     transient do
-      manifest_count 0
+      manifest_count { 0 }
       quire_structure { [[4, 6]] }
     end
     before(:build) do |project, evaluator|
       evaluator.manifest_count.times do
-        manifest = FactoryGirl.build(:manifest)
+        manifest = FactoryBot.build(:manifest)
         project.manifests[manifest[:id]] = manifest
       end
     end
@@ -60,7 +59,7 @@ FactoryGirl.define do
       members = []
       evaluator.quire_structure.each do |qs|
         qs[0].times do
-          members << FactoryGirl.create(:quire, project_id: project.id, leafs: qs[1], start_page: start_page, nestLevel: 1)
+          members << FactoryBot.create(:quire, project_id: project.id, leafs: qs[1], start_page: start_page, nestLevel: 1)
           start_page += qs[1]
         end
       end

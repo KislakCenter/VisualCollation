@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "GET /images/zip/:imageid_:projectid", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
@@ -10,9 +10,9 @@ describe "GET /images/zip/:imageid_:projectid", :type => :request do
   end
 
   before :each do
-    @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
-    @image1 = FactoryGirl.create(:pixel, user: @user)
-    @image2 = FactoryGirl.create(:shiba_inu, user: @user)
+    @project = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1, 2]])
+    @image1 = FactoryBot.create(:pixel, user: @user)
+    @image2 = FactoryBot.create(:shiba_inu, user: @user)
   end
 
   context 'and valid authorization' do

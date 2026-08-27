@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ControllerHelper::GroupsHelper, type: :helper do
   before :each do
-    @project = FactoryGirl.create(:project)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project)
+    @group = FactoryBot.create(:group, project: @project)
   end
   
   describe 'addLeavesInside' do

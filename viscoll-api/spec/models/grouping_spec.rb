@@ -7,9 +7,9 @@
 #   it { is_expected.to belong_to(:member).with_foreign_key(:member_id) }
 
 #   before(:each) do
-#     @project = FactoryGirl.create(:project)
-#     @leaf = FactoryGirl.create(:leaf, project: @project)
-#     @group = FactoryGirl.create(:quire)
+#     @project = FactoryBot.create(:project)
+#     @leaf = FactoryBot.create(:leaf, project: @project)
+#     @group = FactoryBot.create(:quire)
 #   end
 
 #   it "can delete a member" do

@@ -2,16 +2,16 @@ require 'rails_helper'
 
 describe "DELETE /images", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
-    @image1 = FactoryGirl.create(:image, user: @user)
-    @image2 = FactoryGirl.create(:image, user: @user)
+    @project = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1, 2]])
+    @image1 = FactoryBot.create(:image, user: @user)
+    @image2 = FactoryBot.create(:image, user: @user)
     @parameters = {
       "imageIDs": [@image1.id.to_s]
     }
@@ -52,7 +52,7 @@ describe "DELETE /images", :type => :request do
 
     context 'and unauthorized image' do
       before do
-        @image1.update(user: FactoryGirl.create(:user))
+        @image1.update(user: FactoryBot.create(:user))
         delete '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 

@@ -10,9 +10,9 @@ RSpec.describe Image, type: :model do
   it { is_expected.to belong_to(:user) }
   
   before(:each) do
-    @user = FactoryGirl.create(:user)
-    @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
-    @image = FactoryGirl.create(:image, user: @user)
+    @user = FactoryBot.create(:user)
+    @project = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1, 2]])
+    @image = FactoryBot.create(:image, user: @user)
   end
   
   describe 'Validations' do
@@ -21,7 +21,7 @@ RSpec.describe Image, type: :model do
     end
     
     it 'should not be valid with a duplicate file name' do
-      duplicate_image = FactoryGirl.build(:image, user: @user, filename: @image.filename)
+      duplicate_image = FactoryBot.build(:image, user: @user, filename: @image.filename)
       expect(duplicate_image).not_to be_valid
     end
   end

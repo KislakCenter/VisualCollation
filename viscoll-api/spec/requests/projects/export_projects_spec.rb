@@ -4,12 +4,12 @@ describe "GET /projects/:id/export/:format", :type => :request do
   before do
     stub_request(:get, 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest').with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200, body: File.read(File.dirname(__FILE__) + '/../../fixtures/villanova_boston.json'), headers: {})
     # Set up an account and allow sign-in
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
     # Create project
-    @project = FactoryGirl.create(:project,
+    @project = FactoryBot.create(:project,
       user: @user,
       'title' => 'Sample project',
       'shelfmark' => 'Ravenna 384.2339',
@@ -20,17 +20,17 @@ describe "GET /projects/:id/export/:format", :type => :request do
       'manifests' => { '12341234': { 'id' => '12341234', 'url' => 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest', 'name' => 'Boston, and Bunker Hill.' } }
     )
     # Attach group with 2 leafs - (group with 2 leafs) - 2 conjoined leafs, 1 image
-    @testgroup = FactoryGirl.create(:group, project: @project, nestLevel: 1, title: 'Group 1')
-    @upleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
-    @testmidgroup = FactoryGirl.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2, title: 'Group 2')
-    @midleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
-    @botleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
+    @testgroup = FactoryBot.create(:group, project: @project, nestLevel: 1, title: 'Group 1')
+    @upleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
+    @testmidgroup = FactoryBot.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2, title: 'Group 2')
+    @midleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
+    @botleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
     @botleafs[1].update(type: 'Endleaf')
     @project.add_groupIDs([@testgroup.id.to_s, @testmidgroup.id.to_s], 0)
     @testgroup.add_members([@upleafs[0].id.to_s, @upleafs[1].id.to_s, @testmidgroup.id.to_s, @botleafs[0].id.to_s, @botleafs[1].id.to_s], 0)
     @testmidgroup.add_members([@midleafs[0].id.to_s, @midleafs[1].id.to_s], 0)
-    @testterm = FactoryGirl.create(:term, project: @project, title: 'Test Term', taxonomy: 'Ink', description: 'This is a test', show: true, objects: {Group: [@testgroup.id.to_s], Leaf: [@botleafs[0].id.to_s], Recto: [@botleafs[0].rectoID], Verso: [@botleafs[0].versoID]})
-    @testimage = FactoryGirl.create(:pixel, user: @user, projectIDs: [@project.id.to_s], sideIDs: [@upleafs[0].rectoID], filename: 'pixel.png')
+    @testterm = FactoryBot.create(:term, project: @project, title: 'Test Term', taxonomy: 'Ink', description: 'This is a test', show: true, objects: {Group: [@testgroup.id.to_s], Leaf: [@botleafs[0].id.to_s], Recto: [@botleafs[0].rectoID], Verso: [@botleafs[0].versoID]})
+    @testimage = FactoryBot.create(:pixel, user: @user, projectIDs: [@project.id.to_s], sideIDs: [@upleafs[0].rectoID], filename: 'pixel.png')
     Side.find(@upleafs[0].rectoID).update(image: {
       manifestID: 'DIYImages',
       label: "Pixel",
@@ -151,7 +151,7 @@ describe "GET /projects/:id/export/:format", :type => :request do
 
     context 'with unauthorized project' do
       before do
-        @project.update(user: FactoryGirl.create(:user))
+        @project.update(user: FactoryBot.create(:user))
         get "/projects/#{@project.id}/export/#{@format}", headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 

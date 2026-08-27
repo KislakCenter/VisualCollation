@@ -12,16 +12,16 @@ RSpec.describe Side, type: :model do
   it { is_expected.to have_and_belong_to_many(:terms) }
 
   before :each do
-    @user = FactoryGirl.create(:user)
-    @project = FactoryGirl.create(:project, user: @user)
-    @leaf = FactoryGirl.create(:leaf, project: @project)
+    @user = FactoryBot.create(:user)
+    @project = FactoryBot.create(:project, user: @user)
+    @leaf = FactoryBot.create(:leaf, project: @project)
     @side = Side.find(@leaf.rectoID)
   end
 
   describe "Destruction hooks" do
     it "should unlink attached terms" do
-      term = FactoryGirl.create(:term, project: @project, objects: {Group: [], Leaf: [], Recto: [@side.id.to_s], Verso: []} )
-      term2 = FactoryGirl.create(:term, project: @project, objects: {Group: [], Leaf: [], Recto: [], Verso: [@side.id.to_s]} )
+      term = FactoryBot.create(:term, project: @project, objects: {Group: [], Leaf: [], Recto: [@side.id.to_s], Verso: []} )
+      term2 = FactoryBot.create(:term, project: @project, objects: {Group: [], Leaf: [], Recto: [], Verso: [@side.id.to_s]} )
       @side.terms << [term, term2]
       @side.save
       expect(@side.terms).to include term
@@ -32,7 +32,7 @@ RSpec.describe Side, type: :model do
     end
 
     it "should unlink attached image" do
-      image = FactoryGirl.create(:pixel, user: @user, filename: 'pixel.png', projectIDs: [@project.id.to_s], sideIDs: [@side.id.to_s])
+      image = FactoryBot.create(:pixel, user: @user, filename: 'pixel.png', projectIDs: [@project.id.to_s], sideIDs: [@side.id.to_s])
       @side.update(image: { url: "http://127.0.0.1:12345/images/#{image.id}_pixel.png", label: 'Pixel', manifestID: 'DIYImages' })
       @side.destroy
       image.reload

@@ -2,14 +2,14 @@ require 'rails_helper'
 
 describe "POST /groups", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {user: @user, taxonomies: ["Ink"]})
+    @project = FactoryBot.create(:project, {user: @user, taxonomies: ["Ink"]})
     @parameters = {
       "group": {
         "project_id": @project.id.to_str,
@@ -44,7 +44,7 @@ describe "POST /groups", :type => :request do
     
     context 'and as a sub-group' do
       before do
-        @group2 = FactoryGirl.create(:quire, { title: "Existing Quire", project: @project })
+        @group2 = FactoryBot.create(:quire, { title: "Existing Quire", project: @project })
         @project.add_groupIDs([@group2.id.to_s], 0)
         @parameters[:additional][:parentGroupID] = @group2.id.to_s
         @parameters[:additional][:order] = 2

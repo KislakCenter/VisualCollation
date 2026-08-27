@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   sequence :term_title do |n|
     "Term #{n}"
   end
@@ -8,7 +8,7 @@ FactoryGirl.define do
 
   factory :term do
     transient do
-      attachments []
+      attachments { [] }
     end
     after(:build) do |term, evaluator|
       term.objects ||= {Group: [], Leaf: [], Recto: [], Verso: []}
@@ -33,6 +33,6 @@ FactoryGirl.define do
       end
     end
       title { generate(:term_title) }
-      taxonomy 'Unknown'
+      taxonomy { 'Unknown' }
     end
   end

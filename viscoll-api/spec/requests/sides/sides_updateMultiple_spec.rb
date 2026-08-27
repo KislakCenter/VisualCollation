@@ -2,17 +2,17 @@ require 'rails_helper'
 
 describe "PUT /sides/id", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {user: @user})
-    @defaultGroup = FactoryGirl.create(:quire, project: @project)
+    @project = FactoryBot.create(:project, {user: @user})
+    @defaultGroup = FactoryBot.create(:quire, project: @project)
     @project.add_groupIDs([@defaultGroup.id.to_s], 0)
-    @leaf1 = FactoryGirl.create(:leaf, {project: @project})
+    @leaf1 = FactoryBot.create(:leaf, {project: @project})
     @defaultGroup.add_members([@leaf1.id.to_s], 1)
     @side1 = @project.sides.find(@leaf1.rectoID)
     @side2 = @project.sides.find(@leaf1.versoID)
@@ -69,10 +69,10 @@ describe "PUT /sides/id", :type => :request do
 
     context "and someone else's sides" do
       before do
-        @user2 = FactoryGirl.create(:user)
-        @project2 = FactoryGirl.create(:project, { user: @user2 })
-        @defaultGroup2 = FactoryGirl.create(:quire, project: @project)
-        @leaf2 = FactoryGirl.create(:leaf, {project: @project2})
+        @user2 = FactoryBot.create(:user)
+        @project2 = FactoryBot.create(:project, { user: @user2 })
+        @defaultGroup2 = FactoryBot.create(:quire, project: @project)
+        @leaf2 = FactoryBot.create(:leaf, {project: @project2})
         @defaultGroup.add_members([@leaf2.id.to_s], 1)
         @side3 = @project2.sides.find(@leaf2.rectoID)
         @side4 = @project2.sides.find(@leaf2.versoID)

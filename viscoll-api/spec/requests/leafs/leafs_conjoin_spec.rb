@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "PUT /leafs/conjoin", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
@@ -10,10 +10,10 @@ describe "PUT /leafs/conjoin", :type => :request do
 
   before :each do
     leaf_count = 5
-    @project = FactoryGirl.create(:project, user: @user)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project, user: @user)
+    @group = FactoryBot.create(:group, project: @project)
     @project.add_groupIDs([@group.id.to_s], 0)
-    @leafs = leaf_count.times.collect { FactoryGirl.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s) }
+    @leafs = leaf_count.times.collect { FactoryBot.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s) }
     @group.add_members(@leafs.collect { |leaf| leaf.id.to_s }, 0)
     @parameters = {
       "leafs": @leafs[0..3].collect { |leaf| leaf.id.to_s }
@@ -65,7 +65,7 @@ describe "PUT /leafs/conjoin", :type => :request do
 
     context 'and valid odd subleaves within even conjoined quire' do
       before do
-        @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1,8]])
+        @project = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1,8]])
         @leafs = @project.leafs
         @parameters[:leafs] = @leafs[0..4].collect { |leaf| leaf.id.to_s }
         put '/leafs/conjoin', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
@@ -134,7 +134,7 @@ describe "PUT /leafs/conjoin", :type => :request do
 
     context 'and an unauthorized page' do
       before do
-        @user2 = FactoryGirl.create(:user)
+        @user2 = FactoryBot.create(:user)
         @project.update(user: @user2)
         put '/leafs/conjoin', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload

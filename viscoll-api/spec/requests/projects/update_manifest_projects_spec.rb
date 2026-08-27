@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "PUT /projects/:id/manifests", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
@@ -10,13 +10,13 @@ describe "PUT /projects/:id/manifests", :type => :request do
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {
+    @project = FactoryBot.create(:project, {
       user: @user,
       manifests: { "59ee3c623b0eb75251207cfe": { id: "59ee3c623b0eb75251207cfe", name: 'ASDF', url: 'https://iiif.library.utoronto.ca/presentation/v2/hollar:Hollar_a_3000/manifest', images: [{label: "IMAGE", url: "http://www.example.com/iiif-sample"}]} }
     })
-    @defaultGroup = FactoryGirl.create(:quire, project: @project)
+    @defaultGroup = FactoryBot.create(:quire, project: @project)
     @project[:groupIDs] = [@defaultGroup.id.to_s]
-    @leaf1 = FactoryGirl.create(:leaf, {project: @project})
+    @leaf1 = FactoryBot.create(:leaf, {project: @project})
     @defaultGroup.add_members([@leaf1.id.to_s], 1)
     @side1 = @project.sides.find(@leaf1.rectoID)
     @side1.image = { label: "IMAGE", manifestID: "59ee3c623b0eb75251207cfe", url: "http://www.example.com/iiif-sample" }
@@ -92,7 +92,7 @@ describe "PUT /projects/:id/manifests", :type => :request do
     end
     context 'with unauthorized project' do
       before do
-        @project.user = FactoryGirl.create(:user)
+        @project.user = FactoryBot.create(:user)
         @project.save
         put "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
