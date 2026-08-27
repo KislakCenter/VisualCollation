@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ControllerHelper::ExportHelper, type: :helper do
   before do
-    @project = FactoryGirl.create(:project,
+    @project = FactoryBot.create(:project,
       'title' => 'Sample project',
       'shelfmark' => 'Ravenna 384.2339',
       'notationStyle' => 'r-v',
@@ -12,18 +12,18 @@ RSpec.describe ControllerHelper::ExportHelper, type: :helper do
       'manifests' => { '12341234': { 'id' => '12341234', 'url' => 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest', 'name' => 'Boston, and Bunker Hill.' } }
     )
     # Attach group with 2 leafs - (group with 2 leafs) - 2 conjoined leafs
-    @testgroup = FactoryGirl.create(:group, project: @project, nestLevel: 1, title: 'Group 1')
-    upleaf = FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1,
+    @testgroup = FactoryBot.create(:group, project: @project, nestLevel: 1, title: 'Group 1')
+    upleaf = FactoryBot.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1,
                                  conjoined_to: create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1).id.to_s)
     @upleafs = [upleaf, Leaf.find(upleaf.conjoined_to)]
-    @testmidgroup = FactoryGirl.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2, title: 'Group 2')
-    @midleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
-    @botleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
+    @testmidgroup = FactoryBot.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2, title: 'Group 2')
+    @midleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
+    @botleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
     @botleafs[1].update(type: 'Endleaf', attached_above: 'sewn')
     @project.add_groupIDs([@testgroup.id.to_s, @testmidgroup.id.to_s], 0)
     @testgroup.add_members([@upleafs[0].id.to_s, @upleafs[1].id.to_s, @testmidgroup.id.to_s, @botleafs[0].id.to_s, @botleafs[1].id.to_s], 0)
     @testmidgroup.add_members([@midleafs[0].id.to_s, @midleafs[1].id.to_s], 0)
-    @testterm = FactoryGirl.create(:term, project: @project,
+    @testterm = FactoryBot.create(:term, project: @project,
                                    attachments: [@testgroup,
                                                  @botleafs[0],
                                                  Side.find(@botleafs[0].rectoID),

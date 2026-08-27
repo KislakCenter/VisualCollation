@@ -15,8 +15,8 @@ RSpec.describe Group, type: :model do
   it { is_expected.to have_and_belong_to_many(:terms) }
 
   before(:each) do
-    @project = FactoryGirl.create(:project)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project)
+    @group = FactoryBot.create(:group, project: @project)
     @project.add_groupIDs([@group.id], 0)
   end
 
@@ -58,7 +58,7 @@ RSpec.describe Group, type: :model do
 
   describe "On-destroy hooks" do
     it "should remove itself from an associated term" do
-      term = FactoryGirl.create(:term, project: @project, objects: {Group: [@group.id], Leaf: [], Recto: [], Verso: []})
+      term = FactoryBot.create(:term, project: @project, objects: {Group: [@group.id], Leaf: [], Recto: [], Verso: []})
       @group.terms << term
       @group.save
       @group.destroy
@@ -71,7 +71,7 @@ RSpec.describe Group, type: :model do
     end
 
     it "should remove itself from a parent group" do
-      parent_group = FactoryGirl.create(:group, project: @project)
+      parent_group = FactoryBot.create(:group, project: @project)
       @project.add_groupIDs([parent_group.id.to_s], 0)
       @group.parentID = parent_group.id
       parent_group.add_members([@group.id.to_s], 0)
@@ -83,7 +83,7 @@ RSpec.describe Group, type: :model do
     end
 
     it "should remove its members" do
-      subgroup = FactoryGirl.create(:group, project: @project)
+      subgroup = FactoryBot.create(:group, project: @project)
       subgroup_id = subgroup.id
       @project.add_groupIDs([subgroup.id.to_s], 0)
       subgroup.parentID = @group.id
@@ -91,7 +91,7 @@ RSpec.describe Group, type: :model do
       subgroup.save
       expect(@group.memberIDs).to include(subgroup.id.to_s)
 
-      subleaf = FactoryGirl.create(:leaf, project: @project)
+      subleaf = FactoryBot.create(:leaf, project: @project)
       subleaf_id = subleaf.id
       @group.add_members([subleaf.id.to_s], 0)
       subleaf.parentID = @group.id.to_s

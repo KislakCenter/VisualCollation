@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ControllerHelper::ProjectsHelper, type: :helper do
   describe 'addGroupsLeafsConjoin' do
     it 'should create a variety of groups' do
-      @project = FactoryGirl.create(:project)
+      @project = FactoryBot.create(:project)
       addGroupsLeafsConjoin(@project, [
         { 'leaves' => 2 },
         { 'leaves' => 4, 'conjoin' => true },
@@ -22,7 +22,7 @@ RSpec.describe ControllerHelper::ProjectsHelper, type: :helper do
       expect(Leaf.find(@project.groups[2].memberIDs[2]).conjoined_to).to eq @project.groups[2].memberIDs[0]
     end
     it 'should generate folio numbers' do
-      project = FactoryGirl.create(:project)
+      project = FactoryBot.create(:project)
       addGroupsLeafsConjoin(project, [
         { 'leaves' => 2 },
         { 'leaves' => 4, 'conjoin' => true },
@@ -32,7 +32,7 @@ RSpec.describe ControllerHelper::ProjectsHelper, type: :helper do
       expect((Leaf.find(project.groups[0].memberIDs[1])).folio_number).to eq "3"
     end
     it 'should generate page numbers' do
-      project = FactoryGirl.create(:project)
+      project = FactoryBot.create(:project)
       addGroupsLeafsConjoin(project, [
         { 'leaves' => 2 },
         { 'leaves' => 4, 'conjoin' => true },
@@ -44,7 +44,7 @@ RSpec.describe ControllerHelper::ProjectsHelper, type: :helper do
       expect(Side.find(Leaf.find(project.groups[0].memberIDs[1]).versoID).page_number).to eq "8"
     end
     it 'should generate correct patterns of texture' do
-      project = FactoryGirl.create(:project)
+      project = FactoryBot.create(:project)
       addGroupsLeafsConjoin(project, [
         { 'leaves' => 4, 'conjoin' => true},
         { 'leaves' => 4, 'conjoin' => true },
@@ -75,7 +75,7 @@ RSpec.describe ControllerHelper::ProjectsHelper, type: :helper do
   describe 'generateResponse/getLeafMembers' do
     before do
       stub_request(:get, 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest').with(headers: { 'Accept' => '*/*', 'User-Agent' => 'Ruby' }).to_return(status: 200, body: File.read(File.dirname(__FILE__) + '/../../fixtures/villanova_boston.json'), headers: {})
-      @project = FactoryGirl.create(:project,
+      @project = FactoryBot.create(:project,
         title: 'Sample project',
         shelfmark: 'Ravenna 384.2339',
         metadata: { date: '18th century' },
@@ -84,16 +84,16 @@ RSpec.describe ControllerHelper::ProjectsHelper, type: :helper do
         manifests: { '12341234': { id: '12341234', url: 'https://digital.library.villanova.edu/Item/vudl:99213/Manifest', name: 'Boston, and Bunker Hill.' } }
       )
       # Attach group with 2 leafs - (group with 2 leafs) - 2 conjoined leafs
-      @testgroup = FactoryGirl.create(:group, project: @project, nestLevel: 1)
-      @upleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
-      @testmidgroup = FactoryGirl.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2)
-      @midleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
-      @botleafs = 2.times.collect { FactoryGirl.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
+      @testgroup = FactoryBot.create(:group, project: @project, nestLevel: 1)
+      @upleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
+      @testmidgroup = FactoryBot.create(:group, project: @project, parentID: @testgroup.id.to_s, nestLevel: 2)
+      @midleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testmidgroup.id.to_s, nestLevel: 2) }
+      @botleafs = 2.times.collect { FactoryBot.create(:leaf, project: @project, parentID: @testgroup.id.to_s, nestLevel: 1) }
       @botleafs[1].update(type: 'Endleaf')
       @project.add_groupIDs([@testgroup.id.to_s, @testmidgroup.id.to_s], 0)
       @testgroup.add_members([@upleafs[0].id.to_s, @upleafs[1].id.to_s, @testmidgroup.id.to_s, @botleafs[0].id.to_s, @botleafs[1].id.to_s], 0)
       @testmidgroup.add_members([@midleafs[0].id.to_s, @midleafs[1].id.to_s], 0)
-      @testterm = FactoryGirl.create(:term, project: @project, title: 'Test Term', taxonomy: 'Ink', description: 'This is a test', uri: 'https://www.test.com/', show: true, objects: {Group: [@testgroup.id.to_s], Leaf: [@botleafs[0].id.to_s], Recto: [@botleafs[0].rectoID], Verso: [@botleafs[0].versoID]})
+      @testterm = FactoryBot.create(:term, project: @project, title: 'Test Term', taxonomy: 'Ink', description: 'This is a test', uri: 'https://www.test.com/', show: true, objects: {Group: [@testgroup.id.to_s], Leaf: [@botleafs[0].id.to_s], Recto: [@botleafs[0].rectoID], Verso: [@botleafs[0].versoID]})
     end
 
     it 'returns the right output for the given sample' do

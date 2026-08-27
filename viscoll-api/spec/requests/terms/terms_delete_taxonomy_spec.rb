@@ -2,20 +2,20 @@ require 'rails_helper'
 
 describe "DELETE /terms/taxonomy", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {user: @user, taxonomies: ["Ink", "Paper"]})
-    @project.terms << FactoryGirl.create(:term, {
+    @project = FactoryBot.create(:project, {user: @user, taxonomies: ["Ink", "Paper"]})
+    @project.terms << FactoryBot.create(:term, {
       project_id: @project.id,
       taxonomy: "Ink",
       description: "Sepia"
     })
-    @project.terms << FactoryGirl.create(:term, {
+    @project.terms << FactoryBot.create(:term, {
       project_id: @project.id,
       taxonomy: "Paper",
       description: "Parchment"
@@ -91,7 +91,7 @@ describe "DELETE /terms/taxonomy", :type => :request do
 
     context 'with unauthorized project' do
       before do
-        @user2 = FactoryGirl.create(:user)
+        @user2 = FactoryBot.create(:user)
         @project.user = @user2
         @project.save
         delete '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}

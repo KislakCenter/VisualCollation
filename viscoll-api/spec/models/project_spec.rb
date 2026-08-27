@@ -19,8 +19,8 @@ RSpec.describe Project, type: :model do
   it { is_expected.to have_many(:terms) }
 
   before(:each) do
-    @user = FactoryGirl.create(:user)
-    @project = FactoryGirl.create(:project, user: @user)
+    @user = FactoryBot.create(:user)
+    @project = FactoryBot.create(:project, user: @user)
   end
 
   describe "Validations" do
@@ -30,14 +30,14 @@ RSpec.describe Project, type: :model do
     end
 
     it "should be unique to the same user" do
-      @duplicated_project = FactoryGirl.create(:project, user: @user)
+      @duplicated_project = FactoryBot.create(:project, user: @user)
       @project.title = @duplicated_project.title
       expect(@project).not_to be_valid
     end
 
     it "can be duplicated for different users" do
-      @user2 = FactoryGirl.create(:user)
-      @duplicated_project = FactoryGirl.create(:project, user: @user2)
+      @user2 = FactoryBot.create(:user)
+      @duplicated_project = FactoryBot.create(:project, user: @user2)
       @project.title = @duplicated_project.title
       expect(@project).to be_valid
     end
@@ -64,9 +64,9 @@ RSpec.describe Project, type: :model do
 
   describe "Image unlinking hook" do
     before do
-      @project1 = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1,2]])
-      @project2 = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1,2]])
-      @image = FactoryGirl.create(:pixel, user: @user, projectIDs: [@project1.id.to_s, @project2.id.to_s], sideIDs: [@project1.sides[0].id.to_s, @project2.sides[0].id.to_s])
+      @project1 = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1,2]])
+      @project2 = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1,2]])
+      @image = FactoryBot.create(:pixel, user: @user, projectIDs: [@project1.id.to_s, @project2.id.to_s], sideIDs: [@project1.sides[0].id.to_s, @project2.sides[0].id.to_s])
     end
 
     it 'should unhook from deleted project and sides' do

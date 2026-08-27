@@ -1,5 +1,4 @@
-include ActionDispatch::TestProcess
-FactoryGirl.define do
+FactoryBot.define do
   factory :side do
   end
 end

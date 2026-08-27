@@ -2,14 +2,14 @@ require 'rails_helper'
 
 describe "POST /terms/taxonomy", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {user: @user, taxonomies: ["Ink"]})
+    @project = FactoryBot.create(:project, {user: @user, taxonomies: ["Ink"]})
     @parameters = {
       "taxonomy": {
         "project_id": @project.id.to_str,
@@ -75,8 +75,8 @@ describe "POST /terms/taxonomy", :type => :request do
     
     context 'with unauthorized project' do
       before do
-        @user2 = FactoryGirl.create(:user)
-        @project2 = FactoryGirl.create(:project, {user: @user2, taxonomies: ["Ink"]})
+        @user2 = FactoryBot.create(:user)
+        @project2 = FactoryBot.create(:project, {user: @user2, taxonomies: ["Ink"]})
         @parameters[:taxonomy][:project_id] = @project2.id.to_str
         post '/terms/taxonomy', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project2.reload

@@ -2,17 +2,17 @@ require 'rails_helper'
 
 describe "PUT /images/link", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project1 = FactoryGirl.create(:project, user: @user)
-    @project2 = FactoryGirl.create(:project, user: @user)
-    @image1 = FactoryGirl.create(:pixel, user: @user)
-    @image2 = FactoryGirl.create(:shiba_inu, user: @user)
+    @project1 = FactoryBot.create(:project, user: @user)
+    @project2 = FactoryBot.create(:project, user: @user)
+    @image1 = FactoryBot.create(:pixel, user: @user)
+    @image2 = FactoryBot.create(:shiba_inu, user: @user)
     @parameters = {
     	"projectIDs": [],
     	"imageIDs": []
@@ -86,7 +86,7 @@ describe "PUT /images/link", :type => :request do
 
     context 'and valid image but unauthorized project' do
       before do
-        @project2.update(user: FactoryGirl.create(:user))
+        @project2.update(user: FactoryBot.create(:user))
         @parameters[:projectIDs] = [@project1.id.to_s, @project2.id.to_s]
         @parameters[:imageIDs] = [@image1.id.to_s, @image2.id.to_s]
         put '/images/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
@@ -130,7 +130,7 @@ describe "PUT /images/link", :type => :request do
 
     context 'and unauthorized image but valid project' do
       before do
-        @image2.update(user: FactoryGirl.create(:user))
+        @image2.update(user: FactoryBot.create(:user))
         @parameters[:projectIDs] = [@project1.id.to_s, @project2.id.to_s]
         @parameters[:imageIDs] = [@image1.id.to_s, @image2.id.to_s]
         put '/images/link', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}

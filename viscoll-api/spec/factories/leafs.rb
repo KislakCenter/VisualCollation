@@ -1,12 +1,11 @@
-include ActionDispatch::TestProcess
-FactoryGirl.define do
+FactoryBot.define do
   factory :leaf do
     association "project_id",  factory: :project
-    material "Paper"
-    type "Original"
+    material { "Paper" }
+    type { "Original" }
 
     factory :parchment do
-      material "Parchment"
+      material { "Parchment" }
     end
 
     after(:create) do |leaf, _evaluator|

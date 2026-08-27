@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "POST /projects/:id/manifests", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
@@ -15,7 +15,7 @@ describe "POST /projects/:id/manifests", :type => :request do
     		"url": "https://iiif.library.utoronto.ca/presentation/v2/hollar:Hollar_a_3000/manifest"
     	}
     }
-    @project = FactoryGirl.create(:project, { user: @user })
+    @project = FactoryBot.create(:project, { user: @user })
   end
 
   after :each do
@@ -48,7 +48,7 @@ describe "POST /projects/:id/manifests", :type => :request do
     end
     context 'with unauthorized project' do
       before do
-        @project.user = FactoryGirl.create(:user)
+        @project.user = FactoryBot.create(:user)
         @project.save
         post "/projects/#{@project.id.to_str}/manifests", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end

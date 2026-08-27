@@ -2,19 +2,19 @@ require 'rails_helper'
 
 describe "PUT /groups", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {
+    @project = FactoryBot.create(:project, {
       user: @user,
       taxonomies: ["Ink"],
     })
     5.times do |n|
-      @project.groups << FactoryGirl.create(:quire, {
+      @project.groups << FactoryBot.create(:quire, {
         project: @project,
       })
     end
@@ -69,7 +69,7 @@ describe "PUT /groups", :type => :request do
 
     context 'and unauthorized group' do
       before do
-        @project.user = FactoryGirl.create(:user)
+        @project.user = FactoryBot.create(:user)
         @project.save
         put '/groups', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload

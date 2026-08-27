@@ -2,10 +2,10 @@ require 'rails_helper'
 
 describe "PUT /projects/:id/filter", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
-    @user2 = FactoryGirl.create(:user, {:password => "user2"})
-    @project1 = FactoryGirl.create(:codex_project, :user => @user, :quire_structure => [[4, 6]])
-    @project2 = FactoryGirl.create(:codex_project, :user => @user2, :quire_structure => [[4, 6]])
+    @user = FactoryBot.create(:user, {:password => "user"})
+    @user2 = FactoryBot.create(:user, {:password => "user2"})
+    @project1 = FactoryBot.create(:codex_project, :user => @user, :quire_structure => [[4, 6]])
+    @project2 = FactoryBot.create(:codex_project, :user => @user2, :quire_structure => [[4, 6]])
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
@@ -608,10 +608,10 @@ describe "PUT /projects/:id/filter", :type => :request do
 
     context 'and term-based queries' do
       before do
-        @term1 = FactoryGirl.create(:term, project_id: @project1.id, attachments: [@project1.groups[1], @project1.leafs[5], @project1.sides[14], @project1.sides[15]], title: "ULTRA WAAHOO")
-        @term2 = FactoryGirl.create(:term, project_id: @project1.id, attachments: [@project1.groups[2], @project1.leafs[7], @project1.sides[2], @project1.sides[3]], title: "XTREME FOOBAR")
-        @term3 = FactoryGirl.create(:term, project_id: @project1.id, attachments: [@project1.groups[3], @project1.leafs[3], @project1.sides[10], @project1.sides[11]], title: "CREEPY WAAHOO")
-        @termbad = FactoryGirl.create(:term, project_id: @project2.id, attachments: [@project2.groups[1], @project2.leafs[5], @project2.sides[14], @project2.sides[15]], title: "ULTRA WAAHOO")
+        @term1 = FactoryBot.create(:term, project_id: @project1.id, attachments: [@project1.groups[1], @project1.leafs[5], @project1.sides[14], @project1.sides[15]], title: "ULTRA WAAHOO")
+        @term2 = FactoryBot.create(:term, project_id: @project1.id, attachments: [@project1.groups[2], @project1.leafs[7], @project1.sides[2], @project1.sides[3]], title: "XTREME FOOBAR")
+        @term3 = FactoryBot.create(:term, project_id: @project1.id, attachments: [@project1.groups[3], @project1.leafs[3], @project1.sides[10], @project1.sides[11]], title: "CREEPY WAAHOO")
+        @termbad = FactoryBot.create(:term, project_id: @project2.id, attachments: [@project2.groups[1], @project2.leafs[5], @project2.sides[14], @project2.sides[15]], title: "ULTRA WAAHOO")
       end
 
       context "equals one" do

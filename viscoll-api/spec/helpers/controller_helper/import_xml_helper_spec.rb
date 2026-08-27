@@ -18,7 +18,7 @@ RSpec.describe ControllerHelper::StubbedXmlImportHelper, type: :helper do
     end
 
     it 'should import properly' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       expect{ handleXMLImport(xml_import_data) }.to change{Project.count}.by(1)
       project = Project.last
       expect(project.title).to eq 'Sample project'
@@ -32,8 +32,8 @@ RSpec.describe ControllerHelper::StubbedXmlImportHelper, type: :helper do
     end
     
     it 'should avoid overwriting a project of the same name' do
-      user = FactoryGirl.create(:user)
-      existing_project = FactoryGirl.create(:project, title: 'Ultra waahoo project is ultra waahoo')
+      user = FactoryBot.create(:user)
+      existing_project = FactoryBot.create(:project, title: 'Ultra waahoo project is ultra waahoo')
       duplicated_data = xml_import_data
       duplicated_data.at_css('viscoll manuscript title').content = existing_project.title
       expect{ handleXMLImport(duplicated_data) }.to change{Project.count}.by(1)

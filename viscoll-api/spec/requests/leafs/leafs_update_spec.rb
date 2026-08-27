@@ -2,17 +2,17 @@ require 'rails_helper'
 
 describe "PUT /leafs/:id", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, user: @user)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project, user: @user)
+    @group = FactoryBot.create(:group, project: @project)
     @project.add_groupIDs([@group.id.to_s], 0)
-    @leafs = 3.times.collect { FactoryGirl.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s) }
+    @leafs = 3.times.collect { FactoryBot.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s) }
     @group.add_members(@leafs.collect { |leaf| leaf.id.to_s }, 0)
     @parameters = {
       "leaf": {
@@ -74,7 +74,7 @@ describe "PUT /leafs/:id", :type => :request do
     
     context 'and an unauthorized project' do
       before do
-        @user2 = FactoryGirl.create(:user)
+        @user2 = FactoryBot.create(:user)
         @project.update(user: @user2)
         put "/leafs/#{@leafs[0].id.to_s}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload

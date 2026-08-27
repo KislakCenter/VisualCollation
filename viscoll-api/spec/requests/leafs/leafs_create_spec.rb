@@ -2,15 +2,15 @@ require 'rails_helper'
 
 describe "POST /leafs", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, user: @user)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project, user: @user)
+    @group = FactoryBot.create(:group, project: @project)
     @project.add_groupIDs([@group.id.to_s], 0)
     @parameters = {
       "leaf": {
@@ -87,7 +87,7 @@ describe "POST /leafs", :type => :request do
     
     context 'and an unauthorized project' do
       before do
-        @user2 = FactoryGirl.create(:user)
+        @user2 = FactoryBot.create(:user)
         @project.update(user: @user2)
         post '/leafs', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload

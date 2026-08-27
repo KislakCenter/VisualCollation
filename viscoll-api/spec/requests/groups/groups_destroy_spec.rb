@@ -2,20 +2,20 @@ require 'rails_helper'
 
 describe "DELETE /groups/id", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {
+    @project = FactoryBot.create(:project, {
       user: @user,
       taxonomies: ["Ink"],
     })
     @groupIDs = []
     5.times do |n|
-      group = FactoryGirl.create(:quire, { project: @project })
+      group = FactoryBot.create(:quire, { project: @project })
       @groupIDs.push(group.id.to_s)
     end
     @group = @project.groups.find(@groupIDs[3])
@@ -62,7 +62,7 @@ describe "DELETE /groups/id", :type => :request do
 
     context 'and unauthorized group' do
       before do
-        @project.user = FactoryGirl.create(:user)
+        @project.user = FactoryBot.create(:user)
         @project.save
         delete "/groups/#{@group.id.to_str}", params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @body = JSON.parse(response.body)

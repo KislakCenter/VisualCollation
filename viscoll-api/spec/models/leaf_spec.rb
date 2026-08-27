@@ -19,9 +19,9 @@ RSpec.describe Leaf, type: :model do
   it { is_expected.to have_and_belong_to_many(:terms) }
 
   before(:each) do
-    @project = FactoryGirl.create(:project)
-    @leaf = FactoryGirl.create(:leaf, project: @project)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project)
+    @leaf = FactoryBot.create(:leaf, project: @project)
+    @group = FactoryBot.create(:group, project: @project)
     @group.add_members([@leaf.id.to_s], 0)
     @leaf.parentID = @group.id
     @leaf.save
@@ -39,7 +39,7 @@ RSpec.describe Leaf, type: :model do
   end
 
   it "should be able to unlink itself from a group" do
-    @group = FactoryGirl.create(:group, project: @project)
+    @group = FactoryBot.create(:group, project: @project)
     @group.add_members([@leaf.id.to_s], 0)
     @leaf.parentID = @group.id
     @leaf.save
@@ -51,7 +51,7 @@ RSpec.describe Leaf, type: :model do
 
   describe "Destruction" do
     it "should unlink its terms" do
-      subterm = FactoryGirl.create(:term, project: @project, objects: {Group: [], Leaf: [@leaf.id], Recto: [], Verso: []})
+      subterm = FactoryBot.create(:term, project: @project, objects: {Group: [], Leaf: [@leaf.id], Recto: [], Verso: []})
       @leaf.terms << subterm
       @leaf.save
       @leaf.destroy

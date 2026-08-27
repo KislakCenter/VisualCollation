@@ -2,14 +2,14 @@ require 'rails_helper'
 
 describe "POST /images", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:codex_project, user: @user, quire_structure: [[1, 2]])
+    @project = FactoryBot.create(:codex_project, user: @user, quire_structure: [[1, 2]])
     @parameters = {
       "projectID": @project.id.to_s,
       "images": [
@@ -87,7 +87,7 @@ describe "POST /images", :type => :request do
 
     context 'and unauthorized project' do
       before do
-        @project.update(user: FactoryGirl.create(:user))
+        @project.update(user: FactoryBot.create(:user))
         post '/images', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
       end
 

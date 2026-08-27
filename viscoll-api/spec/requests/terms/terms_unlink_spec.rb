@@ -2,17 +2,17 @@ require 'rails_helper'
 
 describe "PUT /terms/id/unlink", :'type' => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
   end
 
   before :each do
-    @project = FactoryGirl.create(:project, {user: @user, taxonomies: ["Ink"]})
-    @defaultGroup = FactoryGirl.create(:quire, project: @project)
+    @project = FactoryBot.create(:project, {user: @user, taxonomies: ["Ink"]})
+    @defaultGroup = FactoryBot.create(:quire, project: @project)
     @project.add_groupIDs([@defaultGroup.id.to_s], 0)
-    @term = FactoryGirl.create(:term, {
+    @term = FactoryBot.create(:term, {
       project: @project,
       title: "some title for term",
       taxonomy: "Ink",
@@ -31,7 +31,7 @@ describe "PUT /terms/id/unlink", :'type' => :request do
   context 'with valid authorization' do
     context 'and correct group target' do
       before do
-        @group = FactoryGirl.create(:group, {project: @project, terms: [@term] })
+        @group = FactoryBot.create(:group, {project: @project, terms: [@term] })
         @project.add_groupIDs([@group.id.to_s], 0)
         @parameters = {
           objects: [
@@ -55,7 +55,7 @@ describe "PUT /terms/id/unlink", :'type' => :request do
     end
     context 'and correct leaf target' do
       before do
-        @leaf = FactoryGirl.create(:leaf, {project: @project, terms: [@term] })
+        @leaf = FactoryBot.create(:leaf, {project: @project, terms: [@term] })
         @defaultGroup.add_members([@leaf.id.to_s], 1)
         @parameters = {
           objects: [
@@ -79,7 +79,7 @@ describe "PUT /terms/id/unlink", :'type' => :request do
     end
     context 'and correct side target' do
       before do
-        @leaf = FactoryGirl.create(:leaf, {project: @project, terms: [@term] })
+        @leaf = FactoryBot.create(:leaf, {project: @project, terms: [@term] })
         @defaultGroup.add_members([@leaf.id.to_s], 1)
         @side = @project.sides.find(@leaf.rectoID)
         @side.terms << @term
@@ -106,12 +106,12 @@ describe "PUT /terms/id/unlink", :'type' => :request do
     end
     context 'and a project belonging to another user' do
       before :each do
-        @user2 = FactoryGirl.create(:user)
-        @project2 = FactoryGirl.create(:project, {user: @user2, taxonomies: ["Ink"] })
+        @user2 = FactoryBot.create(:user)
+        @project2 = FactoryBot.create(:project, {user: @user2, taxonomies: ["Ink"] })
       end
       context 'and group target' do
         before do
-          @group2 = FactoryGirl.create(:group, { project: @project2 })
+          @group2 = FactoryBot.create(:group, { project: @project2 })
           @parameters2 = {
             objects: [
               {
@@ -134,7 +134,7 @@ describe "PUT /terms/id/unlink", :'type' => :request do
       end
       context 'and a leaf target' do
         before do
-          @leaf2 = FactoryGirl.create(:leaf, { project: @project2 })
+          @leaf2 = FactoryBot.create(:leaf, { project: @project2 })
           @defaultGroup.add_members([@leaf2.id.to_s], 1)
           @parameters2 = {
             objects: [
@@ -158,7 +158,7 @@ describe "PUT /terms/id/unlink", :'type' => :request do
       end
       context 'and a side target' do
         before do
-          @side2 = FactoryGirl.create(:side, { project: @project2 })
+          @side2 = FactoryBot.create(:side, { project: @project2 })
           @parameters2 = {
             objects: [
               {
@@ -207,7 +207,7 @@ describe "PUT /terms/id/unlink", :'type' => :request do
     end
     context 'and missing target' do
       before do
-        @group = FactoryGirl.create(:group, { project: @project })
+        @group = FactoryBot.create(:group, { project: @project })
         @parameters = {
           objects: [
             {
@@ -232,7 +232,7 @@ describe "PUT /terms/id/unlink", :'type' => :request do
     context 'and uncaught exception' do
       before do
         allow_any_instance_of(Term).to receive(:save).and_raise(StandardError)
-        @group = FactoryGirl.create(:group, { project: @project })
+        @group = FactoryBot.create(:group, { project: @project })
         @parameters = {
           objects: [
             {

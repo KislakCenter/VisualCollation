@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "DELETE /leafs", :type => :request do
   before do
-    @user = FactoryGirl.create(:user, {:password => "user"})
+    @user = FactoryBot.create(:user, {:password => "user"})
     put "/confirmations/#{@user.confirmation_token}"
     post '/session', params: {:session => { :email => @user.email, :password => "user" }}
     @authToken = JSON.parse(response.body)['session']['jwt']
@@ -10,10 +10,10 @@ describe "DELETE /leafs", :type => :request do
 
   before :each do
     leaf_count = 4
-    @project = FactoryGirl.create(:project, user: @user)
-    @group = FactoryGirl.create(:group, project: @project)
+    @project = FactoryBot.create(:project, user: @user)
+    @group = FactoryBot.create(:group, project: @project)
     @project.add_groupIDs([@group.id.to_s], 0)
-    @leafs = leaf_count.times.collect { FactoryGirl.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s) }
+    @leafs = leaf_count.times.collect { FactoryBot.create(:leaf, project: @project, material: 'Parchment', parentID: @group.id.to_s) }
     leaf_count.times.each do |i|
       params = {
         conjoined_to: @leafs[-i-1].id.to_s
@@ -99,7 +99,7 @@ describe "DELETE /leafs", :type => :request do
 
     context 'and an unauthorized page' do
       before do
-        @user2 = FactoryGirl.create(:user)
+        @user2 = FactoryBot.create(:user)
         @project.update(user: @user2)
         delete '/leafs', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
         @project.reload
