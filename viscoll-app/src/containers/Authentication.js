@@ -83,7 +83,6 @@ class Landing extends Component {
   }
 
   componentDidMount() {
-    const containsParams = this.props.location.search.split('=', 1);
     const params = new URLSearchParams(this.props.location.search);
 
     if (params.size > 0) {
