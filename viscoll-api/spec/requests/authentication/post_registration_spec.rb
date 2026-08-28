@@ -24,6 +24,10 @@ describe "POST /registration", :type => :request do
     it 'creates an User object in the database' do
       expect(User.count).to eq(1)
     end
+
+    it 'sends confirmation email to administrators for approval' do
+      expect(ActionMailer::Base.deliveries.last.to).to contain_exactly(Rails.application.secrets.admin_email)
+    end
   end
 
   context 'with invalid params' do

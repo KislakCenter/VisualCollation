@@ -1,27 +1,19 @@
 class SessionsController < RailsJwtAuth::SessionsController
 
   def create
-    user = find_user
+    se = RailsJwtAuth::Session.new(session_create_params)
 
-    if !user
-      render_422 session: [{error: :invalid_session}]
-    elsif user.respond_to?('confirmed?') && !user.confirmed?
-      render_422 session: [{error: :unconfirmed}]
-    elsif user.authentication?(session_create_params[:password])
+    if se.generate!(request)
+      @user = se.user
+      @userToken = se.jwt
       @userProjects = []
       begin
-        @userProjects = user.projects
+        @userProjects = @user.projects
       rescue
       end
-      @userToken = generate_jwt(user)
-      @user = user
-      render :index, status: :ok, location: {
-        userProjects: @userProjects,
-        userToken: @userToken,
-        user: @user
-      }
+      render :index, status: :ok
     else
-      render_422 session: [user.unauthenticated_error]
+      render_422 se.errors.details
     end
   end
 end

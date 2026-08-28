@@ -70,6 +70,11 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
   end
 
+  # Clear out any email sent in between tests.
+  config.before(:each) do
+    ActionMailer::Base.deliveries.clear
+  end
+
   # start the transaction strategy as examples are run
   config.around(:each) do |example|
     DatabaseCleaner.cleaning do

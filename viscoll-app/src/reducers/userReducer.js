@@ -63,7 +63,12 @@ export default function userReducer(state=initialState, action) {
         ...state,
         errors: {
           ...state.errors,
-          update: {...state.errors.update, ...action.payload}
+          update: {
+            ...state.errors.update,
+            password: action.payload.error?.password?.at(0)?.error || "",
+            current_password: action.payload.error?.current_password?.at(0)?.error || "",
+            email: action.payload.error?.email?.at(0)?.error || ""
+          },
         }
       }
       break;
@@ -86,7 +91,7 @@ export default function userReducer(state=initialState, action) {
       break;
     case "CONFIRM_FAILED":
       errorMessage = "Error confirming your account!";
-      if (action.payload.errors?.confirmation_token?.length>0) {
+      if (action.payload?.errors?.confirmation_token?.length>0) {
         errorMessage = "Confirmation token " + action.payload.errors.confirmation_token[0];
       }
       state = {

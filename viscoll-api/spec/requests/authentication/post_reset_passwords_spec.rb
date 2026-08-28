@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-describe "POST /password", :type => :request do
+describe "POST /reset_passwords", :type => :request do
   context 'with valid params' do
     before do
       @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
       @user.confirmation_token = nil
       @user.confirmed_at = "2017-07-12T16:08:25.278Z"
       @user.save
-      post '/passwords', params: {:password => {:email => "user@mail.com"}}
+      post '/reset_passwords', params: { reset_password: { email: "user@mail.com" } }
     end
 
     it 'returns a successful no_content response' do
@@ -24,7 +24,7 @@ describe "POST /password", :type => :request do
     context 'and unconfirmed user' do 
       before do
         @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
-        post '/passwords', params: {:password => {:email => "user@mail.com"}}
+        post '/reset_passwords', params: { reset_password: { email: "user@mail.com" } }
       end
 
       it 'returns an unprocessable_entity status' do
@@ -43,15 +43,11 @@ describe "POST /password", :type => :request do
 
     context 'and no valid user' do
       before do
-        post '/passwords', params: {:password => {:email => "user@mail.com"}}
+        post '/reset_passwords', params: { reset_password: { email: "user@mail.com" } }
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
-      it 'returns an appropriate error message' do
-        expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('not_found')
+      it 'returns 204 to avoid exposing which emails are present' do
+        expect(response).to have_http_status(:no_content)
       end
     end
   end

@@ -1,14 +1,12 @@
 class ConfirmationsController < RailsJwtAuth::ConfirmationsController
   def update
-    return render_404 unless
-      params[:id] &&
-      (user = RailsJwtAuth.model.where(confirmation_token: params[:id]).first)
+    return render_404 unless @user
 
-    if user.confirm!
-      AccountApprovalMailer.sendApprovalStatus(user).deliver_now
+    if @user.confirm
+      AccountApprovalMailer.sendApprovalStatus(@user).deliver_now
       render_204
     else
-      render_422(user.errors.details)
+      render_422(@user.errors.details)
     end
   end
 end

@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   resource :session, controller: 'sessions', only: [:create, :destroy], defaults: {format: :json}
   resource :registration, controller: 'registrations', only: [:create], defaults: {format: :json}
   resources :confirmations, controller: 'confirmations', only: [:create, :update]
-  resources :passwords, controller: 'rails_jwt_auth/passwords', only: [:create, :update]
+  resources :reset_passwords, controller: 'rails_jwt_auth/reset_passwords', only: [:create, :update]
 
   # USER ENDPOINTS
   resources :users, defaults: {format: :json}, only: [:show, :update, :destroy]
