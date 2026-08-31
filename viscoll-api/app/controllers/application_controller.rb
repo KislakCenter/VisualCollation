@@ -1,12 +1,7 @@
 class ApplicationController < ActionController::API
     include RailsJwtAuth::AuthenticableHelper
 
-    rescue_from Mongoid::Errors::DocumentNotFound do |e|
-        Honeybadger.notify(e)
-        Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
-        render json: { errors: e.message }, status: :not_found
-    end
-
+    # Catching all unexpected errors, logging them and rendering json error for user.
     rescue_from StandardError do |e|
         Honeybadger.notify(e)
         Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
