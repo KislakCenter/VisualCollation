@@ -8,6 +8,8 @@ class ApplicationController < ActionController::API
     end
 
     rescue_from StandardError do |e|
+        request.session # initialize session object to avoid error see: https://github.com/rails/rails/issues/43922
+        # and https://github.com/sul-dlss-deprecated/dor_indexing_app/pull/769
         Honeybadger.notify(e)
         Rails.logger.error(e.message + "\n" + e.backtrace.join("\n"))
         render json: { errors: e.message }, status: :internal_server_error
