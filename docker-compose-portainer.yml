@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   app:
     image: "gitlab.library.upenn.edu/chc/viscoll/visualcollation/vceditor_web:${RELEASE_TAG}"
