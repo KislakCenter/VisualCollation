@@ -81,9 +81,9 @@ export function resetPasswordRequest(email) {
     types: ['NO_LOADING','REQUEST_RESET_SUCCESS','REQUEST_RESET_FAILED'],
     payload: {
       request : {
-        url: `/passwords`,
+        url: `/reset_passwords`,
         method: 'post',
-        data: {password: { email }},
+        data: { reset_password: { email } },
         successMessage: "You have successfully requested to reset password" ,
         errorMessage: "Ooops! Something went wrong"
       }
@@ -96,9 +96,9 @@ export function resetPassword(reset_password_token, password) {
     types: ['NO_LOADING','RESET_SUCCESS','RESET_FAILED'],
     payload: {
       request : {
-        url: `/passwords/${reset_password_token}`,
+        url: `/reset_passwords/${reset_password_token}`,
         method: 'put',
-        data: {password},
+        data: { reset_password: password },
         successMessage: "You have successfully reset your password" ,
         errorMessage: "Ooops! Something went wrong"
       }

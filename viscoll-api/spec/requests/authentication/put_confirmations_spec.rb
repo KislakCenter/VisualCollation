@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "PUT /confirmation", :type => :request do
+describe "PUT /confirmations", :type => :request do
   context 'with invalid token' do
     before do
       put '/confirmations/invalidToken'
@@ -23,6 +23,10 @@ describe "PUT /confirmation", :type => :request do
 
     it 'clears the confirmation token in user record' do
       expect(User.find(@user.id).confirmation_token).to eq(nil)
+    end
+
+    it 'send account approval email to user' do
+      expect(ActionMailer::Base.deliveries.last.to).to contain_exactly(@user.email)
     end
   end
 end
