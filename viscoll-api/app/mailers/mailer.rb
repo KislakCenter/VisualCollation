@@ -18,7 +18,7 @@ if defined?(ActionMailer)
       )
 
       # Sending confirmation email to administrator instead of User, so accounts can be confirmed.
-      mail(to: Rails.application.secrets.admin_email, subject: @subject)
+      mail(to: Settings.admin_email, subject: @subject)
     end
 
     def reset_password_instructions
