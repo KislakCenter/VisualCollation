@@ -1,16 +1,40 @@
 include:
-  - project: "devops/gitlab/ci-templates/docker"
-    ref: "1.0.0"
-    file:
-      - ".build_docker_image.yml"
-      - ".push_docker_image.yml"
-      - ".remove_docker_image.yml"
-  - project: "devops/gitlab/ci-templates/sast"
-    ref: "master"
-    file:
-      - ".shiftleft_container_scanning.yml"
-      - ".trivy_container_scanning.yml"
-
+  - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_build@~latest
+    inputs:
+      docker_build_context: "./"
+      dockerfile_path: "./"
+      dockerfile_filename: "Dockerfile"
+      stage: "build_web"
+      job_suffix: "_web"
+      matrix:
+        - RUNNER: build
+          DOCKER_BUILD_PLATFORM: "linux/amd64"
+    variables:
+      CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
+  - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_build@~latest
+    inputs:
+      docker_build_context: "viscoll-xproc/"
+      dockerfile_path: "viscoll-xproc/"
+      dockerfile_filename: "Dockerfile"
+      stage: "build_xproc"      
+      job_suffix: "_xproc"
+      matrix:
+      - RUNNER: build
+        DOCKER_BUILD_PLATFORM: "linux/amd64"
+    variables:
+      CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
+  - component: $CI_SERVER_FQDN/devops/gitlab/components/sast/trivy@~latest
+    inputs:
+      docker_tag_to_scan: "${CI_COMMIT_SHA}"
+      job_image_tag: "29-dind"
+      needs:
+        - "amend_manifest_xproc"
+      stage: "test"
+  - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_finalize@~latest
+    inputs:
+      needs_copy:
+        - trivy_scan
+ 
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_IID
@@ -20,118 +44,9 @@ workflow:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'development'
 
 stages:
-  - sast:project
-  - build:web
-  - build:xproc
-  - sast:web
-  - sast:xproc
-  - push:web
-  - push:xproc
-  - remove:web
-  - remove:xproc
+  - build_web
+  - build_xproc
+  - test
+  - finalize
 
-shiftleft_project_scanning:
-  stage: sast:project
-  extends:
-    - .shiftleft_container_scanning
-  tags:
-    - build
-  allow_failure: true
 
-build_web_image:
-  stage: build:web
-  extends:
-    - .build_docker_image
-  needs:
-    - shiftleft_project_scanning
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
-  tags:
-    - build
-
-build_xproc_image:
-  stage: build:xproc
-  extends:
-    - .build_docker_image
-  needs:
-    - shiftleft_project_scanning
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
-    DOCKER_BUILD_CONTEXT: "viscoll-xproc/"
-    DOCKERFILE_PATH: "viscoll-xproc/"
-  tags:
-    - build
-
-trivy_web_container_scanning:
-  stage: sast:web
-  extends:
-    - .trivy_container_scanning
-  needs:
-    - build_web_image
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
-  tags:
-    - build
-  allow_failure: true
-
-trivy_xproc_container_scanning:
-  stage: sast:xproc
-  extends:
-    - .trivy_container_scanning
-  needs:
-    - build_xproc_image
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
-  tags:
-    - build
-  allow_failure: true
-
-push_web_image_to_registry:
-  stage: push:web
-  extends:
-    - .push_docker_image
-  needs:
-    - trivy_web_container_scanning
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
-    DOCKER_IMAGE_NAME: "vceditor_web"
-  tags:
-    - build
-
-push_xproc_image_to_registry:
-  stage: push:xproc
-  extends:
-    - .push_docker_image
-  needs:
-    - trivy_xproc_container_scanning
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
-    DOCKER_IMAGE_NAME: "vceditor_xproc"
-  tags:
-    - build
-
-remove_web_image:
-  stage: remove:web
-  extends:
-    - .remove_docker_image
-  needs:
-    - push_web_image_to_registry
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
-  rules:
-    - when: always
-  tags:
-    - build
-
-remove_xproc_image:
-  stage: remove:xproc
-  extends:
-    - .remove_docker_image
-  needs:
-    - push_xproc_image_to_registry
-  variables:
-    CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
-  rules:
-    - when: always
-  tags:
-    - build
