@@ -8,16 +8,19 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1
   def update
-    if user_params_with_password[:password] != nil
-      action = current_user.update_with_password(user_params_with_password)
+    if update_email_params.include?(:email)
+      action = current_user.update_email(update_email_params)
+    elsif update_password_params.include?(:password)
+      action = current_user.update_password(update_password_params)
     else
       action = current_user.update_attributes(user_params)
     end
+
     if action
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      render json: { error: "User update failed: #{current_user.errors.full_messages.to_sentence}"} , status: :unprocessable_entity
+      render json: { error: current_user.errors.details }, status: :unprocessable_entity
     end
   end
 
@@ -44,11 +47,15 @@ class UsersController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def user_params
-    params.require(:user).permit(:email, :name)
+    params.require(:user).permit(:name)
+  end
+
+  def update_email_params
+    params.require(:user).permit(:email, :password)
   end
 
   # Only allow a trusted parameter "white list" through.
-  def user_params_with_password
-    params.require(:user).permit(:email, :name, :current_password, :password)
+  def update_password_params
+    params.require(:user).permit(:current_password, :password)
   end
 end

@@ -16,6 +16,7 @@ class UserProfileForm extends React.Component {
     this.state = {
       name: props.name,
       email: props.email,
+      emailConfirmPassword: "",
       emailMessagePending: false,
       emailMessage: false,
       currentPassword: "",
@@ -24,6 +25,7 @@ class UserProfileForm extends React.Component {
       errors: {
         name: "",
         email: "",
+        emailConfirmPassword: "",
         newPassword: "",
         newPasswordConfirm: "",
         currentPassword: ""
@@ -41,7 +43,7 @@ class UserProfileForm extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ 
+    this.setState({
       name: nextProps.name,
       errors: {
         ...this.state.errors,
@@ -101,6 +103,12 @@ class UserProfileForm extends React.Component {
       } else {
         errors.email = "";
       }
+
+      if (!this.state.emailConfirmPassword) {
+        errors.emailConfirmPassword = "Enter password to confirm change";
+      } else {
+        errors.emailConfirmPassword = "";
+      }
     } 
     return errors;
   }
@@ -113,7 +121,7 @@ class UserProfileForm extends React.Component {
    * Return true if any input fields have been changed and not saved
    */
   isEditing = () => {
-    return (this.state.editing.name || this.state.editing.email || this.state.editing.currentPassword || this.state.editing.newPassword || this.state.editing.newPasswordConfirm);
+    return (this.state.editing.name || this.state.editing.email || this.state.editing.emailConfirmPassword || this.state.editing.currentPassword || this.state.editing.newPassword || this.state.editing.newPasswordConfirm);
   }
 
   onInputChange = (newValue, type) => {
@@ -138,6 +146,7 @@ class UserProfileForm extends React.Component {
       this.setState({
         name: this.props.name,
         email: this.props.email,
+        emailConfirmPassword: "",
         currentPassword: "",
         newPassword: "",
         newPasswordConfirm: "",
@@ -151,6 +160,7 @@ class UserProfileForm extends React.Component {
         editing: {
           name: false,
           email: false,
+          emailConfirmPassword: "",
           newPassword: false,
           newPasswordConfirm: false,
           currentPassword: false,
@@ -246,11 +256,18 @@ class UserProfileForm extends React.Component {
         current_password: this.state.currentPassword,
         password: this.state.newPassword
       }};
+    } else if (type === 'email') {
+      updatedUser = { user: {
+        email: this.state.email,
+        password: this.state.emailConfirmPassword
+      }};
     }
     this.props.handleUserProfileUpdate(updatedUser);
     let types = {};
     if (type==="password") {
       types = {currentPassword: false, newPassword: false, newPasswordConfirm: false};
+    } else if (type === 'email') {
+      types = {email: false, emailConfirmPassword: false};
     } else {
       types = {[type]: false};
     }
@@ -344,6 +361,16 @@ class UserProfileForm extends React.Component {
             value={this.state.email}
             fullWidth
           />
+          <TextField
+              onChange={(e, v)=>this.onInputChange(v, "emailConfirmPassword")}
+              name="emailConfirmPassword"
+              floatingLabelText="Confirm Password"
+              floatingLabelStyle={{color:"#6e6e6e"}}
+              errorText={this.state.errors.emailConfirmPassword}
+              type="password"
+              value={this.state.emailConfirmPassword}
+              fullWidth
+          />
           {this.submitButtons("email")}
         </form>
       </div>
@@ -353,7 +380,7 @@ class UserProfileForm extends React.Component {
       <div>
         <form onSubmit={(e)=>this.handleUserUpdate(e, "password")}>
           <TextField 
-            onChange={(e, v)=>this.onInputChange(v, "currentPassword")} 
+            onChange={(e, v)=>this.onInputChange(v, "currentPassword")}
             name="currentPassword" 
             floatingLabelText="Current Password" 
             {...floatFieldLight}
@@ -402,6 +429,7 @@ class UserProfileForm extends React.Component {
           
           {nameField}
           <br/>
+          <h3 style={{color:"#4e4e4e",marginBottom:0,textAlign:"left"}}>Update your email</h3>
           {emailField}
           <br/>
           <h3 style={{color:"#4e4e4e",marginBottom:0,textAlign:"left"}}>Update your password</h3>

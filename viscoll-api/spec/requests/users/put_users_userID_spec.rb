@@ -12,7 +12,8 @@ describe "PUT /users/userID", :type => :request do
     context 'and valid params' do
       context 'update email address' do
         before do
-          put '/users/'+@user.id.to_s, params: {:user => {:email => "newUser@mail.com"}}, headers: {'Authorization' => @authToken}
+          put "/users/#{@user.id}", params: { user: { email: 'newUser@mail.com', password: 'user' } },
+              headers: { 'Authorization' => @authToken }
         end
 
         it 'returns a successful ok response' do
@@ -47,27 +48,6 @@ describe "PUT /users/userID", :type => :request do
         end
       end
 
-      context 'update email and name' do
-        before do
-          put '/users/'+@user.id.to_s, params: {:user => {:email => "newUser@mail.com", :name => "newUser"}}, headers: {'Authorization' => @authToken}
-        end
-
-        it 'returns a successful ok response' do
-          expect(response).to have_http_status(:ok)
-        end
-
-        it 'returns the updated object in the response with new name and old email' do
-          expect(JSON.parse(response.body)['name']).to eq("newUser")
-          expect(JSON.parse(response.body)['email']).to eq("user@mail.com")
-        end
-
-        it 'updates the field for name and email confirmation in user record' do
-          expect(User.find(@user.id).name).to eq("newUser")
-          expect(User.find(@user.id).confirmation_token).not_to eq(nil)
-          expect(User.find(@user.id).unconfirmed_email).to eq("newUser@mail.com")
-        end
-      end
-
       context 'update password' do
         before do
           put '/users/'+@user.id.to_s, params: {:user => {:current_password => "user", :password => "newUser"}}, headers: {'Authorization' => @authToken}
@@ -86,39 +66,6 @@ describe "PUT /users/userID", :type => :request do
           expect(JSON.parse(response.body)['session']['jwt']).not_to be_empty
         end
       end
-
-      context 'update email, name and password' do
-        before do
-          put '/users/'+@user.id.to_s, params: {:user => {:email => "newUser@mail.com", :name => "newUser", :current_password => "user", :password => "newUser"}}, headers: {'Authorization' => @authToken}
-        end
-
-        it 'returns a successful ok response' do
-          expect(response).to have_http_status(:ok)
-        end
-
-        it 'returns the updated object in the response' do
-          expect(JSON.parse(response.body)['email']).to eq("user@mail.com")
-          expect(JSON.parse(response.body)['name']).to eq("newUser")
-        end
-
-        it 'updates the field for password in user record' do
-          post '/session', params: {:session => { :email=> "user@mail.com", :password => "newUser" }}
-          expect(JSON.parse(response.body)['session']['jwt']).not_to be_empty
-        end
-
-        it 'creates fields for email confirmation in user record' do
-          expect(User.find(@user.id).confirmation_token).not_to eq(nil)
-          expect(User.find(@user.id).unconfirmed_email).to eq("newUser@mail.com")
-        end
-
-        it 'updates the field for name and email confirmation in user record' do
-          expect(User.find(@user.id).name).to eq("newUser")
-          expect(User.find(@user.id).confirmation_token).not_to eq(nil)
-          expect(User.find(@user.id).unconfirmed_email).to eq("newUser@mail.com")
-        end
-      end
-
-
     end
 
     context 'and invalid params' do
@@ -146,7 +93,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include "Current password invalid"
+          expect(JSON.parse(response.body)['error']['current_password'].pluck('error')).to include "invalid"
         end
       end
 
@@ -154,7 +101,8 @@ describe "PUT /users/userID", :type => :request do
         before do
           @user2 = User.create(:name => "newUser", :email => "newUser@mail.com", :password => "newUser")
           put "/confirmations/#{@user2.confirmation_token}"
-          put '/users/'+@user.id.to_s, params: {:user => {:email => "newUser@mail.com"}}, headers: {'Authorization' => @authToken}
+          put "/users/#{@user.id}", params: { user: { email: "newUser@mail.com", password: 'user' } },
+                                    headers: { 'Authorization' => @authToken }
         end
 
         it 'returns an unprocessable_entity status' do
@@ -162,13 +110,14 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include "Email has already been taken"
+          expect(JSON.parse(response.body)['error']['email'].pluck('error')).to include "taken"
         end
       end
 
       context 'with invalid email address' do
         before do
-          put '/users/'+@user.id.to_s, params: {:user => {:email => "invalidEmail"}}, headers: {'Authorization' => @authToken}
+          put "/users/#{@user.id}", params: { user: { email: "invalidEmail", password: 'user' } },
+                                    headers: {'Authorization' => @authToken}
         end
 
         it 'returns an unprocessable_entity status' do
@@ -176,7 +125,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include "Email is invalid"
+          expect(JSON.parse(response.body)['error']['email'].pluck('error')).to include "invalid"
         end
       end
 
@@ -190,7 +139,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include 'Current password blank'
+          expect(JSON.parse(response.body)['error']['current_password'].pluck('error')).to include 'blank'
         end
       end
 
@@ -204,7 +153,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include 'Password blank'
+          expect(JSON.parse(response.body)['error']['password'].pluck('error')).to include 'blank'
         end
       end
     end
