@@ -26,7 +26,7 @@ describe "POST /registration", :type => :request do
     end
 
     it 'sends confirmation email to administrators for approval' do
-      expect(ActionMailer::Base.deliveries.last.to).to contain_exactly(Rails.application.secrets.admin_email)
+      expect(ActionMailer::Base.deliveries.last.to).to contain_exactly(Settings.admin_email)
     end
   end
 
