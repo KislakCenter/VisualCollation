@@ -1,0 +1,3 @@
+#  admin_email: 'smtp://localhost:1025'
+mailer_default_from: 'test@vceditor.library.upenn.edu'
+api_url: 'http://localhost:3001'
