@@ -83,13 +83,14 @@ class Landing extends Component {
   }
 
   componentDidMount() {
-    const token = this.props.location.search.split('=')[1];
-    if (token) {
-      if (this.props.location.pathname.includes('confirmation')) {
-        this.props.confirmUser(token);
+    const params = new URLSearchParams(this.props.location.search);
+
+    if (params.size > 0) {
+      if (params.has('confirmation_token')) {
+        this.props.confirmUser(params.get('confirmation_token'));
         if (this.props.user.authenticated) this.props.logoutUser();
-      } else if (this.props.location.pathname.includes('password')) {
-        this.setState({ reset: true, reset_token: token });
+      } else if (params.has('reset_password_token')) {
+        this.setState({ reset: true, reset_token: params.get('reset_password_token') });
       }
     } else {
       if (this.props.user.authenticated) {

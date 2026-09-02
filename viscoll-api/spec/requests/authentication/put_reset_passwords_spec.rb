@@ -1,18 +1,19 @@
 require 'rails_helper'
 
-describe "PUT /password", :type => :request do
+describe "PUT /reset_passwords", :type => :request do
   before do
     @user = User.create(:name => "user", :email => "user@mail.com", :password => "user")
     @user.confirmation_token = nil
     @user.confirmed_at = "2017-07-12T16:08:25.278Z"
     @user.save
-    post "/passwords", params: {:password => {:email => "user@mail.com"}}
+    post "/reset_passwords", params: {reset_password: { email: "user@mail.com" } }
     @user = User.find(@user.id)
   end
 
   context 'with valid params' do
     before do
-      put "/passwords/#{@user.reset_password_token}", params: { password: {password: "newUser", password_confirmation: "newUser" } }
+      put "/reset_passwords/#{@user.reset_password_token}",
+          params: { reset_password: { password: "newUser", password_confirmation: "newUser" } }
     end
 
     it 'returns a successful no_content response' do
@@ -35,7 +36,8 @@ describe "PUT /password", :type => :request do
       before do
         @user.reset_password_sent_at = "2017-07-12T16:08:30.278Z"
         @user.save
-        put "/passwords/#{@user.reset_password_token}", params: { password: {password: "newUser", password_confirmation: "newUser"}}
+        put "/reset_passwords/#{@user.reset_password_token}",
+            params: { reset_password: { password: "newUser", password_confirmation: "newUser" } }
       end
 
       it 'returns an unprocessable_entity status' do
@@ -53,7 +55,8 @@ describe "PUT /password", :type => :request do
 
     context 'and invalid reset token' do 
       before do
-        put "/passwords/invalidToken", params: { password: {password: "newUser", password_confirmation: "newUser"}}
+        put "/reset_passwords/invalidToken",
+            params: { reset_password: { password: "newUser", password_confirmation: "newUser" } }
       end
 
       it 'returns 404' do
@@ -67,7 +70,8 @@ describe "PUT /password", :type => :request do
 
     context 'and blank password' do
       before do
-        put "/passwords/#{@user.reset_password_token}", params: {password: {password: "", password_confirmation: "newUser"}}
+        put "/reset_passwords/#{@user.reset_password_token}",
+            params: { reset_password: { password: "", password_confirmation: "newUser" } }
       end
 
       it 'returns an unprocessable_entity status' do
@@ -81,7 +85,8 @@ describe "PUT /password", :type => :request do
 
     context 'and no matching passwords' do
       before do
-        put "/passwords/#{@user.reset_password_token}", params: { password: {password: "newUser", password_confirmation: "newUserGhost"}}
+        put "/reset_passwords/#{@user.reset_password_token}",
+            params: { reset_password: { password: "newUser", password_confirmation: "newUserGhost" } }
       end
 
       it 'returns an unprocessable_entity status' do

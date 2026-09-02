@@ -63,7 +63,7 @@ class App extends Component {
                                     <Switch>
                                         <Route exact path="/" component={Authentication}/>
                                         <Route path="/confirmations" component={Authentication}/>
-                                        <Route path="/passwords" component={Authentication}/>
+                                        <Route path="/reset_passwords" component={Authentication}/>
                                         <Route path="/dashboard" component={Dashboard}/>
                                         <Route exact path="/project/:id" component={Project}/>
                                         <Route exact path="/project/:id/viewOnly" component={ProjectViewOnly}/>
