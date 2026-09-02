@@ -14,7 +14,7 @@ FactoryBot.define do
       term.objects ||= {Group: [], Leaf: [], Recto: [], Verso: []}
       evaluator.attachments.each do |attachment|
         attachment_id = attachment.id.to_s
-        case attachment.class
+        case attachment
         when Group
           object = Group.find(attachment_id)
           term.objects[:Group] << attachment_id

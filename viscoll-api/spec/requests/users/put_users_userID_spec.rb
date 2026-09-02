@@ -162,7 +162,7 @@ describe "PUT /users/userID", :type => :request do
         end
 
         it 'returns an appropriate error message' do
-          expect(JSON.parse(response.body)['error']).to include "Email is already taken"
+          expect(JSON.parse(response.body)['error']).to include "Email has already been taken"
         end
       end
 
