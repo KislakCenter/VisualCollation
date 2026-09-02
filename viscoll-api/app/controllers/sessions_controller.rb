@@ -1,11 +1,11 @@
 class SessionsController < RailsJwtAuth::SessionsController
 
   def create
-    se = RailsJwtAuth::Session.new(session_create_params)
+    session = RailsJwtAuth::Session.new(session_create_params)
 
-    if se.generate!(request)
-      @user = se.user
-      @userToken = se.jwt
+    if session.generate!(request)
+      @user = session.user
+      @userToken = session.jwt
       @userProjects = []
       begin
         @userProjects = @user.projects
@@ -13,7 +13,7 @@ class SessionsController < RailsJwtAuth::SessionsController
       end
       render :index, status: :ok
     else
-      render_422 se.errors.details
+      render_422 session.errors.details
     end
   end
 end
