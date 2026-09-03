@@ -117,7 +117,7 @@ GEM
       railties (>= 5.0.0)
     faker (3.5.3)
       i18n (>= 1.8.11, < 2)
-    ffi (1.17.4)
+    ffi (1.17.4-x86_64-linux-gnu)
     globalid (1.4.0)
       activesupport (>= 6.1)
     hashdiff (1.0.1)
@@ -286,10 +286,6 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.2)
-    spring (4.2.1)
-    spring-watcher-listen (2.1.0)
-      listen (>= 2.7, < 4.0)
-      spring (>= 4)
     thor (1.5.0)
     timeout (0.6.1)
     tsort (0.2.0)
@@ -331,8 +327,6 @@ DEPENDENCIES
   rubyzip (~> 3.0)
   shrine (~> 2.17.1)
   simplecov
-  spring (~> 4.2.1)
-  spring-watcher-listen (~> 2.1.0)
   webmock (~> 3.1.0)
 
 BUNDLED WITH
