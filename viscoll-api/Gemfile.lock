@@ -152,7 +152,6 @@ GEM
     marcel (1.2.1)
     method_source (1.1.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
@@ -180,8 +179,7 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.5)
-    nokogiri (1.19.4)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
     ostruct (0.6.3)
     pp (0.6.4)
@@ -196,8 +194,9 @@ GEM
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.7)
-    rack-cors (1.1.1)
-      rack (>= 2.0.0)
+    rack-cors (3.0.0)
+      logger
+      rack (>= 3.0.14)
     rack-session (2.1.2)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -302,7 +301,7 @@ GEM
     zeitwerk (2.8.3)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   byebug
@@ -319,7 +318,7 @@ DEPENDENCIES
   nokogiri
   pry
   puma (~> 6.0)
-  rack-cors (= 1.1.1)
+  rack-cors (~> 3.0)
   rails (~> 7.1.6)
   rails_jwt_auth (= 2.0.4)
   rspec-rails (~> 7)
@@ -330,4 +329,4 @@ DEPENDENCIES
   webmock (~> 3.1.0)
 
 BUNDLED WITH
-   2.7.2
+   2.4.19
