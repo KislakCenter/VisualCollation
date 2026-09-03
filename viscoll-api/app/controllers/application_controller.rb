@@ -18,7 +18,7 @@ class ApplicationController < ActionController::API
     before_action :set_base_api_url
     def set_base_api_url
       # TODO: we need an env var with a complete URL for this
-      @base_api_url = Rails.application.secrets.api_url ? Rails.application.secrets.api_url : "https://#{ENV['APPLICATION_HOST']}"
+      @base_api_url = Settings.api_url ? Settings.api_url : "https://#{ENV['APPLICATION_HOST']}"
     end
 
     include ControllerHelper::ProjectsHelper

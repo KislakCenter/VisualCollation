@@ -1,0 +1,2 @@
+mailer_default_from: <%= ENV['MAILER_DEFAULT_FROM'] %>
+admin_email: <%= ENV["ADMIN_EMAIL"] %>
