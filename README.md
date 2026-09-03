@@ -8,12 +8,6 @@ The VCEditor development environment runs on machine-local docker.
 
 ### Docker environment
 
-Copy the file `docker-environment-dev-sample` to `.docker-environment-dev`:
-
-```shell
-cp docker-environment-dev-sample .docker-environment-dev
-```
-
 ### Bring up the docker env
 
 
@@ -35,8 +29,8 @@ To create and approve a development user:
 - Click "Create account"
 - Enter a name, email and password. It does not have to be a real email address; e.g., `test@test.com` is fine.
 - From the docker log copy the link from the confirmation email body It will look like this: 
-  - https://localhost/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
-- Paste the link into a browser, change the protcol to `http`, and add port `3000` to the domain:
+  - https://localhost:3000/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
+- Paste the link into a browser, change the protcol to `http`:
   - http://localhost:3000/confirmation?confirmation_token=GeZfMcfUaZtwoNMeRtNQvvqU
 - Hit enter and the account will be approved
 
