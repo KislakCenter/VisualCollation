@@ -20,7 +20,7 @@ class ExportController < ApplicationController
       basePath    = "#{Rails.root}/public/uploads/"
       zipFilename = "#{basePath}#{@project.id.to_s}_images.zip"
       File.delete(zipFilename) if File.exist?(zipFilename)
-      ::Zip::File.open(zipFilename, Zip::File::CREATE) do |zipFile|
+      Zip::File.open(zipFilename, create: true) do |zipFile|
         images.each do |image|
           fileExtension = image.metadata['mime_type'].split('/')[1]
           filenameOnly  = image.filename.rpartition(".")[0]
@@ -164,20 +164,20 @@ class ExportController < ApplicationController
     end
   end
 
-  def remove_xml_declaration zip_file, input_file
+  def remove_xml_declaration(zip_file, input_file)
     content     = zip_file.read(input_file.name)
     new_content = content.lines.to_a[1..-1].join
     zip_file.get_output_stream(input_file.name) { |f| f.puts new_content }
     zip_file.commit
   end
 
-  def add_doctype zip_file, input_file
+  def add_doctype(zip_file, input_file)
     content = zip_file.read(input_file.name)
     zip_file.get_output_stream(input_file.name) { |f| f.puts "<!-- Generated with VCEditor -->\n<!DOCTYPE html>\n" + content }
     zip_file.commit
   end
 
-  def process_pipeline pipeline, xml_string, config_xml = nil, image_list = nil
+  def process_pipeline(pipeline, xml_string, config_xml = nil, image_list = nil)
     # run the pipeline
     xproc_uri = URI.parse "#{Rails.configuration.xproc['url']}/xproc/#{pipeline}/"
     xproc_req = Net::HTTP::Post.new(xproc_uri)
@@ -202,7 +202,7 @@ class ExportController < ApplicationController
     job_response
   end
 
-  def write_zip_file response, format
+  def write_zip_file(response, format)
     outfile = "#{Rails.root}/public/xproc/#{@project.id}-#{format}.zip"
     File.open outfile, 'wb' do |f|
       f.puts response.body
