@@ -83,7 +83,7 @@ describe "PUT /terms/taxonomy", :type => :request do
       end
 
       it 'should return 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'should return the right error message' do
@@ -104,7 +104,7 @@ describe "PUT /terms/taxonomy", :type => :request do
       end
 
       it 'should return 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'should return the right error message' do

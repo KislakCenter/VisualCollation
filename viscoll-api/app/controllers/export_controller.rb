@@ -146,10 +146,10 @@ class ExportController < ApplicationController
 
           render json: { data: exportData, type: 'formula', Images: { exportedImages: @zipFilePath ? @zipFilePath : false } }, status: :ok and return
         else
-          render json: { error: "Export format must be one of [json, xml, svg, formula, html]."}, status: :unprocessable_entity
+          render json: { error: "Export format must be one of [json, xml, svg, formula, html]."}, status: :unprocessable_content
         end
       else
-        render json: { error:  "Something went wrong when exporting #{@format}: #{errors}" }, status: :unprocessable_entity
+        render json: { error:  "Something went wrong when exporting #{@format}: #{errors}" }, status: :unprocessable_content
       end
 
   end

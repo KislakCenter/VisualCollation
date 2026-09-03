@@ -5,7 +5,7 @@ class SidesController < ApplicationController
   # PATCH/PUT /sides/1
   def update
     if !@side.update(side_params)
-      render(json: { error: "Side could not be updated: #{@side.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
+      render(json: { error: "Side could not be updated: #{@side.errors.full_messages.to_sentence}" }, status: :unprocessable_content) and return
     end
   end
 
@@ -39,7 +39,7 @@ class SidesController < ApplicationController
       side              = sides[index]
       previousSideImage = side.image.clone
       if !side.update(side_params[:attributes])
-        render(json: { error: "Errors occurred when updating sides: #{side.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
+        render(json: { error: "Errors occurred when updating sides: #{side.errors.full_messages.to_sentence}" }, status: :unprocessable_content) and return
       else
         # SPEICAL CASE FOR DIY IMAGE MAPPING
         if side_params[:attributes]["image"]

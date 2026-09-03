@@ -34,7 +34,7 @@ class ProjectsController < ApplicationController
 
     if !validationResult[:status]
       render json: { error:  "Validation of create groups params failed: #{validationResult[:errors]}"},
-             status: :unprocessable_entity and return
+             status: :unprocessable_content and return
     end
     # Instantiate a new project with the given params
     @project = Project.new(project_params)
@@ -55,7 +55,7 @@ class ProjectsController < ApplicationController
       render :index, status: :ok and return
     else
       render json: { error: "Project could not save: #{@project.errors.full_messages.to_sentence}"},
-             status: :unprocessable_entity
+             status: :unprocessable_content
     end
   end
 
@@ -66,7 +66,7 @@ class ProjectsController < ApplicationController
       @images   = current_user.images
       render :index, status: :ok and return
     else
-      render json: { error: "Project could not be updated: #{@project.errors.full_messages.to_sentence}" }, status: :unprocessable_entity
+      render json: { error: "Project could not be updated: #{@project.errors.full_messages.to_sentence}" }, status: :unprocessable_content
     end
   end
 
@@ -113,10 +113,10 @@ class ProjectsController < ApplicationController
   def updateManifest
     manifest = manifest_params.to_h
     if not manifest.key?("id")
-      render(json: { error: "ID is required." }, status: :unprocessable_entity) and return
+      render(json: { error: "ID is required." }, status: :unprocessable_content) and return
     end
     if not @project.manifests.key?(manifest["id"])
-      render(json: { error: "Manifest not found in project." }, status: :unprocessable_entity) and return
+      render(json: { error: "Manifest not found in project." }, status: :unprocessable_content) and return
     end
     # ONLY UPDATING MANIFEST NAME FOR NOW
     @project.manifests[manifest["id"]]["name"] = manifest["name"]
@@ -127,7 +127,7 @@ class ProjectsController < ApplicationController
   def deleteManifest
     manifestIDToDelete = manifest_params.to_h[:id]
     if not @project.manifests.key?(manifestIDToDelete)
-      render(json: { error: "Manifest not found in Project." }, status: :unprocessable_entity) and return
+      render(json: { error: "Manifest not found in Project." }, status: :unprocessable_content) and return
     end
     @project.manifests.delete(manifestIDToDelete)
     # Update all sides that have the deleted manuscripts mapping

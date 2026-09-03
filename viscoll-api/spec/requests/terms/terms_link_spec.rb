@@ -191,7 +191,7 @@ describe "PUT /terms/id/link", :type => :request do
       end
 
       it 'should return 422' do
-        expect(response).to have_http_status :unprocessable_entity
+        expect(response).to have_http_status :unprocessable_content
       end
 
       it 'should give the right error message' do

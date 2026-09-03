@@ -16,7 +16,7 @@ class LeafsController < ApplicationController
     # Validation error for leaf_params
     @leafErrors = validateLeafParams(project_id, parentID)
     if @leafErrors[:project_id].length > 0 || @leafErrors[:parentID].length > 0
-      render(json: {error: "Leaf validation failed."}, status: :unprocessable_entity) and return
+      render(json: {error: "Leaf validation failed."}, status: :unprocessable_content) and return
     end
 
     # Validation errors checking for additional parameters
@@ -28,7 +28,7 @@ class LeafsController < ApplicationController
       end
     end
     if hasAdditionalErrors
-      render(json: {error: "Leaf validation failed."}, status: :unprocessable_entity) and return
+      render(json: {error: "Leaf validation failed."}, status: :unprocessable_content) and return
     end
 
     @project = Project.find(project_id)
@@ -68,7 +68,7 @@ class LeafsController < ApplicationController
             @leaf.save
           end
         else
-          render(json: {error: "Leaf creation failed: #{@leaf.errors.full_messages.to_sentence}"}, status: :unprocessable_entity) and return
+          render(json: {error: "Leaf creation failed: #{@leaf.errors.full_messages.to_sentence}"}, status: :unprocessable_content) and return
         end
         sideIDIndex += 2
       end
@@ -114,7 +114,7 @@ class LeafsController < ApplicationController
         handle_paper_update(@leaf)
       end
     else
-      render(json: { error: "Leaf failed to update: #{@leaf.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
+      render(json: { error: "Leaf failed to update: #{@leaf.errors.full_messages.to_sentence}" }, status: :unprocessable_content) and return
     end
   end
 
@@ -138,7 +138,7 @@ class LeafsController < ApplicationController
         render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
       if !@leaf.update(leaf_params[:attributes])
-        render(json: { error: "Leaf could not be updated: #{@leaf.errors.full_messages.to_sentence}" }, status: :unprocessable_entity) and return
+        render(json: { error: "Leaf could not be updated: #{@leaf.errors.full_messages.to_sentence}" }, status: :unprocessable_content) and return
       end
       if (leaf_params[:attributes].key?(:attached_below) || leaf_params[:attributes].key?(:attached_above))
         update_attached_to()
@@ -242,7 +242,7 @@ class LeafsController < ApplicationController
       end
     end
     if leafIDs.size < 2
-      render(json: { leafs: ["Minimum of 2 leaves required to conjoin"] }, status: :unprocessable_entity) and return
+      render(json: { leafs: ["Minimum of 2 leaves required to conjoin"] }, status: :unprocessable_content) and return
     end
     if haveErrors
       render(json: { error: "Error with conjoin: #{@errors.join "\n"}" }, status: :not_found) and return

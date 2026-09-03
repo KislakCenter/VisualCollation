@@ -10,8 +10,8 @@ describe "POST /session", :type => :request do
       expect(JSON.parse(response.body)['errors']['session'][0]['error']).to eq('invalid')
     end
 
-    it 'returns an unprocessable_entity status' do
-      expect(response).to have_http_status(:unprocessable_entity)
+    it 'returns an unprocessable_content status' do
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -26,8 +26,8 @@ describe "POST /session", :type => :request do
         expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('unconfirmed')
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns an unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -50,8 +50,8 @@ describe "POST /session", :type => :request do
           expect(JSON.parse(response.body)['errors']['session'][0]['error']).to eq('invalid')
         end
 
-        it 'returns an unprocessable_entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+        it 'returns an unprocessable_content status' do
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 

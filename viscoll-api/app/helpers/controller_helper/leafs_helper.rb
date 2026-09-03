@@ -52,7 +52,7 @@ module ControllerHelper
       rescue Exception => e
         if new_conjoined_to_leafID
           conjoinedToErrors.push("leaf not found with id "+new_conjoined_to_leafID)
-          render json: {leaf: conjoinedToErrors}, status: :unprocessable_entity
+          render json: {leaf: conjoinedToErrors}, status: :unprocessable_content
           return
         end
       end

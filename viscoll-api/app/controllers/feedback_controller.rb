@@ -4,14 +4,14 @@ class FeedbackController < ApplicationController
   # POST /feedback
   def create
       unless current_user
-        render json: {}, status: :unprocessable_entity and return
+        render json: {}, status: :unprocessable_content and return
       end
       @title = feedback_params[:title]
       @message = feedback_params[:message]
       @browserInformation = feedback_params[:browserInformation]
       @projectJSONExport = feedback_params[:project]
       if @title.blank? or @message.blank?
-        render(json: { error: 'Title and message required.' }, status: :unprocessable_entity) and return
+        render(json: { error: 'Title and message required.' }, status: :unprocessable_content) and return
       end
       FeedbackMailer.sendFeedback(
         @title, 

@@ -20,7 +20,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       render :show, status: :ok and return
     else
-      render json: { error: current_user.errors.details }, status: :unprocessable_entity
+      render json: { error: current_user.errors.details }, status: :unprocessable_content
     end
   end
 

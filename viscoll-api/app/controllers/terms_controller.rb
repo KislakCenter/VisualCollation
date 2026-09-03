@@ -20,10 +20,10 @@ class TermsController < ApplicationController
     if @term.save
       if not Project.find(@term.project_id).taxonomies.include?(@term.taxonomy)
         @term.delete
-        render(json: { error: "Taxonomy (#{@term.taxonomy}) does not belong to project."}, status: :unprocessable_entity)
+        render(json: { error: "Taxonomy (#{@term.taxonomy}) does not belong to project."}, status: :unprocessable_content)
       end
     else
-      render(json: { error: "Something went wrong with saving terms." }, status: :unprocessable_entity)
+      render(json: { error: "Something went wrong with saving terms." }, status: :unprocessable_content)
     end
   end
 
@@ -31,10 +31,10 @@ class TermsController < ApplicationController
   def update
     taxonomy = term_update_params.to_h[:taxonomy]
     if not Project.find(@term.project_id).taxonomies.include?(taxonomy)
-      render(json: { error: "Taxonomy (#{@term.taxonomy}) does not belong to project."  }, status: :unprocessable_entity) and return
+      render(json: { error: "Taxonomy (#{@term.taxonomy}) does not belong to project."  }, status: :unprocessable_content) and return
     end
     if !@term.update(term_update_params)
-      render(json: { error: "Term could not update: #{@term.errors.full_messages.to_sentence}" }, status: :unprocessable_entity)
+      render(json: { error: "Term could not update: #{@term.errors.full_messages.to_sentence}" }, status: :unprocessable_content)
     end
   end
 
@@ -59,7 +59,7 @@ class TermsController < ApplicationController
         when "Recto", "Verso"
           @object    = Side.find(id)
         else
-          render(json: { error: "Object not found with type: #{type}" }, status: :unprocessable_entity) and return
+          render(json: { error: "Object not found with type: #{type}" }, status: :unprocessable_content) and return
         end
       rescue Mongoid::Errors::DocumentNotFound
         render(json: { error: "#{type} not found." }, status: :not_found) and return
@@ -94,7 +94,7 @@ class TermsController < ApplicationController
         when "Recto", "Verso"
           @object    = Side.find(id)
         else
-          render(json: { error: "Object not found with type: #{type}" }, status: :unprocessable_entity) and return
+          render(json: { error: "Object not found with type: #{type}" }, status: :unprocessable_content) and return
         end
       rescue Mongoid::Errors::DocumentNotFound
         render(json: { error: "#{type} not found." }, status: :not_found) and return
@@ -115,7 +115,7 @@ class TermsController < ApplicationController
   def createTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
     if @project.taxonomies.include?(taxonomy)
-      render json: { error: "Taxonomy (#{taxonomy}) already exists in the project"}, status: :unprocessable_entity
+      render json: { error: "Taxonomy (#{taxonomy}) already exists in the project"}, status: :unprocessable_content
     else
       @project.taxonomies.push(taxonomy)
       @project.save
@@ -126,7 +126,7 @@ class TermsController < ApplicationController
   def deleteTaxonomy
     taxonomy = taxonomy_params.to_h[:taxonomy]
     if not @project.taxonomies.include?(taxonomy)
-      render json: { error: "Taxonomy (#{taxonomy}) does not exist in the project"}, status: :unprocessable_entity
+      render json: { error: "Taxonomy (#{taxonomy}) does not exist in the project"}, status: :unprocessable_content
     else
       @project.taxonomies.delete(taxonomy)
       @project.save
@@ -142,9 +142,9 @@ class TermsController < ApplicationController
     old_taxonomy = taxonomy_params.to_h[:old_taxonomy]
     taxonomy     = taxonomy_params.to_h[:taxonomy]
     if not @project.taxonomies.include?(old_taxonomy)
-      render json: { error: "Taxonomy (#{old_taxonomy}) does not exist in the project" }, status: :unprocessable_entity
+      render json: { error: "Taxonomy (#{old_taxonomy}) does not exist in the project" }, status: :unprocessable_content
     elsif @project.taxonomies.include?(taxonomy)
-      render json: { error: "Taxonomy (#{taxonomy}) already exists in the project" }, status: :unprocessable_entity
+      render json: { error: "Taxonomy (#{taxonomy}) already exists in the project" }, status: :unprocessable_content
     else
       indexToEdit                      = @project.taxonomies.index(old_taxonomy)
       @project.taxonomies[indexToEdit] = taxonomy

@@ -168,7 +168,7 @@ describe "GET /projects/:id/export/:format", :type => :request do
       end
 
       it 'should return 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'should show error' do
