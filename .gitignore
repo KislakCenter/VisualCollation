@@ -68,6 +68,5 @@ viscoll-api/uploads/*
 secrets_scan.json
 
 .env
-.docker-environment-dev
 viscoll-api/.generators
 viscoll-api/public/uploads
