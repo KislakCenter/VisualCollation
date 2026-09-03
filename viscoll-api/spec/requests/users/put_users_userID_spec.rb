@@ -88,8 +88,8 @@ describe "PUT /users/userID", :type => :request do
           put '/users/'+@user.id.to_s, params: {:user => {:current_password => "userInvalid", :password => "newUser"}}, headers: {'Authorization' => @authToken}
         end
 
-        it 'returns an unprocessable_entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+        it 'returns an unprocessable_content status' do
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'returns an appropriate error message' do
@@ -105,8 +105,8 @@ describe "PUT /users/userID", :type => :request do
                                     headers: { 'Authorization' => @authToken }
         end
 
-        it 'returns an unprocessable_entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+        it 'returns an unprocessable_content status' do
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'returns an appropriate error message' do
@@ -120,8 +120,8 @@ describe "PUT /users/userID", :type => :request do
                                     headers: {'Authorization' => @authToken}
         end
 
-        it 'returns an unprocessable_entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+        it 'returns an unprocessable_content status' do
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'returns an appropriate error message' do
@@ -134,8 +134,8 @@ describe "PUT /users/userID", :type => :request do
           put '/users/'+@user.id.to_s, params: {:user => {:password => "newUser"}}, headers: {'Authorization' => @authToken}
         end
 
-        it 'returns an unprocessable_entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+        it 'returns an unprocessable_content status' do
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'returns an appropriate error message' do
@@ -148,8 +148,8 @@ describe "PUT /users/userID", :type => :request do
           put '/users/'+@user.id.to_s, params: {:user => {:current_password => "userInvalid", :password => ""}}, headers: {'Authorization' => @authToken}
         end
 
-        it 'returns an unprocessable_entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+        it 'returns an unprocessable_content status' do
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'returns an appropriate error message' do

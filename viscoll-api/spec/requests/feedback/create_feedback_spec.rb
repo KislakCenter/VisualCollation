@@ -28,14 +28,14 @@ describe "POST /feedback", :type => :request do
       it 'requires a title' do
         @parameters[:feedback][:title] = ''
         post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['error']).to eq 'Title and message required.'
       end
 
       it 'requires a message' do
         @parameters[:feedback][:message] = ''
         post '/feedback', params: @parameters.to_json, headers: {'Authorization' => @authToken, 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['error']).to eq 'Title and message required.'
       end
 

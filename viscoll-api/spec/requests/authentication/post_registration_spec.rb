@@ -44,7 +44,7 @@ describe "POST /registration", :type => :request do
       end
     
       it 'returns an appropriate error messages with 422 code' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['email'].pluck('error')).to eq(['blank', 'invalid'])
       end
 
@@ -59,7 +59,7 @@ describe "POST /registration", :type => :request do
       end
     
       it 'returns an appropriate error message with 422 code' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('invalid')
       end
 
@@ -74,7 +74,7 @@ describe "POST /registration", :type => :request do
       end
     
       it 'returns an appropriate error message with 422 code' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('taken')
       end
 
@@ -89,7 +89,7 @@ describe "POST /registration", :type => :request do
       end
     
       it 'returns an appropriate error message with 422 code' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['password'][0]['error']).to eq('blank')
       end
 
@@ -104,7 +104,7 @@ describe "POST /registration", :type => :request do
       end
     
       it 'returns an appropriate error message with 422 code' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['email'][0]['error']).to eq('invalid')
         expect(JSON.parse(response.body)['errors']['password'][0]['error']).to eq('blank')
       end

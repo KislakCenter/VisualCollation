@@ -27,7 +27,7 @@ class ImagesController < ApplicationController
             copyCounter += 1
           else
             image.destroy
-            render(json: { error: "Image failed: #{image.errors.full_messages.join("\n")}"}, status: :unprocessable_entity) and return
+            render(json: { error: "Image failed: #{image.errors.full_messages.join("\n")}"}, status: :unprocessable_content) and return
           end
         end
       end

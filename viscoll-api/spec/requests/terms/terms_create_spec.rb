@@ -44,7 +44,7 @@ describe "POST /terms", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns error message' do
@@ -75,7 +75,7 @@ describe "POST /terms", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 

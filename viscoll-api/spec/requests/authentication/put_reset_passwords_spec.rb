@@ -40,8 +40,8 @@ describe "PUT /reset_passwords", :type => :request do
             params: { reset_password: { password: "newUser", password_confirmation: "newUser" } }
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns an unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns an appropriate error message' do
@@ -74,8 +74,8 @@ describe "PUT /reset_passwords", :type => :request do
             params: { reset_password: { password: "", password_confirmation: "newUser" } }
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns an unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns an appropriate error message' do
@@ -89,8 +89,8 @@ describe "PUT /reset_passwords", :type => :request do
             params: { reset_password: { password: "newUser", password_confirmation: "newUserGhost" } }
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns an unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns an appropriate error message' do

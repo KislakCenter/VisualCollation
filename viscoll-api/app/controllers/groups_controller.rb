@@ -24,10 +24,10 @@ class GroupsController < ApplicationController
       end
     end
     if (hasAdditionalErrors)
-      render json({ error: "Additional group errors: #{@additionalErrors}" }, status: :unprocessable_entity) and return
+      render json({ error: "Additional group errors: #{@additionalErrors}" }, status: :unprocessable_content) and return
     end
     if (project_id == nil)
-      render(json: { error: "Project ID is nil." }, status: :unprocessable_entity) and return
+      render(json: { error: "Project ID is nil." }, status: :unprocessable_content) and return
     end
 
     begin
@@ -58,10 +58,10 @@ class GroupsController < ApplicationController
           new_groups.push(group)
           new_group_ids.push(group.id.to_s)
         else
-          render(json: { error: "Group was unable to save" }, status: :unprocessable_entity) and return
+          render(json: { error: "Group was unable to save" }, status: :unprocessable_content) and return
         end
       rescue StandardError => e
-        render(json: { error: "Group was unable to save" }, status: :unprocessable_entity) and return
+        render(json: { error: "Group was unable to save" }, status: :unprocessable_content) and return
       end
     end
     # Add new group(s) to parent
@@ -85,7 +85,7 @@ class GroupsController < ApplicationController
   # PATCH/PUT /groups/1
   def update
     unless @group.update(group_params)
-      render(json: { error: "Group was unable to update" }, status: :unprocessable_entity) and return
+      render(json: { error: "Group was unable to update" }, status: :unprocessable_content) and return
     end
   end
 
@@ -95,7 +95,7 @@ class GroupsController < ApplicationController
     # Run validations
     errors = validateGroupBatchUpdate(allGroups)
     if not errors.empty?
-      render(json: {error: "Batch update error: #{errors}"}, status: :unprocessable_entity) and return
+      render(json: {error: "Batch update error: #{errors}"}, status: :unprocessable_content) and return
     end
     allGroups.each do |group_params|
       @group   = Group.find(group_params[:id])
@@ -104,7 +104,7 @@ class GroupsController < ApplicationController
         render(json: { error: "Project is not authorized for current user." }, status: :forbidden) and return
       end
       if !@group.update(group_params[:attributes])
-        render(json: { error: "Group: #{@group} could not be updated. Errors: #{errors}" }, status: :unprocessable_entity) and return
+        render(json: { error: "Group: #{@group} could not be updated. Errors: #{errors}" }, status: :unprocessable_content) and return
       end
     end
   end

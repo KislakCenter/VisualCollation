@@ -7,7 +7,7 @@ class FilterController < ApplicationController
     queries = filter_params.to_h[:queries]
     errors  = runValidations(queries)
     if errors != []
-      render json: { error: errors }, status: :unprocessable_entity and return
+      render json: { error: errors }, status: :unprocessable_content and return
     end
     @objectIDs             = { Groups: [], Leafs: [], Sides: [], Terms: [] }
     @visibleAttributes     = {

@@ -70,7 +70,7 @@ describe "POST /groups", :type => :request do
       end
       
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
       
       it 'returns the error message' do
@@ -101,7 +101,7 @@ describe "POST /groups", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -113,7 +113,7 @@ describe "POST /groups", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         @body = JSON.parse(response.body)
       end
       

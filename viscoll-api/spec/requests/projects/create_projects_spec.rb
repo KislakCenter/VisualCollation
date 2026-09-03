@@ -74,7 +74,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -87,7 +87,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'shows the right leaves error' do
@@ -103,7 +103,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'shows the right leaves error' do
@@ -120,7 +120,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'shows the right odd-leaf error' do
@@ -137,7 +137,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'shows the right odd-leaf error' do
@@ -154,7 +154,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'shows the right odd-leaf error' do
@@ -170,7 +170,7 @@ describe "POST /projects", :type => :request do
       end
 
       it 'returns 422' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'shows the right leaves error' do

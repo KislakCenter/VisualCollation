@@ -27,8 +27,8 @@ describe "POST /reset_passwords", :type => :request do
         post '/reset_passwords', params: { reset_password: { email: "user@mail.com" } }
       end
 
-      it 'returns an unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns an unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns an appropriate error message' do
