@@ -16,7 +16,7 @@ gem 'rack-cors', '1.1.1'
 gem 'rails', '~> 7.1.6'
 gem 'rails_jwt_auth', '2.0.4'
 gem 'rubyzip', '~> 3.0'
-gem 'shrine', '~> 2.17.1'
+gem 'shrine', '~> 3.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
