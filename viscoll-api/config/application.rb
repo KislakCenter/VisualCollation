@@ -51,11 +51,11 @@ module ViscollApi
     # Rack CORS for handling Cross-Origin Resource Sharing (CORS)
     config.middleware.use Rack::Cors do
       allow do
-        origins '*'
+        origins '*' # TODO: use upenn.edu?
         resource '*',
-          :headers => :any,
-          :expose  => ['access-token', 'expiry', 'token-type', 'uid', 'client'],
-          :methods => [:get, :patch, :put, :delete, :post, :options]
+                 headers: :any,
+                 expose: %w[access-token expiry token-type uid client],
+                 methods: %i[get patch put delete post options]
       end
     end
 
