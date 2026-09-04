@@ -17,6 +17,7 @@ services:
     environment:
       APPLICATION_HOST: localhost:3000
       RAILS_ENV: development
+      SECRET_KEY_BASE: 98eb3bcbe406c141ad93c58e5f5ff08ab7348c82d688b78ee1fb1a30559d7104081e0dd9bf97c8e080a54f1d408f7f9d22710439c44cbbddc332861994b1c531
     container_name: viscoll_api
     build:
       context: .
