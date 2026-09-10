@@ -1,6 +1,7 @@
 include:
   - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_build@~latest
     inputs:
+      registry_repository: "${CI_PIPELINE_ID}"
       docker_build_context: "./"
       dockerfile_path: "./"
       dockerfile_filename: "Dockerfile"
@@ -14,6 +15,7 @@ include:
       CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
   - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_build@~latest
     inputs:
+      registry_repository: "${CI_PIPELINE_ID}"
       docker_build_context: "viscoll-xproc/"
       dockerfile_path: "viscoll-xproc/"
       dockerfile_filename: "Dockerfile"
