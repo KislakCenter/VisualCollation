@@ -29,6 +29,7 @@ include:
       job_image_tag: "29-dind"
       needs:
         - "amend_manifest_xproc"
+        - "amend_manifest_web"
       stage: "test"
   - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_finalize@~latest
     inputs:
