@@ -6,6 +6,7 @@ include:
       dockerfile_filename: "Dockerfile"
       stage: "build_web"
       job_suffix: "_web"
+      image_tags: "${CI_COMMIT_TAG} ${CI_COMMIT_REF_SLUG} ${CI_COMMIT_SHA} ${CI_COMMIT_SHORT_SHA} ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID} ${CI_COMMIT_SHA}-web"
       matrix:
         - RUNNER: build
           DOCKER_BUILD_PLATFORM: "linux/amd64"
@@ -18,6 +19,7 @@ include:
       dockerfile_filename: "Dockerfile"
       stage: "build_xproc"      
       job_suffix: "_xproc"
+      image_tags: "${CI_COMMIT_TAG} ${CI_COMMIT_REF_SLUG} ${CI_COMMIT_SHA} ${CI_COMMIT_SHORT_SHA} ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_ID} ${CI_COMMIT_SHA}-xproc"
       matrix:
       - RUNNER: build
         DOCKER_BUILD_PLATFORM: "linux/amd64"
@@ -25,11 +27,17 @@ include:
       CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
   - component: $CI_SERVER_FQDN/devops/gitlab/components/sast/trivy@~latest
     inputs:
-      docker_tag_to_scan: "${CI_COMMIT_SHA}"
+      docker_tag_to_scan: "${CI_COMMIT_SHA}-web"
+      job_image_tag: "29-dind"
+      needs:
+        - "amend_manifest_web"
+      stage: "test"
+  - component: $CI_SERVER_FQDN/devops/gitlab/components/sast/trivy@~latest
+    inputs:
+      docker_tag_to_scan: "${CI_COMMIT_SHA}-xproc"
       job_image_tag: "29-dind"
       needs:
         - "amend_manifest_xproc"
-        - "amend_manifest_web"
       stage: "test"
   - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_finalize@~latest
     inputs:
