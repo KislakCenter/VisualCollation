@@ -27,7 +27,7 @@ include:
       CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
   - component: $CI_SERVER_FQDN/devops/gitlab/components/sast/trivy@~latest
     inputs:
-      docker_tag_to_scan: "${CI_COMMIT_SHA}-web"
+      docker_tag_to_scan: "${CI_COMMIT_SHA}web"
       job_image_tag: "29-dind"
       job_suffix: "_web"
       needs:
@@ -35,7 +35,7 @@ include:
       stage: "test"
   - component: $CI_SERVER_FQDN/devops/gitlab/components/sast/trivy@~latest
     inputs:
-      docker_tag_to_scan: "${CI_COMMIT_SHA}-xproc"
+      docker_tag_to_scan: "${CI_COMMIT_SHA}xproc"
       job_image_tag: "29-dind"
       job_suffix: "_xproc"
       needs:
