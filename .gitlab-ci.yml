@@ -44,7 +44,8 @@ include:
   - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_finalize@~latest
     inputs:
       needs_copy:
-        - trivy_scan
+        - trivy_scan_xproc
+        - trivy_scan_web
  
 workflow:
   rules:
