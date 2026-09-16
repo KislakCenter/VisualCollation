@@ -46,9 +46,8 @@ include:
         - trivy_scan_web
  
 variables:
-  GIT_STRATEGY: clone
-  GIT_CLEAN_FLAGS: -ffdx
-  
+  GIT_CLONE_PATH: "${CI_BUILDS_DIR}/${CI_JOB_ID}/${CI_PIPELINE_ID}/${CI_PROJECT_NAME}"
+
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_IID
