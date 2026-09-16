@@ -1,5 +1,5 @@
 class XprocController < ApplicationController
-  before_action :authenticate!, except: [:show, :get_zip]
+  before_action :authenticate!, except: [:get_zip]
 
   # GET /xproc/zip/:job_id
   def get_zip
