@@ -11,8 +11,6 @@ include:
       matrix:
         - RUNNER: build
           DOCKER_BUILD_PLATFORM: "linux/amd64"
-    variables:
-      CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-web"
   - component: gitlab.library.upenn.edu/devops/gitlab/components/docker/stage_build@~latest
     inputs:
       registry_repository: "${CI_PIPELINE_ID}"
@@ -25,8 +23,6 @@ include:
       matrix:
       - RUNNER: build
         DOCKER_BUILD_PLATFORM: "linux/amd64"
-    variables:
-      CI_IMAGE_NAME: "${CI_PROJECT_ID}-${CI_PIPELINE_ID}-xproc"
   - component: $CI_SERVER_FQDN/devops/gitlab/components/sast/trivy@~latest
     inputs:
       docker_tag_to_scan: "${CI_COMMIT_SHA}web"
