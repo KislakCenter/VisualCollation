@@ -12,7 +12,7 @@ The VCEditor development environment runs on machine-local docker.
 
 
 ```
-docker-compose -f docker-compose-dev.yml up  
+docker compose -f docker-compose-dev.yml up  
 ```
 
 Note: Do not use the `-d` flag. You'll need information from the log output to create the user account needed to work with VCEditor (instructions below). 
