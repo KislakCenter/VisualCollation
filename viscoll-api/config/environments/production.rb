@@ -61,14 +61,11 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    :user_name            => ENV['MAILER_USR'],
-    :password             => ENV['MAILER_PWD'],
-    :from                 => ENV['MAILER_DEFAULT_FROM'],
-    :domain               => ENV['MAILER_DOMAIN'],
-    :address              => ENV['MAILER_HOST'],
-    :port                 => ENV['MAILER_PORT'] || 587,
-    :authentication       => :plain,
-    :enable_starttls_auto => true
+    address: 'mailrelay.library.upenn.int',
+    port: 25,
+    domain: 'upenn.edu',
+    from: ENV['MAILER_DEFAULT_FROM'],
+    enable_starttls_auto: true
   }
 
   # Set host to be used by links generated in mailer templates.
