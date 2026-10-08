@@ -76,13 +76,10 @@ Staging and production deployments are run as docker stacks in Portainer. Both a
 These variables are set in each stack's environment variable section:
 
 ```dotenv
-MAILER_HOST=an.smtp.host
 MAILER_DEFAULT_FROM=<siteadmin>@upenn.edu
-MAILER_DOMAIN=vceditor.library.upenn.edu
-MAILER_PORT=25
-APPLICATION_HOST=vceditor.library.upenn.edu:443 # or vceditor.library.upenn.edu:8443 
+APPLICATION_HOST=vceditor.library.upenn.edu # or vceditor-staging.library.upenn.edu
 # ADMIN_EMAIL: addresses of confirmation email recipients
-ADMIN_EMAIL=address1@upenn.edu,address2@upenn.edu,adress3@gmail.com
+ADMIN_EMAIL=address1@upenn.edu,address2@upenn.edu,address3@gmail.com
 SECRET_KEY_BASE=railssecretkey
 RAILS_ENV=production
 RAILS_SERVE_STATIC_ FILES=true
@@ -94,7 +91,7 @@ INSTANCE=production # or staging
 HONEYBADGER_API_KEY=anapikey
 ```
 
-#### Prduction docker images
+#### Production docker images
 
 The GitLab pipeline builds the production API and XProc images. 
 
