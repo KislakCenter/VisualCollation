@@ -9,9 +9,6 @@ include:
       ci_requirements_file: ".gitlab/ci-requirements.yml"
       docker_build_context: "."
       job_suffix: "_web"
-      matrix:
-        - RUNNER: build
-          DOCKER_BUILD_PLATFORM: "linux/amd64"
       needs_build:
         - secret_detection
       platforms: '["linux/amd64"]'
@@ -21,9 +18,6 @@ include:
       ci_requirements_file: ".gitlab/ci-requirements.yml"
       docker_build_context: "viscoll-xproc/"
       job_suffix: "_xproc"
-      matrix:
-        - RUNNER: build
-          DOCKER_BUILD_PLATFORM: "linux/amd64"
       needs_build:
         - secret_detection
       platforms: '["linux/amd64"]'
@@ -35,8 +29,6 @@ include:
       job_suffix: "_web"
       needs:
         - "build_and_push_docker_images_web"
-        - job: "amend_manifest_web"
-          optional: true
       registry_repository: "${CI_PIPELINE_ID}/web"
       stage: "test"
   - component: $CI_SERVER_FQDN/devops/gitlab/components/sast/trivy@~latest
@@ -46,8 +38,6 @@ include:
       job_suffix: "_xproc"
       needs:
         - "build_and_push_docker_images_xproc"
-        - job: "amend_manifest_xproc"
-          optional: true
       registry_repository: "${CI_PIPELINE_ID}/xproc"
       stage: "test"
   - component: $CI_SERVER_FQDN/devops/gitlab/components/docker/stage_finalize@~latest
